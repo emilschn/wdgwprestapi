@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-require '../../classes/client.php';
+require_once '../../classes/client.php';
 
 class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
 	
