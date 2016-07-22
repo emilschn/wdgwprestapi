@@ -32,23 +32,11 @@ class WDGRESTAPI {
 	
 	public function __construct() {
 		
-		$this->add_include( 'authentication' );
-		$this->add_include( 'client' );
-		add_filter( 'rest_authentication_errors', 'WDGRESTAPI_Authentication::authentication' );
-		
-		if (is_admin() ) {
-			$this->add_admin( 'users' );
-			WDGRESTAPI_Admin_Users::init();
-		}
 		
 	}
 	
 	public function add_include( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'classes/' . $include_name . '.php');
-	}
-	
-	public function add_admin( $include_name ) {
-		include_once( plugin_dir_path( __FILE__ ) . 'admin/' . $include_name . '.php');
 	}
 }
 
