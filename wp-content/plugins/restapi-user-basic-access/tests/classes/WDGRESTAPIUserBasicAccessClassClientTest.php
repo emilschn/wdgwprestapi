@@ -5,23 +5,10 @@ require_once dirname( __FILE__ ) . '/../../classes/client.php';
 
 class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
 	
-	public function testSuccess() {
-		echo "testSuccess";
-		$stack = array();
-        $this->assertEquals(0, count($stack));
-	}
-	
-	public function testFail() {
-		echo "testFail";
-		$stack = array();
-        $this->assertEquals(1, count($stack));
-	}
-	
     /**
      * @dataProvider ipProvider
      */
 	public function testIsAuthorizedIP( $client_ip, $authorized_ip, $expected ) {
-		echo "testIsAuthorizedIP";
 		$client = new WDG_RESTAPIUserBasicAccess_Class_Client();
 		$client->set_authorized_ips( $authorized_ip );
         $this->assertEquals( $expected, $client->is_authorized_ip( $client_ip ) );
@@ -52,7 +39,6 @@ class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
      * @dataProvider actionProvider
      */
 	public function testIsAuthorizedAction( $client_method, $authorized_method, $expected ) {
-		echo "testIsAuthorizedAction";
 		$client = new WDG_RESTAPIUserBasicAccess_Class_Client();
 		$client->set_authorized_ips( $authorized_method );
         $this->assertEquals( $expected, $client->is_authorized_action( $client_method ) );
