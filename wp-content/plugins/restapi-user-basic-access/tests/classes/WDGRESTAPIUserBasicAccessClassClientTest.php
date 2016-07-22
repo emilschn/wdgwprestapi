@@ -5,6 +5,16 @@ require_once dirname( __FILE__ ) . '/../../classes/client.php';
 
 class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
 	
+	public function testSuccess() {
+		$stack = array();
+        $this->assertEquals(0, count($stack));
+	}
+	
+	public function testFail() {
+		$stack = array();
+        $this->assertEquals(1, count($stack));
+	}
+	
     /**
      * @dataProvider ipProvider
      */
