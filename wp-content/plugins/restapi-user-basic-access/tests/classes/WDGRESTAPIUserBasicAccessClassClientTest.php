@@ -9,7 +9,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 use PHPUnit\Framework\TestCase;
 require '../../classes/client.php';
 
-class WDG_RESTAPIUserBasicAccess_Class_ClientTest extends TestCase {
+class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
 	
     /**
      * @dataProvider ipProvider
