@@ -27,6 +27,7 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 	/**
 	 * Properties
 	 */
+	private $authorized_ips; // Needs to be set before access
 	private $authorized_actions; // Needs to be set before access
 	
 	/**
@@ -38,13 +39,26 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 		return ($buffer == '1');
 	}
 	
+/*******************************************************************************
+ * AUTHORIZED IPs
+ ******************************************************************************/
+	/**
+	 * Set authorized IPs (useful for testing)
+	 * @param string $authorized_ips
+	 */
+	public function set_authorized_ips( $authorized_ips ) {
+		$this->authorized_ips = $authorized_ips;
+	}
+	
 	/**
 	 * Returns single IP address or the list of IP addresses authorized for the user
 	 * @return string
 	 */
 	public function get_authorized_ips() {
-		$buffer = get_user_meta( $this->ID, WDG_RESTAPIUserBasicAccess_Class_Client::$key_authorized_ips, TRUE );
-		return $buffer;
+		if ( !isset( $this->authorized_ips ) ) {
+			$this->set_authorized_ips( get_user_meta( $this->ID, WDG_RESTAPIUserBasicAccess_Class_Client::$key_authorized_ips, TRUE ) );
+		}
+		return $this->authorized_ips;
 	}
 	
 	/**
@@ -82,6 +96,17 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 		return FALSE;
 	}
 	
+/*******************************************************************************
+ * AUTHORIZED ACTIONS
+ ******************************************************************************/
+	/**
+	 * Set authorized actions (useful for testing)
+	 * @param string $authorized_actions
+	 */
+	public function set_authorized_actions( $authorized_actions ) {
+		$this->authorized_actions = json_decode( $authorized_actions );
+	}
+	
 	/**
 	 * Returns a REST API actions array, with authorization for each of them
 	 * @return array
@@ -89,20 +114,25 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 	public function get_authorized_actions() {
 		if ( !isset( $this->authorized_actions ) ) {
 			$meta_result = get_user_meta( $this->ID, WDG_RESTAPIUserBasicAccess_Class_Client::$key_authorized_actions, TRUE );
-			$this->authorized_actions = json_decode( $meta_result );
+			$this->set_authorized_actions( $meta_result );
 		}
 		return $this->authorized_actions;
 	}
 	
 	/**
 	 * Returns true if the specified action is authorized for this user
-	 * @param string $action
+	 * @param string $action_init
 	 * @return boolean
 	 */
 	public function is_authorized_action( $action_init ) {
 		$authorized_actions_array = $this->get_authorized_actions();
 		$action = strtolower( $action_init );
-		return ( $authorized_actions_array->$action == '1' );
+		if ( isset( $authorized_actions_array->$action ) ) {
+			return ( $authorized_actions_array->$action == '1' );
+			
+		} else {
+			return FALSE;
+		}
 	}
 	
 }
