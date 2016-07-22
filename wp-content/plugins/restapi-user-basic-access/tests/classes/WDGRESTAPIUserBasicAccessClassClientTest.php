@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-require_once '../../classes/client.php';
+require_once dirname( __FILE__ ) . '/../../classes/client.php';
 
 class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
 	
