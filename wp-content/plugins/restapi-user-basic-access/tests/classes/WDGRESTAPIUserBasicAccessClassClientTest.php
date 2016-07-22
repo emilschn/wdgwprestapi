@@ -52,6 +52,7 @@ class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
      * @dataProvider actionProvider
      */
 	public function testIsAuthorizedAction( $client_method, $authorized_method, $expected ) {
+		echo "testIsAuthorizedAction";
 		$client = new WDG_RESTAPIUserBasicAccess_Class_Client();
 		$client->set_authorized_ips( $authorized_method );
         $this->assertEquals( $expected, $client->is_authorized_action( $client_method ) );
