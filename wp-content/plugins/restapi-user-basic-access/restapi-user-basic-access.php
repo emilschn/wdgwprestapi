@@ -33,6 +33,7 @@ class WDG_RESTAPIUserBasicAccess {
 		$this->add_class( 'authentication' );
 		$this->add_class( 'client' );
 		add_filter( 'rest_authentication_errors', 'WDG_RESTAPIUserBasicAccess_Class_Authentication::authentication' );
+		add_filter( 'rest_pre_dispatch', 'WDG_RESTAPIUserBasicAccess_Class_Authentication::check_authorized_actions', 10, 3 );
 		
 		if (is_admin() ) {
 			$this->add_admin( 'users' );

@@ -14,6 +14,20 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 	 */
 	public static $key_authorized_restapi = 'authorized_restapi';
 	public static $key_authorized_ips = 'authorized_ips';
+	public static $key_authorized_actions = 'authorized_actions';
+	
+	/**
+	 * Actions list
+	 */
+	public static $action_get = 'get';
+	public static $action_post = 'post';
+	public static $action_put = 'put';
+	public static $action_delete = 'delete';
+	
+	/**
+	 * Properties
+	 */
+	private $authorized_actions; // Needs to be set before access
 	
 	/**
 	 * Returns true if user can access to REST API
@@ -66,6 +80,29 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 		}
 		
 		return FALSE;
+	}
+	
+	/**
+	 * Returns a REST API actions array, with authorization for each of them
+	 * @return array
+	 */
+	public function get_authorized_actions() {
+		if ( !isset( $this->authorized_actions ) ) {
+			$meta_result = get_user_meta( $this->ID, WDG_RESTAPIUserBasicAccess_Class_Client::$key_authorized_actions, TRUE );
+			$this->authorized_actions = json_decode( $meta_result );
+		}
+		return $this->authorized_actions;
+	}
+	
+	/**
+	 * Returns true if the specified action is authorized for this user
+	 * @param string $action
+	 * @return boolean
+	 */
+	public function is_authorized_action( $action_init ) {
+		$authorized_actions_array = $this->get_authorized_actions();
+		$action = strtolower( $action_init );
+		return ( $authorized_actions_array->$action == '1' );
 	}
 	
 }
