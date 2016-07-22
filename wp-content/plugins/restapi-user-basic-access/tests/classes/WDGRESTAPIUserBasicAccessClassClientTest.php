@@ -22,6 +22,7 @@ class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
 	
 	public function ipProvider() {
         return [
+            'FAKE Localhost, Empty list'			=> [ '127.0.0.1', '', TRUE ],
             'Localhost, Empty list'					=> [ '127.0.0.1', '', FALSE ],
             'Localhost, Null list'					=> [ '127.0.0.1', null, FALSE ],
             'Localhost, Sing Localhost list'		=> [ '127.0.0.1', '127.0.0.1', TRUE ],
