@@ -31,12 +31,16 @@ class WDGRESTAPI {
 	}
 	
 	public function __construct() {
-		
-		
+		$this->add_admin_include( 'posts' );
+		WDGRESTAPI_Admin_Posts::add_actions();
 	}
 	
 	public function add_include( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'classes/' . $include_name . '.php');
+	}
+	
+	public function add_admin_include( $include_name ) {
+		include_once( plugin_dir_path( __FILE__ ) . 'admin/' . $include_name . '.php');
 	}
 }
 
