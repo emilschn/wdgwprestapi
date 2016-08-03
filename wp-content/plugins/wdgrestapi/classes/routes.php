@@ -38,7 +38,7 @@ class WDGRESTAPI_Routes {
 			array_push( $buffer, $staticpage_item );
 		}
 		
-		return json_encode( $buffer );
+		return $buffer;
 	}
 	
 }
