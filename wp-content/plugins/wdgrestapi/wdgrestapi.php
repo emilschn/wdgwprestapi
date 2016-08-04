@@ -42,19 +42,27 @@ class WDGRESTAPI {
 	}
 	
 	public function __construct() {
-		$this->add_admin_include( 'posts' );
-		WDGRESTAPI_Admin_Posts::add_actions();
+		$this->add_include_entities( 'entity' );
+		$this->add_include_entities( 'staticpage' );
 		
-		$this->add_include( 'routes' );
-		add_action( 'rest_api_init', 'WDGRESTAPI_Routes::register');
+		$this->add_include_routes( 'route' );
+		$this->add_include_routes( 'staticpage' );
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_StaticPage::register');
+		
+		$this->add_include_admin( 'posts' );
+		WDGRESTAPI_Admin_Posts::add_actions();
 	}
 	
-	public function add_include( $include_name ) {
-		include_once( plugin_dir_path( __FILE__ ) . 'classes/' . $include_name . '.php');
-	}
-	
-	public function add_admin_include( $include_name ) {
+	public function add_include_admin( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'admin/' . $include_name . '.php');
+	}
+	
+	public function add_include_entities( $include_name ) {
+		include_once( plugin_dir_path( __FILE__ ) . 'entities/' . $include_name . '.php');
+	}
+	
+	public function add_include_routes( $include_name ) {
+		include_once( plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php');
 	}
 }
 

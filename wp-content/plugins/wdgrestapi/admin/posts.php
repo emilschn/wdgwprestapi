@@ -10,8 +10,6 @@ if ( ! function_exists( 'is_admin' ) ) {
  * Extends Posts Admin
  */
 class WDGRESTAPI_Admin_Posts {
-	
-	public static $key_export_static = 'export_static';
 
 	public static function add_actions() {
 		add_action( 'add_meta_boxes', 'WDGRESTAPI_Admin_Posts::add_meta_boxes' );
@@ -33,15 +31,15 @@ class WDGRESTAPI_Admin_Posts {
             return;
         }
 		
-		$saved_value = filter_input( INPUT_POST, WDGRESTAPI_Admin_Posts::$key_export_static );
-		update_post_meta( $post_id, WDGRESTAPI_Admin_Posts::$key_export_static, $saved_value ? '1' : '0' );
+		$saved_value = filter_input( INPUT_POST, WDGRESTAPI_Entity_StaticPage::$key_export_static );
+		WDGRESTAPI_Entity_StaticPage::save_exported_static( $post_id, $saved_value );
 	}
 	
 	public static function wdgrestapi_posts_export_static() {
 		global $post;
-		$is_exported_static = get_post_meta( $post->ID, WDGRESTAPI_Admin_Posts::$key_export_static, TRUE );
+		$is_exported_static = WDGRESTAPI_Entity_StaticPage::is_exported_static( $post->ID );
 		?>  
-		<input type="checkbox" name="<?php echo WDGRESTAPI_Admin_Posts::$key_export_static; ?>" <?php checked( $is_exported_static ); ?> />
+		<input type="checkbox" name="<?php echo WDGRESTAPI_Entity_StaticPage::$key_export_static; ?>" <?php checked( $is_exported_static ); ?> />
 		<?php _e( 'Exporter cette page en contenu statique', 'wdgrestapi' ); ?>
 		<?php
 	}
