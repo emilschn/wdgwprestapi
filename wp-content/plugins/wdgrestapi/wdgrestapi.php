@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.1';
+	private $version = '0.0.2';
     
 	/**
 	 * Instanciation du singleton
@@ -42,27 +42,58 @@ class WDGRESTAPI {
 	}
 	
 	public function __construct() {
-		$this->add_include_entities( 'entity' );
-		$this->add_include_entities( 'staticpage' );
+		$this->add_include_entities();
+		$this->upgrade_db();
+		$this->add_include_routes();
+		$this->register_routes();
 		
-		$this->add_include_routes( 'route' );
-		$this->add_include_routes( 'staticpage' );
-		add_action( 'rest_api_init', 'WDGRESTAPI_Route_StaticPage::register');
 		
 		$this->add_include_admin( 'posts' );
 		WDGRESTAPI_Admin_Posts::add_actions();
 	}
 	
+	
+	// Gestion des entités
+	public function add_include_entities() {
+		$this->add_include_entity( 'entity' );
+		$this->add_include_entity( 'staticpage' );
+		$this->add_include_entity( 'organization' );
+	}
+	public function add_include_entity( $include_name ) {
+		include_once( plugin_dir_path( __FILE__ ) . 'entities/' . $include_name . '.php');
+	}
+	
+	
+	// Gestion des routes
+	public function add_include_routes() {
+		$this->add_include_route( 'route' );
+		$this->add_include_route( 'staticpage' );
+		$this->add_include_route( 'organization' );
+	}
+	public function add_include_route( $include_name ) {
+		include_once( plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php');
+	}
+	public function register_routes() {
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_StaticPage::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Organization::register');
+	}
+	
+	
+	// Gestion de l'affichage en admin
 	public function add_include_admin( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'admin/' . $include_name . '.php');
 	}
 	
-	public function add_include_entities( $include_name ) {
-		include_once( plugin_dir_path( __FILE__ ) . 'entities/' . $include_name . '.php');
-	}
 	
-	public function add_include_routes( $include_name ) {
-		include_once( plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php');
+	// Mise à jour éventuelle de la bdd
+	public function upgrade_db() {
+		if (get_option('wdgwpapi_version') != $this->version) {
+			$result = WDGRESTAPI_Entity_Organization::upgrade_db();
+			if (!empty($result)) {
+				exit();
+			}
+			update_option('wdgwpapi_version', $this->version);
+		}
 	}
 }
 

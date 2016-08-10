@@ -1,24 +1,38 @@
 <?php
-// Blocks direct access
-if ( ! function_exists( 'is_admin' ) && ! class_exists( 'TestCase' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
-
-
-class WDGRESTAPI_Route {
+class WDGRESTAPI_Route extends WP_REST_Controller {
 	
-	public static $namespace = 'wdg/v1';
+	public static $wdg_namespace = 'wdg/v1';
 	
-	public static function register( $route, $method, $callback ) {
+	/**
+	 * Définit les différentes propriétés d'une entité à partir d'informations postées
+	 * @param array $properties_list
+	 * @param WDGRESTAPI_Entity $entity
+	 */
+	public function set_posted_properties( WDGRESTAPI_Entity $entity, array $properties_list ) {
+		foreach ( $properties_list as $property_key => $db_property ) {
+			$property_new_value = filter_input( INPUT_POST, $property_key );
+			if ( $property_new_value !== null && $property_new_value !== FALSE ) {
+				$entity->set_property( $property_key, $property_new_value );
+			}
+		}
+	}
+	
+	/**
+	 * Enregistre une nouvelle route dans l'API REST
+	 * @param string $route
+	 * @param string $method
+	 * @param function $callback
+	 * @param array $args
+	 */
+	public static function register( $route, $method, $callback, $args = array() ) {
 		
 		register_rest_route(
-			WDGRESTAPI_Route::$namespace,
+			WDGRESTAPI_Route::$wdg_namespace,
 			$route,
 			array(
-				'methods' => $method,
-				'callback' => $callback
+				'methods'	=> $method,
+				'callback'	=> $callback,
+				'args'		=> $args
 			)
 		);
 		
