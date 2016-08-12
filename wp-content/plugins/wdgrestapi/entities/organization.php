@@ -11,14 +11,6 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	}
 	
 	/**
-	 * Retourne la liste des propriétés chargées dans la BDD
-	 * @return object
-	 */
-	public function get_loaded_data() {
-		return $this->loaded_data;
-	}
-	
-	/**
 	 * Retourne la liste de toutes les organisations
 	 * @return array
 	 */

@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.2';
+	private $version = '0.0.23';
     
 	/**
 	 * Instanciation du singleton
@@ -58,6 +58,7 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'entity' );
 		$this->add_include_entity( 'staticpage' );
 		$this->add_include_entity( 'organization' );
+		$this->add_include_entity( 'organization-user' );
 	}
 	public function add_include_entity( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'entities/' . $include_name . '.php');
@@ -69,6 +70,7 @@ class WDGRESTAPI {
 		$this->add_include_route( 'route' );
 		$this->add_include_route( 'staticpage' );
 		$this->add_include_route( 'organization' );
+		$this->add_include_route( 'organization-user' );
 	}
 	public function add_include_route( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php');
@@ -76,6 +78,7 @@ class WDGRESTAPI {
 	public function register_routes() {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_StaticPage::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Organization::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_OrganizationUser::register');
 	}
 	
 	
@@ -88,10 +91,8 @@ class WDGRESTAPI {
 	// Mise à jour éventuelle de la bdd
 	public function upgrade_db() {
 		if (get_option('wdgwpapi_version') != $this->version) {
-			$result = WDGRESTAPI_Entity_Organization::upgrade_db();
-			if (!empty($result)) {
-				exit();
-			}
+			WDGRESTAPI_Entity_Organization::upgrade_db();
+			WDGRESTAPI_Entity_OrganizationUser::upgrade_db();
 			update_option('wdgwpapi_version', $this->version);
 		}
 	}

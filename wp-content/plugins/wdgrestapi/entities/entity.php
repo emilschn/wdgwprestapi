@@ -5,7 +5,7 @@ class WDGRESTAPI_Entity {
 	protected $current_db_properties;
 	protected $loaded_data;
 	
-	public function __construct( $id = FALSE, $entity_type, $db_properties ) {
+	public function __construct( $id, $entity_type, $db_properties ) {
 		$this->current_entity_type = $entity_type;
 		$this->current_db_properties = $db_properties;
 		
@@ -27,6 +27,14 @@ class WDGRESTAPI_Entity {
 			}
 			
 		}
+	}
+	
+	/**
+	 * Retourne la liste des propriétés chargées dans la BDD
+	 * @return object
+	 */
+	public function get_loaded_data() {
+		return $this->loaded_data;
 	}
 	
 	/**
@@ -55,7 +63,7 @@ class WDGRESTAPI_Entity {
 		
 		// Si il y a déjà un ID, on met simplement à jour les données sur la ligne concernée
 		if ( !empty( $this->loaded_data->id ) ) {
-			$wpdb->update( 
+			$result = $wpdb->update( 
 				$table_name,
 				$array_properties,
 				array(
