@@ -11,13 +11,6 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
  * GESTION BDD
  ******************************************************************************/
 	
-	/**
-	 * Requete de transfert SQL :
-	 * INSERT INTO `wp_entity_organization` (`id`, `wpref`, `name`, `creation_date`, `strong_authentication`, `type`, `legalform`, `idnumber`, `rcs`, `capital`, `address`, `postalcode`, `city`, `country`, `ape`, `bank_owner`, `bank_address`, `bank_iban`, `bank_bic`, `website_url`, `twitter_url`, `facebook_url`, `linkedin_url`, `viadeo_url`) VALUES
-(6, 0, 'BLI', '2014-12-16', 0, 'society', 'BLI', 'BLI', 'BLI', 400, 'BLI', 300, 'BLI', 'BH', 'BLI', '', '', '', '', '---', '---', '---', '---', '---');
-	 */
-	
-	// Pour les types, voir WDGRESTAPI_Entity::get_mysqltype_from_wdgtype
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),

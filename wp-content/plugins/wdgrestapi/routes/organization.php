@@ -60,6 +60,19 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	}
 	
 	/**
+	 * Crée une organisation
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_create( WP_REST_Request $request ) {
+		$organization_item = new WDGRESTAPI_Entity_Organization();
+		$this->set_posted_properties( $organization_item, WDGRESTAPI_Entity_Organization::$db_properties );
+		$organization_item->save();
+		$reloaded_data = $organization_item->get_loaded_data();
+		return $reloaded_data;
+	}
+	
+	/**
 	 * Edite une organisation spécifique
 	 * @param WP_REST_Request $request
 	 * @return \WP_Error
@@ -82,14 +95,6 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 			}
 			
 		}
-	}
-	
-	public function single_create( WP_REST_Request $request ) {
-		$organization_item = new WDGRESTAPI_Entity_Organization();
-		$this->set_posted_properties( $organization_item, WDGRESTAPI_Entity_Organization::$db_properties );
-		$organization_item->save();
-		$reloaded_data = $organization_item->get_loaded_data();
-		return $reloaded_data;
 	}
 	
 }
