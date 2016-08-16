@@ -59,6 +59,7 @@ class WDGRESTAPI_Route_OrganizationUser extends WDGRESTAPI_Route {
 					$organization_list,
 					array( 
 						"id"	=> $loaded_data->id,
+						"wpref"	=> $loaded_data->wpref,
 						"name"	=> $loaded_data->name,
 						"type"	=> $link_item->type
 					)
