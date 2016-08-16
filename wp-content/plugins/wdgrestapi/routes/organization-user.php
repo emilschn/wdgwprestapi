@@ -33,14 +33,7 @@ class WDGRESTAPI_Route_OrganizationUser extends WDGRESTAPI_Route {
 		$organization_id = $request->get_param( 'id' );
 		if ( !empty( $organization_id ) ) {
 			$user_list = WDGRESTAPI_Entity_OrganizationUser::get_list_by_organization_id( $organization_id );
-			
-			if ( !empty( $user_list ) ) {
-				return $user_list;
-				
-			} else {
-				return new WP_Error( '404', "Invalid organization ID" );
-				
-			}
+			return $user_list;
 			
 		} else {
 			return new WP_Error( '404', "Invalid organization ID (empty)" );
@@ -66,13 +59,7 @@ class WDGRESTAPI_Route_OrganizationUser extends WDGRESTAPI_Route {
 				);
 			}
 			
-			if ( !empty( $organization_list ) ) {
-				return $organization_list;
-				
-			} else {
-				return new WP_Error( '404', "Invalid user ID" );
-				
-			}
+			return $organization_list;
 			
 		} else {
 			return new WP_Error( '404', "Invalid user ID (empty)" );
