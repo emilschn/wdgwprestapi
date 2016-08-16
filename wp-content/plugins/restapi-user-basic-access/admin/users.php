@@ -1,16 +1,12 @@
 <?php
-// Blocks direct access
-if ( ! function_exists( 'is_admin' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
-
 /**
  * Extends User Admin
  */
 class WDG_RESTAPIUserBasicAccess_Admin_Users {
     
+	/**
+	 * Subscribes to standard WP actions
+	 */
 	public static function add_actions() {
 		add_action( 'show_user_profile', 'WDG_RESTAPIUserBasicAccess_Admin_Users::add_user_fields' );
 		add_action( 'edit_user_profile', 'WDG_RESTAPIUserBasicAccess_Admin_Users::add_user_fields' );
@@ -18,7 +14,10 @@ class WDG_RESTAPIUserBasicAccess_Admin_Users {
 		add_action( 'edit_user_profile_update', 'WDG_RESTAPIUserBasicAccess_Admin_Users::save_user_fields' );
 	}
 	
-	
+	/**
+	 * Adds some new fields to the user account admin form
+	 * @param WP_User $user
+	 */
 	public static function add_user_fields( $user ) {
 		$client_user = new WDG_RESTAPIUserBasicAccess_Class_Client( $user->ID );
 	?>
@@ -72,6 +71,10 @@ class WDG_RESTAPIUserBasicAccess_Admin_Users {
 	<?php
 	}
 	
+	/**
+	 * Saves new fields from the user account admin form
+	 * @param int $user_id
+	 */
 	public static function save_user_fields( $user_id ) {
 		$is_authorized_restapi = filter_input( INPUT_POST, WDG_RESTAPIUserBasicAccess_Class_Client::$key_authorized_restapi );
 		update_user_meta( $user_id, WDG_RESTAPIUserBasicAccess_Class_Client::$key_authorized_restapi, ($is_authorized_restapi ? '1' : '0') );

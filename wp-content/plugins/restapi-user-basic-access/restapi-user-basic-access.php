@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: REST API User Basic Access
- * Description: API REST access authorization and user accounts management
- * Version: 0.0.1
+ * Plugin Name: REST API User Basic Authorization
+ * Description: REST API access and user accounts management via basic authorization. Once activated, WP REST API will only be accessible to registered users.
+ * Version: 0.5
  * Author: Emilien Schneider
  * Author URI: http://www.wedogood.co
 */
