@@ -25,8 +25,8 @@ class WDGRESTAPI_Route_OrganizationUser extends WDGRESTAPI_Route {
 	}
 	
 	public static function register() {
-		$route_organization = new WDGRESTAPI_Route_OrganizationUser();
-		return $route_organization;
+		$route_organization_user = new WDGRESTAPI_Route_OrganizationUser();
+		return $route_organization_user;
 	}
 	
 	public function get_userlist_by_organization_id( WP_REST_Request $request ) {
