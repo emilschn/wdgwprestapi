@@ -39,8 +39,23 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 	public function get_organizationlist_by_project_id( WP_REST_Request $request ) {
 		$project_id = $request->get_param( 'id' );
 		if ( !empty( $project_id ) ) {
-			$organization = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $project_id );
-			return $organization;
+			$result = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $project_id );
+			$organization_list = array();
+			foreach ( $result as $link_item ) {
+				$project = new WDGRESTAPI_Entity_Organization( $link_item->id_organization );
+				$loaded_data = $project->get_loaded_data();
+				array_push( 
+					$organization_list,
+					array( 
+						"id"	=> $loaded_data->id,
+						"wpref"	=> $loaded_data->wpref,
+						"name"	=> $loaded_data->name,
+						"type"	=> $link_item->type
+					)
+				);
+			}
+			
+			return $organization_list;
 			
 		} else {
 			return new WP_Error( '404', "Invalid project ID (empty)" );
@@ -69,7 +84,7 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 			return $project_list;
 			
 		} else {
-			return new WP_Error( '404', "Invalid user ID (empty)" );
+			return new WP_Error( '404', "Invalid organization ID (empty)" );
 		}
 	}
 	

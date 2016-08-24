@@ -44,14 +44,25 @@ class WDGRESTAPI_Entity_ProjectOrganization extends WDGRESTAPI_Entity {
 		if ( !empty( $id_project ) && !empty( $id_organization ) && !empty( $type ) ) {
 			global $wpdb;
 			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ProjectOrganization::$entity_type );
-			$wpdb->delete(
+			$wpdb->query( $wpdb->prepare( "
+				DELETE FROM `" .$table_name. "`
+				WHERE id_project = %d AND id_organization = %d AND type = '%s'",
+				array( $id_project, $id_organization, $type )
+			) );
+			echo 'print_error : ' . $wpdb->print_error();
+			/*$wpdb->delete(
 				$table_name,
 				array(
 					'id_project'		=> $id_project,
 					'id_organization'	=> $id_organization,
 					'type'				=> $type
+				),
+				array(
+					'%d',
+					'%d',
+					'%s'
 				)
-			);
+			);*/
 		}
 	}
 

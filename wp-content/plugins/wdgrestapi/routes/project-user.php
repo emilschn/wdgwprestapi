@@ -39,7 +39,23 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 	public function get_userlist_by_project_id( WP_REST_Request $request ) {
 		$project_id = $request->get_param( 'id' );
 		if ( !empty( $project_id ) ) {
-			$user_list = WDGRESTAPI_Entity_ProjectUser::get_list_by_project_id( $project_id );
+			$result = WDGRESTAPI_Entity_ProjectUser::get_list_by_project_id( $project_id );
+			$user_list = array();
+			foreach ( $result as $link_item ) {
+				$user = new WDGRESTAPI_Entity_User( $link_item->id_user );
+				$loaded_data = $user->get_loaded_data();
+				array_push( 
+					$user_list,
+					array( 
+						"id"		=> $loaded_data->id,
+						"wpref"		=> $loaded_data->wpref,
+						"name"		=> $loaded_data->name,
+						"surname"	=> $loaded_data->surname,
+						"type"		=> $link_item->type
+					)
+				);
+			}
+			
 			return $user_list;
 			
 		} else {
