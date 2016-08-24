@@ -43,7 +43,7 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 			return $user_list;
 			
 		} else {
-			return new WP_Error( '404', "Invalid organization ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
 	
