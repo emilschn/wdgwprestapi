@@ -8,10 +8,12 @@ class WDG_RESTAPIUserBasicAccess_Admin_Users {
 	 * Subscribes to standard WP actions
 	 */
 	public static function add_actions() {
-		add_action( 'show_user_profile', 'WDG_RESTAPIUserBasicAccess_Admin_Users::add_user_fields' );
-		add_action( 'edit_user_profile', 'WDG_RESTAPIUserBasicAccess_Admin_Users::add_user_fields' );
-		add_action( 'personal_options_update', 'WDG_RESTAPIUserBasicAccess_Admin_Users::save_user_fields' );
-		add_action( 'edit_user_profile_update', 'WDG_RESTAPIUserBasicAccess_Admin_Users::save_user_fields' );
+		if ( current_user_can( 'manage_options' ) ) {
+			add_action( 'show_user_profile', 'WDG_RESTAPIUserBasicAccess_Admin_Users::add_user_fields' );
+			add_action( 'edit_user_profile', 'WDG_RESTAPIUserBasicAccess_Admin_Users::add_user_fields' );
+			add_action( 'personal_options_update', 'WDG_RESTAPIUserBasicAccess_Admin_Users::save_user_fields' );
+			add_action( 'edit_user_profile_update', 'WDG_RESTAPIUserBasicAccess_Admin_Users::save_user_fields' );
+		}
 	}
 	
 	/**
