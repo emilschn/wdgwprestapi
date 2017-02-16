@@ -2,11 +2,11 @@
 # BEGIN WordPress
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteBase /taffe/wedogood/wdgwprestapi/
+RewriteBase /wdgwprestapi/
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /taffe/wedogood/wdgwprestapi/index.php [L]
+RewriteRule . /wdgwprestapi/index.php [L]
 </IfModule>
 
 # END WordPress
