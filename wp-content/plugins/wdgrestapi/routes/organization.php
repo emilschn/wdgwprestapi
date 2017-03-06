@@ -45,6 +45,9 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 		if ( !empty( $organization_id ) ) {
 			$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
 			$loaded_data = $organization_item->get_loaded_data();
+			if ( isset( $loaded_data->metadata ) ) {
+				unset( $loaded_data->metadata );
+			}
 			
 			if ( !empty( $loaded_data ) ) {
 				return $loaded_data;

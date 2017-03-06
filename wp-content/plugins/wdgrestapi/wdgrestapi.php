@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.43';
+	private $version = '0.0.45';
     
 	/**
 	 * Instanciation du singleton
@@ -42,6 +42,7 @@ class WDGRESTAPI {
 	}
 	
 	public function __construct() {
+		$this->add_include_libs();
 		$this->add_include_entities();
 		$this->upgrade_db();
 		$this->add_include_routes();
@@ -50,6 +51,16 @@ class WDGRESTAPI {
 		
 		$this->add_include_admin( 'posts' );
 		WDGRESTAPI_Admin_Posts::add_actions();
+	}
+	
+	
+	// Gestion des entités
+	public function add_include_libs() {
+		$this->add_include_lib( 'logs' );
+		$this->add_include_lib( 'geolocation' );
+	}
+	public function add_include_lib( $include_name ) {
+		include_once( plugin_dir_path( __FILE__ ) . 'libs/' . $include_name . '.php');
 	}
 	
 	

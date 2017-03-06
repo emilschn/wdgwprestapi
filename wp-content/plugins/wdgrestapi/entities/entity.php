@@ -39,11 +39,42 @@ class WDGRESTAPI_Entity {
 	
 	/**
 	 * Définit la valeur d'une propriété
+	 * Nécessite une sauvegarde en BDD ultérieure
 	 * @param string $property_name
-	 * @param string $value
+	 * @param string $property_value
 	 */
-	public function set_property( $property_name, $value ) {
-		$this->loaded_data->$property_name = $value;
+	public function set_property( $property_name, $property_value ) {
+		$this->loaded_data->$property_name = $property_value;
+	}
+
+	/**
+	 * Pour les entités qui ont un champ metadata, retourne une valeur particulière
+	 * @return string
+	 */
+	public function get_metadata( $property_name ) {
+		$metadata_list = json_decode( $this->loaded_data->metadata );
+		$buffer = FALSE;
+		if ( isset( $metadata_list->$property_name ) ) {
+			$buffer = $metadata_list->$property_name;
+		}
+		return $buffer;
+	}
+
+	/**
+	 * Pour les entités qui ont un champ metadata, met à jour la valeur d'une des metadata
+	 * Nécessite une sauvegarde en BDD ultérieure
+	 * @param string nom de la propriété de metadonnée
+	 * @param string valeur de la metaonnée
+	 */
+	public function set_metadata( $property_name, $property_value ) {
+		if ( isset( $this->loaded_data->metadata ) ) {
+			$metadata_list = json_decode( array() );
+			if ( !empty( $this->loaded_data->metadata ) ) {
+				$metadata_list = json_decode( $this->loaded_data->metadata );
+			}
+			$metadata_list->$property_name = $property_value;
+			$this->loaded_data->metadata = json_encode( $metadata_list );
+		}
 	}
 	
 	/**
@@ -98,9 +129,12 @@ class WDGRESTAPI_Entity {
 		$table_name = WDGRESTAPI_Entity::get_table_name( $entity_type );
 		
 		$sql = "CREATE TABLE " .$table_name. " (";
+		// Ajout de tous les champs de propriétés
 		foreach ( $db_properties as $db_property_key => $db_property ) {
 			if ( !empty( $db_property[ "type" ] ) ) {
-				$sql .= " " . $db_property_key;
+				// Saut de ligne obligatoire pour être interprété par le diff de WP
+				$sql .= "
+				" . $db_property_key;
 				$sql .= " " . WDGRESTAPI_Entity::get_mysqltype_from_wdgtype( $db_property[ "type" ] );
 				if ( !empty( $db_property[ "other" ] ) ) {
 					$sql .= " " . $db_property[ "other" ];
@@ -109,14 +143,19 @@ class WDGRESTAPI_Entity {
 			}
 		}
 		if ( !empty( $db_properties[ "unique_key" ] ) ) {
-			$sql .= " UNIQUE KEY " . $db_properties[ "unique_key" ] . " (" .$db_properties[ "unique_key" ]. ")";
+			// Saut de ligne obligatoire pour être interprété par le diff de WP
+			$sql .= "
+			UNIQUE KEY " . $db_properties[ "unique_key" ] . " (" .$db_properties[ "unique_key" ]. ")";
 		}
 		
-		$sql .= " ) ";
+		// Saut de ligne obligatoire pour être interprété par le diff de WP
+		$sql .= " )
+		";
 		$sql .= $charset_collate. ";";
-		
+
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		$result = dbDelta( $sql );
+
 		return $result;
 	}
 	
