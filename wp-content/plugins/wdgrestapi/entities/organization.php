@@ -5,7 +5,50 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Organization::$entity_type, WDGRESTAPI_Entity_Organization::$db_properties );
 	}
+
+	/**
+	* Surcharge la fonction de récupération de données
+	 * @return object
+	*/
+	public function get_loaded_data() {
+		$this->check_geolocation_data();
+		return parent::get_loaded_data();
+	}
+
+	/**
+	* Se charge des vérifications de données de géolocalisation actualisées
+	*/
+	private function check_geolocation_data() {
+		$loaded_data = $this->loaded_data;
+
+		// Définition de l'adresse et du MD5 de l'adresse
+		$geolocation_address = $loaded_data->address . ' ' . $loaded_data->postalcode . ' ' . $loaded_data->city;
+		$geolocation_addr_md5 = md5( $geolocation_address );
+		$current_geolocation_addr_md5 = $this->get_metadata( 'geolocation_addr_md5' );
+		WDGRESTAPI_Lib_Logs::log( 'check_geolocation_data > ' . $geolocation_addr_md5 . ' | ' . $current_geolocation_addr_md5 );
+
+		// Si la géolocalisation de l'organisation n'a pas été récupérée
+			// ou si le nouveau MD5 de l'adresse est différent de celui qui a déjà été enregistré
+		if ( empty( $loaded_data->geolocation ) || $current_geolocation_addr_md5 != $geolocation_addr_md5 ) {
+
+			// Récupération des données de géolocalisation
+			WDGRESTAPI_Lib_Logs::log( 'check_geolocation_data >> get_geolocation_data' );
+			$geolocation_data = WDGRESTAPI_Lib_Geolocation::get_geolocation_data( $geolocation_address );
+
+			// Si l'API a retourné des valeurs exploitables, on les enregistre
+			if ( $geolocation_data != false && !is_wp_error( $geolocation_data ) ) {
+				$this->set_metadata( 'geolocation_addr_md5', $geolocation_addr_md5 );
+				$this->set_property( 'geolocation', $geolocation_data['lat'] . ',' . $geolocation_data['long'] );
+				$this->save();
+			}
+
+		}
+	}
 	
+	/**
+	* Définit le nom de l'organisation
+	 * @param string $new_name
+	*/
 	public function set_name( $new_name ) {
 		$this->loaded_data->name = $new_name;
 	}
@@ -59,7 +102,9 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'twitter_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'facebook_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'linkedin_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'viadeo_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' )
+		'viadeo_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'metadata'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'geolocation'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' )
 	);
 	
 	// Mise à jour de la bdd
