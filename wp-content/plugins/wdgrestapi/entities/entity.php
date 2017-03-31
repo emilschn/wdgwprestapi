@@ -68,7 +68,7 @@ class WDGRESTAPI_Entity {
 	 */
 	public function set_metadata( $property_name, $property_value ) {
 		if ( isset( $this->loaded_data->metadata ) ) {
-			$metadata_list = json_decode( array() );
+			$metadata_list = json_decode( json_encode( array() ) );
 			if ( !empty( $this->loaded_data->metadata ) ) {
 				$metadata_list = json_decode( $this->loaded_data->metadata );
 			}
