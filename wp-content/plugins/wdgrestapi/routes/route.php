@@ -18,6 +18,18 @@ class WDGRESTAPI_Route extends WP_REST_Controller {
 	}
 	
 	/**
+	 * Enregistre une nouvelle ligne de log quand nécessaire
+	 * @param string $route
+	 * @param string $result
+	 */
+	public function log( $route, $result ) {
+		$log_item = new WDGRESTAPI_Entity_Log();
+		$log_item->set_property( 'route', $route );
+		$log_item->set_property( 'result', $result );
+		$log_item->save();
+	}
+	
+	/**
 	 * Enregistre une nouvelle route dans l'API REST
 	 * @param string $route
 	 * @param string $method

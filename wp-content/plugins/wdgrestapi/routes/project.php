@@ -42,14 +42,17 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			
 			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
+				$this->log( "WDGRESTAPI_Route_Project::single_get::" . $project_id, json_encode( $loaded_data ) );
 				return $loaded_data;
 				
 			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_get::" . $project_id, "404 : Invalid project ID" );
 				return new WP_Error( '404', "Invalid project ID" );
 				
 			}
 			
 		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_get", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
@@ -66,6 +69,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		$project_item->set_property( 'client_user_id', $current_client->ID );
 		$project_item->save();
 		$reloaded_data = $project_item->get_loaded_data();
+		$this->log( "WDGRESTAPI_Route_Project::single_create", json_encode( $reloaded_data ) );
 		return $reloaded_data;
 	}
 	
@@ -85,13 +89,18 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 				$this->set_posted_properties( $project_item, WDGRESTAPI_Entity_Project::$db_properties );
 				$project_item->save();
 				$reloaded_data = $project_item->get_loaded_data();
+				$this->log( "WDGRESTAPI_Route_Project::single_edit::" . $project_id, json_encode( $reloaded_data ) );
 				return $reloaded_data;
 				
 			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_edit::" . $project_id, "404 : Invalid project ID" );
 				return new WP_Error( '404', "Invalid project ID" );
 				
 			}
 			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_edit", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
 	

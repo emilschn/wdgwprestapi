@@ -192,6 +192,10 @@ class WDGRESTAPI_Entity {
 				$buffer = 'date';
 				break;
 			
+			case 'datetime':
+				$buffer = 'datetime';
+				break;
+			
 			case 'bool':
 				$buffer = 'int(1)';
 				break;

@@ -55,9 +55,11 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 				);
 			}
 			
+			$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_organizationlist_by_project_id::" . $project_id, json_encode( $organization_list ) );
 			return $organization_list;
 			
 		} else {
+			$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_organizationlist_by_project_id", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
@@ -81,9 +83,11 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 				);
 			}
 			
+			$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_projectlist_by_organization_id::" . $organization_id, json_encode( $project_list ) );
 			return $project_list;
 			
 		} else {
+			$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_projectlist_by_organization_id", "404 : Invalid organization ID (empty)" );
 			return new WP_Error( '404', "Invalid organization ID (empty)" );
 		}
 	}
@@ -93,9 +97,10 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 		$projectorganization_item = new WDGRESTAPI_Entity_ProjectOrganization();
 		$this->set_posted_properties( $projectorganization_item, WDGRESTAPI_Entity_ProjectOrganization::$db_properties );
 		$projectorganization_item->set_property( 'id_project', $project_id );
-		//TODO : vérifier que l'utilisateur et le projet existent ?
+		//TODO : vérifier que l'organisation et le projet existent ?
 		$projectorganization_item->save();
 		$reloaded_data = $projectorganization_item->get_loaded_data();
+		$this->log( "WDGRESTAPI_Route_ProjectOrganization::link_organization::" . $project_id, json_encode( $reloaded_data ) );
 		return $reloaded_data;
 	}
 	
@@ -104,6 +109,7 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 		$organization_id = $request->get_param( 'organizationid' );
 		$type = $request->get_param( 'type' );
 		WDGRESTAPI_Entity_ProjectOrganization::remove( $project_id, $organization_id, $type );
+		$this->log( "WDGRESTAPI_Route_ProjectOrganization::unlink_organization::".$project_id."::".$organization_id."::".$type, 'TRUE' );
 		return TRUE;
 	}
 	

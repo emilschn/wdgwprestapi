@@ -56,9 +56,11 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 				);
 			}
 			
+			$this->log( "WDGRESTAPI_Route_ProjectUser::get_userlist_by_project_id::" . $project_id, json_encode( $user_list ) );
 			return $user_list;
 			
 		} else {
+			$this->log( "WDGRESTAPI_Route_ProjectUser::get_userlist_by_project_id", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
@@ -82,9 +84,11 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 				);
 			}
 			
+			$this->log( "WDGRESTAPI_Route_ProjectUser::get_projectlist_by_user_id::" . $user_id, json_encode( $project_list ) );
 			return $project_list;
 			
 		} else {
+			$this->log( "WDGRESTAPI_Route_ProjectUser::get_projectlist_by_user_id", "404 : Invalid user ID (empty)" );
 			return new WP_Error( '404', "Invalid user ID (empty)" );
 		}
 	}
@@ -97,6 +101,7 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 		//TODO : vérifier que l'utilisateur et le projet existent ?
 		$projectuser_item->save();
 		$reloaded_data = $projectuser_item->get_loaded_data();
+		$this->log( "WDGRESTAPI_Route_ProjectUser::link_user::" . $project_id, json_encode( $reloaded_data ) );
 		return $reloaded_data;
 	}
 	
@@ -105,6 +110,7 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 		$user_id = $request->get_param( 'userid' );
 		$type = $request->get_param( 'type' );
 		WDGRESTAPI_Entity_ProjectUser::remove( $project_id, $user_id, $type );
+		$this->log( "WDGRESTAPI_Route_ProjectUser::unlink_user::".$project_id."::".$user_id."::".$type, 'TRUE' );
 		return TRUE;
 	}
 	
