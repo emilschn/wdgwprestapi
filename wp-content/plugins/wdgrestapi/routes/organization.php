@@ -49,7 +49,8 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 				unset( $loaded_data->metadata );
 			}
 			
-			if ( !empty( $loaded_data ) ) {
+			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
 				return $loaded_data;
 				
 			} else {
@@ -70,6 +71,8 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	public function single_create( WP_REST_Request $request ) {
 		$organization_item = new WDGRESTAPI_Entity_Organization();
 		$this->set_posted_properties( $organization_item, WDGRESTAPI_Entity_Organization::$db_properties );
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$organization_item->set_property( 'client_user_id', $current_client->ID );
 		$organization_item->save();
 		$reloaded_data = $organization_item->get_loaded_data();
 		return $reloaded_data;
@@ -85,8 +88,9 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 		if ( !empty( $organization_id ) ) {
 			$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
 			$loaded_data = $organization_item->get_loaded_data();
+			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			
-			if ( !empty( $loaded_data ) ) {
+			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
 				$this->set_posted_properties( $organization_item, WDGRESTAPI_Entity_Organization::$db_properties );
 				$organization_item->save();
 				$reloaded_data = $organization_item->get_loaded_data();

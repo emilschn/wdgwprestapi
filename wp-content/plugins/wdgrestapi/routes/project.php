@@ -39,8 +39,9 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		if ( !empty( $project_id ) ) {
 			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
 			$loaded_data = $project_item->get_loaded_data();
+			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			
-			if ( !empty( $loaded_data ) ) {
+			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
 				return $loaded_data;
 				
 			} else {
@@ -61,6 +62,8 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	public function single_create( WP_REST_Request $request ) {
 		$project_item = new WDGRESTAPI_Entity_Project();
 		$this->set_posted_properties( $project_item, WDGRESTAPI_Entity_Project::$db_properties );
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$project_item->set_property( 'client_user_id', $current_client->ID );
 		$project_item->save();
 		$reloaded_data = $project_item->get_loaded_data();
 		return $reloaded_data;
@@ -76,8 +79,9 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		if ( !empty( $project_id ) ) {
 			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
 			$loaded_data = $project_item->get_loaded_data();
+			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			
-			if ( !empty( $loaded_data ) ) {
+			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
 				$this->set_posted_properties( $project_item, WDGRESTAPI_Entity_Project::$db_properties );
 				$project_item->save();
 				$reloaded_data = $project_item->get_loaded_data();

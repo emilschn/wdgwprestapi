@@ -15,6 +15,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'wpref'					=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		'gender'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'surname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),

@@ -16,6 +16,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'wpref'					=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		'creation_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' )
 	);

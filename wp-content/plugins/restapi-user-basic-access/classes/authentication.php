@@ -7,7 +7,7 @@ class WDG_RESTAPIUserBasicAccess_Class_Authentication {
 	/**
 	 * @var WDG_RESTAPIUserBasicAccess_Class_Client 
 	 */
-	private static $current_client;
+	public static $current_client;
     
 	/**
 	 * Authenticates the user with username, password and authorized IP addresses
