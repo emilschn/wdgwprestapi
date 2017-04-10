@@ -39,9 +39,8 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		if ( !empty( $project_id ) ) {
 			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
 			$loaded_data = $project_item->get_loaded_data();
-			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			
-			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->log( "WDGRESTAPI_Route_Project::single_get::" . $project_id, json_encode( $loaded_data ) );
 				return $loaded_data;
 				
@@ -83,9 +82,8 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		if ( !empty( $project_id ) ) {
 			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
 			$loaded_data = $project_item->get_loaded_data();
-			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			
-			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->set_posted_properties( $project_item, WDGRESTAPI_Entity_Project::$db_properties );
 				$project_item->save();
 				$reloaded_data = $project_item->get_loaded_data();

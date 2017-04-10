@@ -11,6 +11,8 @@ class WDGRESTAPI_Entity_Log extends WDGRESTAPI_Entity {
 		date_default_timezone_set( 'Europe/Paris' );
 		$current_date = new DateTime();
 		$this->set_property( 'date', $current_date->format( 'Y-m-d H:i:s' ) );
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$this->set_property( 'caller', $current_client->ID );
 		parent::save();
 	}
 	
@@ -24,7 +26,8 @@ class WDGRESTAPI_Entity_Log extends WDGRESTAPI_Entity {
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'date'					=> array( 'type' => 'datetime', 'other' => '' ),
 		'route'					=> array( 'type' => 'varchar', 'other' => '' ),
-		'result'				=> array( 'type' => 'longtext', 'other' => '' )
+		'result'				=> array( 'type' => 'longtext', 'other' => '' ),
+		'caller'				=> array( 'type' => 'id', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd

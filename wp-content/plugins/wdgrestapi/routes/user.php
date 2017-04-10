@@ -39,9 +39,8 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
 			$loaded_data = $user_item->get_loaded_data();
-			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			
-			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->log( "WDGRESTAPI_Route_User::single_get::" . $user_id, json_encode( $loaded_data ) );
 				return $loaded_data;
 				
@@ -83,9 +82,8 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
 			$loaded_data = $user_item->get_loaded_data();
-			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			
-			if ( !empty( $loaded_data ) && $loaded_data['client_user_id'] == $current_client->ID ) {
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->set_posted_properties( $user_item, WDGRESTAPI_Entity_User::$db_properties );
 				$user_item->save();
 				$reloaded_data = $user_item->get_loaded_data();

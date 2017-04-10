@@ -18,6 +18,16 @@ class WDGRESTAPI_Route extends WP_REST_Controller {
 	}
 	
 	/**
+	 * Renvoie TRUE si la donnée peut être renvoyée au client qui fait l'appel
+	 * @param object $loaded_data
+	 * @return boolean
+	 */
+	public function is_data_for_current_client( $loaded_data ) {
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		return ( $loaded_data->client_user_id == $current_client->ID );
+	}
+	
+	/**
 	 * Enregistre une nouvelle ligne de log quand nécessaire
 	 * @param string $route
 	 * @param string $result
