@@ -4,10 +4,12 @@ class WDGRESTAPI_Entity {
 	protected $current_entity_type;
 	protected $current_db_properties;
 	protected $loaded_data;
+	protected $properties_errors;
 	
 	public function __construct( $id, $entity_type, $db_properties ) {
 		$this->current_entity_type = $entity_type;
 		$this->current_db_properties = $db_properties;
+		$this->properties_errors = array();
 		
 		// Si un id est passé, on construit à partir de la base de données
 		if ( $id != FALSE ) {
@@ -27,6 +29,14 @@ class WDGRESTAPI_Entity {
 			}
 			
 		}
+	}
+	
+	/**
+	 * Renvoie true si les données qui ont été transmises sont correctes
+	 * @return boolean
+	 */
+	public function has_checked_properties() {
+		return true;
 	}
 	
 	/**
@@ -59,6 +69,14 @@ class WDGRESTAPI_Entity {
 		}
 		return $buffer;
 	}
+	
+	/**
+	 * Retourne le tableau des erreurs constatées sur les propriétés
+	 * @return array
+	 */
+	public function get_properties_errors() {
+		return $this->properties_errors;
+	}
 
 	/**
 	 * Pour les entités qui ont un champ metadata, met à jour la valeur d'une des metadata
@@ -75,6 +93,14 @@ class WDGRESTAPI_Entity {
 			$metadata_list->$property_name = $property_value;
 			$this->loaded_data->metadata = json_encode( $metadata_list );
 		}
+	}
+	
+	public function make_uid() {
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$test = $current_client->ID . '-' . time() . '-';
+		$buffer = md5( $test );
+		//Test si effectivement unique
+		return $buffer;
 	}
 	
 	/**
@@ -112,6 +138,7 @@ class WDGRESTAPI_Entity {
 				$this->loaded_data->id = $wpdb->insert_id;
 			}
 		}
+		return $result;
 	}
 	
 /*******************************************************************************
@@ -178,6 +205,10 @@ class WDGRESTAPI_Entity {
 		switch ( $mysql_type ) {
 			case 'id':
 				$buffer = 'mediumint(9)';
+				break;
+			
+			case 'uid':
+				$buffer = 'varchar(50)';
 				break;
 			
 			case 'varchar':

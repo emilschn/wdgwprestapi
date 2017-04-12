@@ -2,11 +2,12 @@
 class WDGRESTAPI_Route extends WP_REST_Controller {
 	
 	public static $wdg_namespace = 'wdg/v1';
+	public static $external_namespace = 'external/v1';
 	
 	/**
 	 * Définit les différentes propriétés d'une entité à partir d'informations postées
-	 * @param array $properties_list
 	 * @param WDGRESTAPI_Entity $entity
+	 * @param array $properties_list
 	 */
 	public function set_posted_properties( WDGRESTAPI_Entity $entity, array $properties_list ) {
 		foreach ( $properties_list as $property_key => $db_property ) {
@@ -50,6 +51,27 @@ class WDGRESTAPI_Route extends WP_REST_Controller {
 		
 		register_rest_route(
 			WDGRESTAPI_Route::$wdg_namespace,
+			$route,
+			array(
+				'methods'	=> $method,
+				'callback'	=> $callback,
+				'args'		=> $args
+			)
+		);
+		
+	}
+	
+	/**
+	 * Enregistre une nouvelle route externe dans l'API REST
+	 * @param string $route
+	 * @param string $method
+	 * @param function $callback
+	 * @param array $args
+	 */
+	public static function register_external( $route, $method, $callback, $args = array() ) {
+		
+		register_rest_route(
+			WDGRESTAPI_Route::$external_namespace,
 			$route,
 			array(
 				'methods'	=> $method,
