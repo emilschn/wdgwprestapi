@@ -138,12 +138,12 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		
 		// Données relatives à l'investissement
 		$this->loaded_data->project = (int)$this->loaded_data->project;
-		if ( !WDGRESTAPI_Lib_Validator::is_number_positive( $this->loaded_data->project ) ) {
+		if ( !WDGRESTAPI_Lib_Validator::is_number_positive_integer( $this->loaded_data->project ) ) {
 			array_push( $this->properties_errors, __( "Le champ Projet (project) n'est pas correct.", 'wdgrestapi' ) );
 			$buffer = false;
 		}
 		$this->loaded_data->amount = (int)$this->loaded_data->amount;
-		if ( !WDGRESTAPI_Lib_Validator::is_number_positive( $this->loaded_data->amount ) ) {
+		if ( !WDGRESTAPI_Lib_Validator::is_number_positive_integer( $this->loaded_data->amount ) ) {
 			array_push( $this->properties_errors, __( "Le champ Montant (amount) n'est pas correct.", 'wdgrestapi' ) );
 			$buffer = false;
 		}

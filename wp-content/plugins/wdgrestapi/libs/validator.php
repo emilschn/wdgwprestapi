@@ -288,6 +288,24 @@ class WDGRESTAPI_Lib_Validator {
 	public static function is_number_positive( $input ) {
 		return ( $input > 0 );
 	}
+	
+	/**
+	 * Vérifie si le champ est bien un nombre entier
+	 * @param string $input
+	 * @return boolean
+	 */
+	public static function is_number_integer( $input ) {
+		return ( is_int( $input ) );
+	}
+	
+	/**
+	 * Vérifie si le champ est bien positif et entier
+	 * @param string $input
+	 * @return boolean
+	 */
+	public static function is_number_positive_integer( $input ) {
+		return ( is_int( $input ) && ( $input > 0 ) );
+	}
 
 	/**
 	 * Vérifie si la variable est un e-mail
@@ -349,7 +367,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_year( $input ) {
-		return is_numeric( $input );
+		return is_numeric( $input ) && is_int( $input );
 	}
 	
 	/**
