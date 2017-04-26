@@ -2,8 +2,23 @@
 class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	public static $entity_type = 'project';
 	
-	public function __construct( $id = FALSE ) {
+	public function __construct( $id = FALSE, $wpref = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Project::$entity_type, WDGRESTAPI_Entity_Project::$db_properties );
+		if ( $wpref != FALSE ) {
+			global $wpdb;
+			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project::$entity_type );
+			$query = 'SELECT * FROM ' .$table_name. ' WHERE wpref='.$wpref;
+			$this->loaded_data = $wpdb->get_row( $query );
+		}
+	}
+	
+	/**
+	 * Récupération des données de royalties concernant un projet
+	 * @return string
+	 */
+	public function get_royalties_data() {
+		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_royalties_by_project', $this->loaded_data->wpref );
+		return $buffer;
 	}
 	
 	

@@ -22,6 +22,13 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
 		);
+		
+		WDGRESTAPI_Route::register_external(
+			'/user/(?P<email>[a-zA-Z0-9\-\@\.]+)/royalties',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_royalties'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
 	}
 	
 	public static function register() {
@@ -53,6 +60,24 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		} else {
 			$this->log( "WDGRESTAPI_Route_User::single_get", "404 : Invalid user ID (empty)" );
 			return new WP_Error( '404', "Invalid user ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les royalties d'un utilisateur par son ID
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_royalties( WP_REST_Request $request ) {
+		$user_email = $request->get_param( 'email' );
+		if ( !empty( $user_email ) ) {
+			$royalties_data = WDGRESTAPI_Entity_User::get_royalties_data( $user_email );
+			$this->log( "WDGRESTAPI_Route_User::single_get_royalties::" . $user_email, json_encode( $royalties_data ) );
+			return $royalties_data;
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_User::single_get_royalties", "404 : Invalid user email (empty)" );
+			return new WP_Error( '404', "Invalid user email (empty)" );
 		}
 	}
 	

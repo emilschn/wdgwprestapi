@@ -141,6 +141,26 @@ class WDGRESTAPI_Entity {
 		return $result;
 	}
 	
+	/**
+	 * Se charge de récupérer des données en fonction de l'identifiant client
+	 * @param string; $data_type
+	 * @return string
+	 */
+	protected static function get_data_on_client_site( $action, $param ) {
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$ref_client_url = $current_client->user_url;
+		$route = '/connexion';
+		$params = '?action=' .$action. '&param=' .urlencode( $param );
+		$url = $ref_client_url . $route . $params;
+		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::get_data_on_client_site > $url : ' . $url);
+		
+		$buffer = wp_remote_get(
+			$url,
+			array( 'timeout' => 10 )
+		);
+		return json_decode( $buffer["body"] );
+	}
+	
 /*******************************************************************************
  * GESTION BDD
  ******************************************************************************/

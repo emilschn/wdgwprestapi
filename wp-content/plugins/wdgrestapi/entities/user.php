@@ -6,6 +6,15 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		parent::__construct( $id, WDGRESTAPI_Entity_User::$entity_type, WDGRESTAPI_Entity_User::$db_properties );
 	}
 	
+	/**
+	 * Récupération des données de royalties concernant un utilisateur
+	 * @return string
+	 */
+	public static function get_royalties_data( $param_email ) {
+		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_royalties_by_user', $param_email );
+		return $buffer;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD
