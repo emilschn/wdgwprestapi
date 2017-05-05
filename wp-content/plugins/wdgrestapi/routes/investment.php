@@ -3,7 +3,7 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	
 	public function __construct() {
 		WDGRESTAPI_Route::register_external(
-			'/investment/(?P<token>\d+)',
+			'/investment/(?P<token>[a-z0-9]+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
 			array( 'token' => array( 'default' => 0 ) )
@@ -17,7 +17,7 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_external(
-			'/investment/(?P<token>\d+)',
+			'/investment/(?P<token>[a-z0-9]+)',
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
