@@ -142,6 +142,22 @@ class WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Supprime l'élément de la base de données
+	 */
+	public function delete() {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
+		$where_properties = array(
+			'id'	=> $this->loaded_data->id
+		);
+		$wpdb->delete( 
+			$table_name, 
+			$where_properties
+		);
+		return true;
+	}
+	
+	/**
 	 * Se charge de récupérer des données en fonction de l'identifiant client
 	 * @param string; $data_type
 	 * @return string

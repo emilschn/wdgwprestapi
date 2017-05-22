@@ -16,7 +16,7 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
 		
-		WDGRESTAPI_Route::register_external(
+		WDGRESTAPI_Route::register(
 			'/investment/(?P<token>[a-z0-9]+)',
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),

@@ -4,6 +4,13 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 	public static $entity_type = 'investment';
 	
 	public static $status_init = 'init';
+	public static $status_expired = 'expired';
+	public static $status_started = 'started';
+	public static $status_waiting_check = 'waiting-check';
+	public static $status_waiting_wire = 'waiting-wire';
+	public static $status_error = 'error';
+	public static $status_canceled = 'canceled';
+	public static $status_validated = 'validated';
 	
 	public function __construct( $id = FALSE, $token = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Investment::$entity_type, WDGRESTAPI_Entity_Investment::$db_properties );
@@ -13,6 +20,11 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 			$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
 			$query = "SELECT * FROM " .$table_name. " WHERE token='" .$token. "'";
 			$this->loaded_data = $wpdb->get_row( $query );
+		}
+		
+		if ( isset( $this->loaded_data ) && $this->loaded_data->status == WDGRESTAPI_Entity_Investment::$status_init && $this->has_token_expired() ) {
+			$this->loaded_data->status = WDGRESTAPI_Entity_Investment::$status_expired;
+			$this->save();
 		}
 	}
 	
@@ -163,6 +175,17 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		}
 		
 		
+		return $buffer;
+	}
+	
+	/**
+	 * Renvoie true sur le token d'investissement a expiré
+	 */
+	public function has_token_expired() {
+	    date_default_timezone_set('Europe/Paris');
+		$date_now = new DateTime();
+		$date_expiration = new DateTime( $this->token_info->token_expiration );
+		$buffer = ( $date_now > $date_expiration );
 		return $buffer;
 	}
 	

@@ -22,6 +22,13 @@ class WDGRESTAPI_Route_BankInfo extends WDGRESTAPI_Route {
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
 		);
+		
+		WDGRESTAPI_Route::register_external(
+			'/bankinfo/(?P<email>\d+)',
+			WP_REST_Server::DELETABLE,
+			array( $this, 'single_delete'),
+			$this->get_endpoint_args_for_item_schema( WP_REST_Server::DELETABLE )
+		);
 	}
 	
 	public static function register() {
@@ -120,6 +127,35 @@ class WDGRESTAPI_Route_BankInfo extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_BankInfo::single_edit", "404 : Invalid bank info e-mail (empty)" );
+			return new WP_Error( '404', "Invalid bank info e-mail (empty)" );
+		}
+	}
+	
+	/**
+	 * Supprime les informations bancaires correspondantes à un email
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_delete( WP_REST_Request $request ) {
+		$bankinfo_email = $request->get_param( 'email' );
+		if ( !empty( $bankinfo_email ) ) {
+			$bankinfo_item = new WDGRESTAPI_Entity_BankInfo( '', $bankinfo_email );
+			$loaded_data = $bankinfo_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$bankinfo_item->delete();
+				$reloaded_data = TRUE;
+				$this->log( "WDGRESTAPI_Route_BankInfo::single_delete::" . $bankinfo_email, 'deleted' );
+				return $reloaded_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_BankInfo::single_delete::" . $bankinfo_email, "404 : Invalid bank info e-mail" );
+				return new WP_Error( '404', "Invalid bank info e-mail" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_BankInfo::single_delete", "404 : Invalid bank info e-mail (empty)" );
 			return new WP_Error( '404', "Invalid bank info e-mail (empty)" );
 		}
 	}
