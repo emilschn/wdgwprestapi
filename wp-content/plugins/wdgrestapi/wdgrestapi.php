@@ -51,6 +51,8 @@ class WDGRESTAPI {
 		
 		$this->add_include_admin( 'posts' );
 		WDGRESTAPI_Admin_Posts::add_actions();
+		$this->add_include_admin( 'users' );
+		WDGRESTAPI_Admin_Users::add_actions();
 	}
 	
 	

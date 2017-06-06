@@ -3,6 +3,7 @@ class WDGRESTAPI_Route extends WP_REST_Controller {
 	
 	public static $wdg_namespace = 'wdg/v1';
 	public static $external_namespace = 'external/v1';
+	public static $key_authorized_accounts_access = 'wdg_authorized_accounts_access';
 	
 	/**
 	 * Définit les différentes propriétés d'une entité à partir d'informations postées
@@ -24,8 +25,23 @@ class WDGRESTAPI_Route extends WP_REST_Controller {
 	 * @return boolean
 	 */
 	public function is_data_for_current_client( $loaded_data ) {
+		$authorized_access_list = array();
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		return ( $loaded_data->client_user_id == $current_client->ID );
+		array_push( $authorized_access_list, $current_client->ID );
+		
+		$access_temp = $current_client->get( WDGRESTAPI_Route::$key_authorized_accounts_access );
+		if ( !empty( $access_temp ) ) {
+			if ( strpos( $access_temp, ',' ) !== FALSE ) {
+				$array_access_temp = explode( ',', $access_temp );
+				$authorized_access_list = array_merge( $authorized_access_list, $array_access_temp );
+				
+			} else {
+				array_push( $authorized_access_list, $access_temp );
+				
+			}
+		}
+		
+		return ( in_array( $loaded_data->client_user_id, $authorized_access_list ) );
 	}
 	
 	/**
