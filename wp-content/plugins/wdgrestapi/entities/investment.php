@@ -173,6 +173,10 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 			array_push( $this->properties_errors, __( "Le champ URL de retour NOT OK (redirect_url_nok) n'est pas correct.", 'wdgrestapi' ) );
 			$buffer = false;
 		}
+		if ( !WDGRESTAPI_Lib_Validator::is_url( $this->loaded_data->notification_url ) ) {
+			array_push( $this->properties_errors, __( "Le champ URL de notification (notification_url) n'est pas correct.", 'wdgrestapi' ) );
+			$buffer = false;
+		}
 		
 		
 		return $buffer;
@@ -229,6 +233,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'amount'				=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'redirect_url_ok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'redirect_url_nok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'notification_url'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'token_expiration'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' )
