@@ -15,6 +15,41 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
+	/**
+	 * Met à jour l'e-mail de l'utilisateur
+	 * @param string $param_email
+	 * @param array $posted_array
+	 * @return string
+	 */
+	public static function update_email( $param_email, $posted_array ) {
+		$buffer = array();
+		$new_email = $posted_array[ 'new_email' ];
+		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_User::update_email > '.$new_email. ' != ' .$param_email );
+		
+		if ( empty( $new_email ) || $param_email == $new_email ) {
+			$buffer['error'] = '404';
+			$buffer['error-message'] = 'Invalid new email';
+			
+		} else {
+			$posted_params = array(
+				'new_email'	=> $new_email
+			);
+			$return = WDGRESTAPI_Entity::post_data_on_client_site( 'update_user_email', $param_email, $posted_params );
+			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_User::update_email > $return : ' . $return);
+			
+			if ( $return == 'success' ) {
+				$buffer = 'success';
+				
+			} else {
+				$buffer['error'] = '404';
+				$buffer['error-message'] = $return;
+			}
+			
+		}
+		
+		return $buffer;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD

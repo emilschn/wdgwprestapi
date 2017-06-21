@@ -24,6 +24,13 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_external(
+			'/user/(?P<email>[a-zA-Z0-9\-\@\.]+)',
+			WP_REST_Server::EDITABLE,
+			array( $this, 'single_edit_email'),
+			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
+		);
+		
+		WDGRESTAPI_Route::register_external(
 			'/user/(?P<email>[a-zA-Z0-9\-\@\.]+)/royalties',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_royalties'),
@@ -124,6 +131,24 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		} else {
 			$this->log( "WDGRESTAPI_Route_User::single_edit", "404 : Invalid user ID (empty)" );
 			return new WP_Error( '404', "Invalid user ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Edite un utilisateur spécifique
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_edit_email( WP_REST_Request $request ) {
+		$user_email = $request->get_param( 'email' );
+		if ( !empty( $user_email ) ) {
+			$email_data = WDGRESTAPI_Entity_User::update_email( $user_email, $_POST );
+			$this->log( "WDGRESTAPI_Route_User::single_edit_email::" . $user_email, json_encode( $email_data ) );
+			return $email_data;
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_User::single_edit_email", "404 : Invalid user email (empty)" );
+			return new WP_Error( '404', "Invalid user email (empty)" );
 		}
 	}
 	

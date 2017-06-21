@@ -159,8 +159,9 @@ class WDGRESTAPI_Entity {
 	
 	/**
 	 * Se charge de récupérer des données en fonction de l'identifiant client
-	 * @param string; $data_type
-	 * @return string
+	 * @param string $action
+	 * @param string $param
+	 * @return array
 	 */
 	protected static function get_data_on_client_site( $action, $param ) {
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
@@ -177,7 +178,34 @@ class WDGRESTAPI_Entity {
 		return json_decode( $buffer["body"] );
 	}
 	
-/*******************************************************************************
+	/**
+	 * Se charge de poster des données sur le site du client
+	 * @param string $action
+	 * @param string $param
+	 * @param array $posted_params
+	 * @return array
+	 */
+	protected static function post_data_on_client_site( $action, $param, $posted_params ) {
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$ref_client_url = $current_client->user_url;
+		$route = '/connexion';
+		$params = '?action=' .$action. '&param=' .urlencode( $param );
+		$url = $ref_client_url . $route . $params;
+		
+		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::post_data_on_client_site > $url : ' . $url);
+		$buffer = wp_remote_post(
+			$url,
+			array(
+				'body'	=> $posted_params
+			)
+		);
+		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::post_data_on_client_site > $buffer : ' . print_r( $buffer, true ) );
+		
+		return $buffer["body"];
+	}
+
+
+	/*******************************************************************************
  * GESTION BDD
  ******************************************************************************/
 	
