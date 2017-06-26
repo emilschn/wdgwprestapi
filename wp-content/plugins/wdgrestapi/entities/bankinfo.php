@@ -41,6 +41,8 @@ class WDGRESTAPI_Entity_BankInfo extends WDGRESTAPI_Entity {
 			array_push( $this->properties_errors, __( "Le champ Adresse 1 (address1) n'est pas au bon format.", 'wdgrestapi' ) );
 			$buffer = false;
 		}
+		
+		return $buffer;
 	}
 	
 	
