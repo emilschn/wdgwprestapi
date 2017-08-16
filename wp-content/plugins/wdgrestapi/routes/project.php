@@ -3,6 +3,12 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	
 	public function __construct() {
 		WDGRESTAPI_Route::register(
+			'/projects',
+			WP_REST_Server::READABLE,
+			'WDGRESTAPI_Entity_Project::list_get'
+		);
+		
+		WDGRESTAPI_Route::register(
 			'/project/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
