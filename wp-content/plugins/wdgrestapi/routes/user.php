@@ -3,6 +3,12 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	
 	public function __construct() {
 		WDGRESTAPI_Route::register(
+			'/users',
+			WP_REST_Server::READABLE,
+			'WDGRESTAPI_Entity_User::list_get'
+		);
+		
+		WDGRESTAPI_Route::register(
 			'/user/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),

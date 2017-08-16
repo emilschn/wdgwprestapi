@@ -60,7 +60,8 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	public static function list_get() {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Organization::$entity_type );
-		$query = "SELECT id, wpref, name FROM " .$table_name;
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$query = "SELECT id, wpref, name FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}

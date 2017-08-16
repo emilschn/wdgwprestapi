@@ -2,6 +2,12 @@
 class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	
 	public function __construct() {
+		WDGRESTAPI_Route::register(
+			'/investments',
+			WP_REST_Server::READABLE,
+			'WDGRESTAPI_Entity_Investment::list_get'
+		);
+		
 		WDGRESTAPI_Route::register_external(
 			'/investment/(?P<token>[a-z0-9]+)',
 			WP_REST_Server::READABLE,

@@ -193,6 +193,19 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
+	/**
+	 * Retourne la liste de tous les investissements
+	 * @return array
+	 */
+	public static function list_get() {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$query = "SELECT id, email, project, amount, status FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
+		$results = $wpdb->get_results( $query );
+		return $results;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD
