@@ -5,7 +5,7 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 		WDGRESTAPI_Route::register(
 			'/organizations',
 			WP_REST_Server::READABLE,
-			'WDGRESTAPI_Entity_Organization::list_get'
+			array( $this, 'list_get')
 		);
 		
 		WDGRESTAPI_Route::register(
@@ -33,6 +33,14 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	public static function register() {
 		$route_organization = new WDGRESTAPI_Route_Organization();
 		return $route_organization;
+	}
+	
+	/**
+	 * Retourne la liste des organisations
+	 * @return array
+	 */
+	public function list_get() {
+		return WDGRESTAPI_Entity_Organization::list_get( $this->get_current_client_autorized_ids_string() );
 	}
 	
 	/**

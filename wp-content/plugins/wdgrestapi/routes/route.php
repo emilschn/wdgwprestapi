@@ -25,23 +25,52 @@ class WDGRESTAPI_Route extends WP_REST_Controller {
 	 * @return boolean
 	 */
 	public function is_data_for_current_client( $loaded_data ) {
-		$authorized_access_list = array();
+		$authorized_access_list = $this->get_current_client_authorized_ids();
+		return ( in_array( $loaded_data->client_user_id, $authorized_access_list ) );
+	}
+	
+	/**
+	 * Renvoie la liste des données auquel le client peut accéder
+	 * @return array
+	 */
+	public function get_current_client_authorized_ids() {
+		$buffer = array();
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		array_push( $authorized_access_list, $current_client->ID );
+		array_push( $buffer, $current_client->ID );
 		
 		$access_temp = $current_client->get( WDGRESTAPI_Route::$key_authorized_accounts_access );
 		if ( !empty( $access_temp ) ) {
 			if ( strpos( $access_temp, ',' ) !== FALSE ) {
 				$array_access_temp = explode( ',', $access_temp );
-				$authorized_access_list = array_merge( $authorized_access_list, $array_access_temp );
+				$buffer = array_merge( $buffer, $array_access_temp );
 				
 			} else {
-				array_push( $authorized_access_list, $access_temp );
+				array_push( $buffer, $access_temp );
 				
 			}
 		}
 		
-		return ( in_array( $loaded_data->client_user_id, $authorized_access_list ) );
+		return $buffer;
+	}
+	
+	/**
+	 * Renvoie la liste des id de données autorisées sous forme de chaine
+	 * @param string $prefix
+	 * @param string $suffix
+	 * @return string
+	 */
+	public function get_current_client_autorized_ids_string( $prefix = '(', $suffix = ')' ) {
+		$authorized_client_ids = $this->get_current_client_authorized_ids();
+		$client_user_id_list = $prefix;
+		$count_ids = count( $authorized_client_ids );
+		for ( $i = 0; $i < $count_ids; $i++ ) {
+			if ( $i > 0 ) {
+				$client_user_id_list .= ',';
+			}
+			$client_user_id_list .= $authorized_client_ids[ $i ];
+		}
+		$client_user_id_list .= $suffix;
+		return $client_user_id_list;
 	}
 	
 	/**

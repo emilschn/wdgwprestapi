@@ -57,11 +57,10 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les organisations
 	 * @return array
 	 */
-	public static function list_get() {
+	public static function list_get( $authorized_client_id_string ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Organization::$entity_type );
-		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		$query = "SELECT id, wpref, name FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
+		$query = "SELECT id, wpref, name FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}

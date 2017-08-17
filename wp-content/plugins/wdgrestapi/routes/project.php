@@ -5,7 +5,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		WDGRESTAPI_Route::register(
 			'/projects',
 			WP_REST_Server::READABLE,
-			'WDGRESTAPI_Entity_Project::list_get'
+			array( $this, 'list_get')
 		);
 		
 		WDGRESTAPI_Route::register(
@@ -40,6 +40,14 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	public static function register() {
 		$route_project = new WDGRESTAPI_Route_Project();
 		return $route_project;
+	}
+	
+	/**
+	 * Retourne la liste des projets
+	 * @return array
+	 */
+	public function list_get() {
+		return WDGRESTAPI_Entity_Project::list_get( $this->get_current_client_autorized_ids_string() );
 	}
 	
 	/**

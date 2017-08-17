@@ -5,7 +5,7 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		WDGRESTAPI_Route::register(
 			'/users',
 			WP_REST_Server::READABLE,
-			'WDGRESTAPI_Entity_User::list_get'
+			array( $this, 'list_get')
 		);
 		
 		WDGRESTAPI_Route::register(
@@ -47,6 +47,14 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	public static function register() {
 		$route_user = new WDGRESTAPI_Route_User();
 		return $route_user;
+	}
+	
+	/**
+	 * Retourne la liste des utilisateurs
+	 * @return array
+	 */
+	public function list_get() {
+		return WDGRESTAPI_Route_User::list_get( $this->get_current_client_autorized_ids_string() );
 	}
 	
 	/**
