@@ -54,7 +54,7 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		return WDGRESTAPI_Route_User::list_get( $this->get_current_client_autorized_ids_string() );
+		return WDGRESTAPI_Entity_User::list_get( $this->get_current_client_autorized_ids_string() );
 	}
 	
 	/**
