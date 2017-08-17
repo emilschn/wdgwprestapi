@@ -77,7 +77,7 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	 */
 	public function single_create( WP_REST_Request $request ) {
 		$this->log( "WDGRESTAPI_Route_Declaration::single_create", json_encode( $_POST ) );
-		$declaration_item = new WDGRESTAPI_Route_Declaration();
+		$declaration_item = new WDGRESTAPI_Entity_Declaration();
 		$this->set_posted_properties( $declaration_item, WDGRESTAPI_Entity_Declaration::$db_properties );
 		if ( $declaration_item->has_checked_properties() ) {
 			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;

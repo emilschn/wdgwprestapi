@@ -298,6 +298,10 @@ class WDGRESTAPI_Entity {
 			case 'int':
 				$buffer = 'int(11)';
 				break;
+			
+			case 'float':
+				$buffer = 'float';
+				break;
 		}
 		
 		return $buffer;

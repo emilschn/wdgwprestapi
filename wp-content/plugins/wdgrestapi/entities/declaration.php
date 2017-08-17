@@ -3,7 +3,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	
 	public static $entity_type = 'declaration';
 	
-	public function __construct( $id ) {
+	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Declaration::$entity_type, WDGRESTAPI_Entity_Declaration::$db_properties );
 	}
 	
@@ -14,7 +14,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	public static function list_get( $authorized_client_id_string ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
-		$query = "SELECT id FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
@@ -27,6 +27,21 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
+		'id_project'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'date_due'				=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
+		'date_paid'				=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
+		'date_transfer'			=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
+		'amount'				=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'remaining_amount'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'transfered_previous_remaining_amount'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'percent_commission'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'payment_token'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'file_list'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'turnover'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'message'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' )
 	);
 	
 	// Mise à jour de la bdd
