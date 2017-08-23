@@ -5,7 +5,13 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 		WDGRESTAPI_Route::register(
 			'/investments',
 			WP_REST_Server::READABLE,
-			'WDGRESTAPI_Entity_Investment::list_get'
+			array( $this, 'list_get')
+		);
+		
+		WDGRESTAPI_Route::register(
+			'/investments/stats',
+			WP_REST_Server::READABLE,
+			array( $this, 'list_get_stats')
 		);
 		
 		WDGRESTAPI_Route::register_external(
@@ -33,6 +39,22 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	public static function register() {
 		$route_investment = new WDGRESTAPI_Route_Investment();
 		return $route_investment;
+	}
+	
+	/**
+	 * Retourne la liste des investissements
+	 * @return array
+	 */
+	public function list_get() {
+		return WDGRESTAPI_Entity_Investment::list_get();
+	}
+	
+	/**
+	 * Retourne les statistiques concernant les investissements
+	 * @return array
+	 */
+	public function list_get_stats() {
+		return WDGRESTAPI_Entity_Investment::get_stats();
 	}
 	
 	/**

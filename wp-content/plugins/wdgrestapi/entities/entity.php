@@ -163,7 +163,7 @@ class WDGRESTAPI_Entity {
 	 * @param string $param
 	 * @return array
 	 */
-	protected static function get_data_on_client_site( $action, $param ) {
+	protected static function get_data_on_client_site( $action, $param = '1' ) {
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 		$ref_client_url = $current_client->user_url;
 		$route = '/connexion';

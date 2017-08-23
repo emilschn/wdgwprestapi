@@ -9,6 +9,12 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register(
+			'/users/stats',
+			WP_REST_Server::READABLE,
+			array( $this, 'list_get_stats')
+		);
+		
+		WDGRESTAPI_Route::register(
 			'/user/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
@@ -55,6 +61,14 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 */
 	public function list_get() {
 		return WDGRESTAPI_Entity_User::list_get( $this->get_current_client_autorized_ids_string() );
+	}
+	
+	/**
+	 * Retourne les statistiques concernant les utilisateurs
+	 * @return array
+	 */
+	public function list_get_stats() {
+		return WDGRESTAPI_Entity_User::get_stats();
 	}
 	
 	/**

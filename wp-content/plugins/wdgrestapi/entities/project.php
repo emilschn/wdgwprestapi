@@ -33,6 +33,14 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		return $results;
 	}
 	
+	/**
+	 * Retourne les statistiques qui concernent les projets
+	 */
+	public static function get_stats() {
+		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_projects_stats' );
+		return $buffer;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD

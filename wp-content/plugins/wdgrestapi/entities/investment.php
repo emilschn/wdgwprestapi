@@ -206,6 +206,14 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		return $results;
 	}
 	
+	/**
+	 * Retourne les statistiques qui concernent les investissements
+	 */
+	public static function get_stats() {
+		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_investments_stats' );
+		return $buffer;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD
