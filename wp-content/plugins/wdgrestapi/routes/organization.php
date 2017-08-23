@@ -9,6 +9,12 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register(
+			'/organizations/stats',
+			WP_REST_Server::READABLE,
+			array( $this, 'list_get_stats')
+		);
+		
+		WDGRESTAPI_Route::register(
 			'/organization/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
@@ -41,6 +47,13 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	 */
 	public function list_get() {
 		return WDGRESTAPI_Entity_Organization::list_get( $this->get_current_client_autorized_ids_string() );
+	}
+	
+	/**
+	 * Retourne des statistiques sur les organisations
+	 */
+	public function list_get_stats() {
+		return array(); // Rien pour l'instant
 	}
 	
 	/**
