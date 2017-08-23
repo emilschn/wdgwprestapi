@@ -247,6 +247,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'redirect_url_ok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'redirect_url_nok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'notification_url'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'contract_url'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'token_expiration'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' )
