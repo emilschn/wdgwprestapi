@@ -3,8 +3,24 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	
 	public static $entity_type = 'declaration';
 	
-	public function __construct( $id = FALSE ) {
+	public function __construct( $id = FALSE, $payment_token = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Declaration::$entity_type, WDGRESTAPI_Entity_Declaration::$db_properties );
+		
+		if ( empty( $id ) && !empty( $payment_token ) ) {
+			global $wpdb;
+			$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
+			$query = "SELECT * FROM " .$table_name. " WHERE payment_token='" .$payment_token. "'";
+			$this->loaded_data = $wpdb->get_row( $query );
+		}
+	}
+	
+	/**
+	 * Retourne la liste des ROIs de cette déclaration
+	 * @return array
+	 */
+	public function get_rois() {
+		$buffer = WDGRESTAPI_Entity_ROI::list_get_by_declaration_id( $this->loaded_data->id );
+		return $buffer;
 	}
 	
 	/**
@@ -26,10 +42,12 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	public static function list_get_by_project_id( $project_id ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
-		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment FROM " .$table_name. " WHERE id_project = " .$project_id;
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
+	
+	
 	
 	
 /*******************************************************************************

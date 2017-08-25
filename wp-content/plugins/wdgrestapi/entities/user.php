@@ -7,6 +7,15 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne la liste des ROIs de cet utilisateur
+	 * @return array
+	 */
+	public function get_rois() {
+		$buffer = WDGRESTAPI_Entity_ROI::list_get_by_user_id( $this->loaded_data->id );
+		return $buffer;
+	}
+	
+	/**
 	 * Récupération des données de royalties concernant un utilisateur
 	 * @return string
 	 */

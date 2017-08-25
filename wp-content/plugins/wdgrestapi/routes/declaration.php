@@ -22,6 +22,13 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register(
+			'/declaration/token/(?P<token>[a-z0-9]+)',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_by_token'),
+			array( 'token' => array( 'default' => 0 ) )
+		);
+		
+		WDGRESTAPI_Route::register(
 			'/declaration',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create'),
@@ -33,6 +40,13 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
+		);
+		
+		WDGRESTAPI_Route::register(
+			'/declaration/(?P<id>\d+)/rois',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_rois'),
+			array( 'token' => array( 'default' => 0 ) )
 		);
 	}
 	
@@ -80,6 +94,33 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 		} else {
 			$this->log( "WDGRESTAPI_Route_Declaration::single_get", "404 : Invalid declaration id (empty)" );
 			return new WP_Error( '404', "Invalid declaration id (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne une déclaration par le token de paiement
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_get_by_token( WP_REST_Request $request ) {
+		$payment_token = $request->get_param( 'token' );
+		if ( !empty( $payment_token ) ) {
+			$declaration_item = new WDGRESTAPI_Entity_Declaration( FALSE, $payment_token );
+			$loaded_data = $declaration_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_by_token::" . $payment_token, json_encode( $loaded_data ) );
+				return $loaded_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_by_token::" . $payment_token, "404 : Invalid declaration payment token" );
+				return new WP_Error( '404', "Invalid declaration payment token" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Declaration::single_get_by_token", "404 : Invalid declaration payment token (empty)" );
+			return new WP_Error( '404', "Invalid declaration payment token (empty)" );
 		}
 	}
 	
@@ -146,6 +187,34 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 		} else {
 			$this->log( "WDGRESTAPI_Route_Declaration::single_edit", "404 : Invalid declaration id (empty)" );
 			return new WP_Error( '404', "Invalid declaration id (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les ROIs liées à une déclaration (par l'ID de la déclaration)
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_rois( WP_REST_Request $request ) {
+		$declaration_id = $request->get_param( 'id' );
+		if ( !empty( $declaration_id ) ) {
+			$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
+			$loaded_data = $declaration_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$rois_data = $declaration_item->get_rois();
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_rois::" . $declaration_id, json_encode( $rois_data ) );
+				return $rois_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_rois::" . $declaration_id, "404 : Invalid declaration ID" );
+				return new WP_Error( '404', "Invalid declaration ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Declaration::single_get_rois", "404 : Invalid declaration ID (empty)" );
+			return new WP_Error( '404', "Invalid declaration ID (empty)" );
 		}
 	}
 	
