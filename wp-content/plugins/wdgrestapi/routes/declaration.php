@@ -73,13 +73,13 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 				
 			} else {
 				$this->log( "WDGRESTAPI_Route_Declaration::single_get::" . $declaration_id, "404 : Invalid declaration id" );
-				return new WP_Error( '404', "Invalid declaration token" );
+				return new WP_Error( '404', "Invalid declaration id" );
 				
 			}
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Declaration::single_get", "404 : Invalid declaration id (empty)" );
-			return new WP_Error( '404', "Invalid declaration token (empty)" );
+			return new WP_Error( '404', "Invalid declaration id (empty)" );
 		}
 	}
 	
@@ -134,17 +134,17 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 				$this->set_posted_properties( $declaration_item, WDGRESTAPI_Entity_Declaration::$db_properties );
 				$declaration_item->save();
 				$reloaded_data = $declaration_item->get_loaded_data();
-				$this->log( "WDGRESTAPI_Entity_Declaration::single_edit::" . $declaration_id, json_encode( $reloaded_data ) );
+				$this->log( "WDGRESTAPI_Route_Declaration::single_edit::" . $declaration_id, json_encode( $reloaded_data ) );
 				return $reloaded_data;
 				
 			} else {
-				$this->log( "WDGRESTAPI_Entity_Declaration::single_edit::" . $declaration_id, "404 : Invalid declaration id" );
+				$this->log( "WDGRESTAPI_Route_Declaration::single_edit::" . $declaration_id, "404 : Invalid declaration id" );
 				return new WP_Error( '404', "Invalid declaration id" );
 				
 			}
 			
 		} else {
-			$this->log( "WDGRESTAPI_Entity_Declaration::single_edit", "404 : Invalid declaration id (empty)" );
+			$this->log( "WDGRESTAPI_Route_Declaration::single_edit", "404 : Invalid declaration id (empty)" );
 			return new WP_Error( '404', "Invalid declaration id (empty)" );
 		}
 	}
