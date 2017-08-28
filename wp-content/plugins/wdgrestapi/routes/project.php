@@ -35,7 +35,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
 		);
 		
-		WDGRESTAPI_Route::register_external(
+		WDGRESTAPI_Route::register(
 			'/project/(?P<id>\d+)/declarations',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_declarations'),
@@ -106,7 +106,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	public function single_get_declarations( WP_REST_Request $request ) {
 		$project_id = $request->get_param( 'id' );
 		if ( !empty( $project_id ) ) {
-			$project_item = new WDGRESTAPI_Entity_Project( FALSE, $project_id );
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
 			$loaded_data = $project_item->get_loaded_data();
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {

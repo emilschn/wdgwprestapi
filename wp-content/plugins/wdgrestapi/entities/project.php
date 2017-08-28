@@ -17,7 +17,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	public function get_declarations() {
-		$buffer = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $this->loaded_data->wpref );
+		$buffer = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $this->loaded_data->id );
 		return $buffer;
 	}
 	
