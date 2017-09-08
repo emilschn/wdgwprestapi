@@ -164,18 +164,32 @@ class WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	protected static function get_data_on_client_site( $action, $param = '1' ) {
+		$buffer = '';
+		
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 		$ref_client_url = $current_client->user_url;
 		$route = '/connexion';
 		$params = '?action=' .$action. '&param=' .urlencode( $param );
-		$url = $ref_client_url . $route . $params;
-		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::get_data_on_client_site > $url : ' . $url);
 		
-		$buffer = wp_remote_get(
-			$url,
-			array( 'timeout' => 10 )
-		);
-		return json_decode( $buffer["body"] );
+		$cached_version_entity = new WDGRESTAPI_Entity_Cache( FALSE, $params );
+		$cached_value = $cached_version_entity->get_value();
+		
+		if ( !empty( $cached_value ) ) {
+			$buffer = $cached_value;
+			
+		} else {
+			$url = $ref_client_url . $route . $params;
+			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::get_data_on_client_site > $url : ' . $url);
+
+			$remote_result = wp_remote_get(
+				$url,
+				array( 'timeout' => 10 )
+			);
+			$buffer = $remote_result["body"];
+			
+			$cached_version_entity->save( $params, $buffer );
+		}
+		return json_decode( $buffer );
 	}
 	
 	/**
@@ -205,7 +219,7 @@ class WDGRESTAPI_Entity {
 	}
 
 
-	/*******************************************************************************
+/*******************************************************************************
  * GESTION BDD
  ******************************************************************************/
 	

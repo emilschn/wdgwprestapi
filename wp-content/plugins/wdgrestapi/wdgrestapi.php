@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.66';
+	private $version = '0.0.67';
     
 	/**
 	 * Instanciation du singleton
@@ -72,6 +72,7 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'entity' );
 		$this->add_include_entity( 'staticpage' );
 		$this->add_include_entity( 'log' );
+		$this->add_include_entity( 'cache' );
 		$this->add_include_entity( 'organization' );
 		$this->add_include_entity( 'user' );
 		$this->add_include_entity( 'project' );
@@ -130,6 +131,7 @@ class WDGRESTAPI {
 	// Mise à jour éventuelle de la bdd
 	public function upgrade_db() {
 		if (get_option('wdgwpapi_version') != $this->version) {
+			WDGRESTAPI_Entity_Cache::upgrade_db();
 			WDGRESTAPI_Entity_Log::upgrade_db();
 			WDGRESTAPI_Entity_Organization::upgrade_db();
 			WDGRESTAPI_Entity_User::upgrade_db();
