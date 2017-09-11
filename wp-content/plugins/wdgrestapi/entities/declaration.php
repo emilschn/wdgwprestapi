@@ -71,7 +71,9 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		'file_list'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'turnover'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'message'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' )
+		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'employees_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL' )
 	);
 	
 	// Mise à jour de la bdd
