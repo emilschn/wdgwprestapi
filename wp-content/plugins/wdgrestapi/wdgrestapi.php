@@ -98,6 +98,7 @@ class WDGRESTAPI {
 		$this->add_include_route( 'organization-user' );
 		$this->add_include_route( 'project-user' );
 		$this->add_include_route( 'project-organization' );
+		$this->add_include_route( 'mail-template' );
 	}
 	public function add_include_route( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php');
@@ -112,6 +113,7 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_OrganizationUser::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectUser::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectOrganization::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_MailTemplate::register');
 	}
 	
 	
