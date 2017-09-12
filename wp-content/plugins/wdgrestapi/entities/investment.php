@@ -91,7 +91,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 			array_push( $this->properties_errors, __( "Le champ Adresse (address) n'est pas correct.", 'wdgrestapi' ) );
 			$buffer = false;
 		}
-		if ( !WDGRESTAPI_Lib_Validator::is_postalcode( $this->loaded_data->postalcode ) ) {
+		if ( !WDGRESTAPI_Lib_Validator::is_postalcode( $this->loaded_data->postalcode, $this->loaded_data->country ) ) {
 			array_push( $this->properties_errors, __( "Le champ Code postal (postalcode) n'est pas correct.", 'wdgrestapi' ) );
 			$buffer = false;
 		}
@@ -133,7 +133,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 				array_push( $this->properties_errors, __( "Le champ Adresse (legal_entity_address) n'est pas correct.", 'wdgrestapi' ) );
 				$buffer = false;
 			}
-			if ( !WDGRESTAPI_Lib_Validator::is_postalcode( $this->loaded_data->legal_entity_postalcode ) ) {
+			if ( !WDGRESTAPI_Lib_Validator::is_postalcode( $this->loaded_data->legal_entity_postalcode, $this->loaded_data->legal_entity_nationality ) ) {
 				array_push( $this->properties_errors, __( "Le champ Code postal (legal_entity_postalcode) n'est pas correct.", 'wdgrestapi' ) );
 				$buffer = false;
 			}

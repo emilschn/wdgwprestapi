@@ -408,10 +408,11 @@ class WDGRESTAPI_Lib_Validator {
 	/**
 	 * Vérifie si la variable est bien un code postal
 	 * @param string $input
+	 * @param string $input_country
 	 * @return boolean
 	 */
-	public static function is_postalcode( $input ) {
-		return ( preg_match( '#^[0-9]{5}$#', $input ) );
+	public static function is_postalcode( $input, $input_country ) {
+		return ( $input_country != 'FR' || preg_match( '#^[0-9]{5}$#', $input ) );
 	}
 	
 	/**
