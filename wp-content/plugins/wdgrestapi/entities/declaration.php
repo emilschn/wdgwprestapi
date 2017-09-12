@@ -3,6 +3,14 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	
 	public static $entity_type = 'declaration';
 	
+	public static $status_declaration = 'declaration';
+	public static $status_declaration_late = 'declaration_late';
+	public static $status_payment = 'payment';
+	public static $status_payment_late = 'payment_late';
+	public static $status_waiting_transfer = 'waiting_transfer';
+	public static $status_transfer = 'transfer';
+	public static $status_finished = 'finished';
+	
 	public function __construct( $id = FALSE, $payment_token = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Declaration::$entity_type, WDGRESTAPI_Entity_Declaration::$db_properties );
 		
@@ -32,7 +40,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
 		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		$results = $wpdb->get_results( $query );
-		return $results;
+		return self::complete_data( $results );
 	}
 	
 	/**
@@ -44,10 +52,96 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
 		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE id_project = " .$project_id;
 		$results = $wpdb->get_results( $query );
-		return $results;
+		return self::complete_data( $results );
 	}
 	
+	/**
+	 * Parcourt les données pour ajouter celles qu'il manque
+	 * @param array $results
+	 * @return array
+	 */
+	private static function complete_data( $results ) {
+		$buffer = array();
+		
+		foreach ( $results as $result ) {
+			$buffer_item = self::complete_single_data( $result );
+			array_push( $buffer, $buffer_item );
+		}
+		
+		return $buffer;
+	}
 	
+	/**
+	 * Ajoute les données manquantes
+	 * @param object $result
+	 * @return array
+	 */
+	public static function complete_single_data( $result ) {
+		// Données de base
+		$buffer = array(
+			'id'						=> $result->id,
+			'client_user_id'			=> $result->client_user_id,
+			'id_project'				=> $result->id_project,
+			'date_due'					=> $result->date_due,
+			'date_paid'					=> $result->date_paid,
+			'date_transfer'				=> $result->date_transfer,
+			'amount'					=> $result->amount,
+			'remaining_amount'			=> $result->remaining_amount,
+			'transfered_previous_remaining_amount'			=> $result->transfered_previous_remaining_amount,
+			'percent_commission'		=> $result->percent_commission,
+			'status'					=> $result->status,
+			'mean_payment'				=> $result->mean_payment,
+			'payment_token'				=> $result->payment_token,
+			'file_list'					=> $result->file_list,
+			'turnover'					=> $result->turnover,
+			'message'					=> $result->message,
+			'adjustment'				=> $result->adjustment,
+			'employees_number'			=> $result->employees_number,
+			'other_fundings'			=> $result->other_fundings
+		);
+		
+		// Données ajoutées
+		// Nom du projet
+		$project_item = new WDGRESTAPI_Entity_Project( $result->id_project );
+		$project_data = $project_item->get_loaded_data();
+		$buffer[ 'name_project' ] = $project_data->name;
+		// CA total
+		$turnover_list = json_decode( $result->turnover );
+		$turnover_total = 0;
+		foreach ( $turnover_list as $turnover_month ) {
+			$turnover_total += $turnover_month;
+		}
+		$buffer[ 'turnover_total' ] = $turnover_total;
+		// Statut d'affichage
+		$current_date = new DateTime();
+		$due_date = new DateTime( $result->date_due );
+		$buffer[ 'status_display' ] = $result->status;
+		if ( $buffer[ 'status_display' ] == WDGRESTAPI_Entity_Declaration::$status_declaration && $current_date > $due_date ) {
+			$buffer[ 'status_display' ] = WDGRESTAPI_Entity_Declaration::$status_declaration_late;
+		}
+		if ( $buffer[ 'status_display' ] == WDGRESTAPI_Entity_Declaration::$status_payment && $current_date > $due_date ) {
+			$buffer[ 'status_display' ] = WDGRESTAPI_Entity_Declaration::$status_payment_late;
+		}
+		// Frais investisseurs (TODO : aller chercher la bonne donnée)
+		$buffer[ 'cost_to_investors' ] = 0;
+		// Nombre de déclarations de CA (TODO : aller chercher la bonne donnée)
+		$buffer[ 'turnover_nb' ] = count( $turnover_list );
+		// Pourcentage de royalties versé (TODO : aller chercher la bonne donnée)
+		$buffer[ 'royalties_percent' ] = 'TODO';
+		// Ajustement
+		$adjustment = json_decode( $result->adjustment );
+		$buffer[ 'adjustment_needed' ] = ( isset( $adjustment->needed ) && $adjustment->needed == 1 ) ? 1 : 0;
+		$buffer[ 'adjustment_value' ] = ( isset( $adjustment->value ) ) ? $adjustment->value : 0;
+		$buffer[ 'adjustment_turnover_difference' ] = ( isset( $adjustment->turnover_difference ) ) ? $adjustment->turnover_difference : 0;
+		$buffer[ 'adjustment_msg_to_author' ] = ( isset( $adjustment->msg_to_author ) ) ? $adjustment->msg_to_author : 0;
+		// Contact
+		$buffer[ 'organization_email' ] = 'TODO';
+		$buffer[ 'organization_phone' ] = 'TODO';
+		// Fichiers
+		$buffer[ 'certificate' ] = 'TODO';
+		$buffer[ 'bill' ] = 'TODO';
+		return $buffer;
+	}
 	
 	
 /*******************************************************************************

@@ -79,9 +79,10 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 		$declaration_id = $request->get_param( 'id' );
 		if ( !empty( $declaration_id ) ) {
 			$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
-			$loaded_data = $declaration_item->get_loaded_data();
+			$loaded_data_temp = $declaration_item->get_loaded_data();
 			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+			if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
+				$loaded_data = WDGRESTAPI_Entity_Declaration::complete_single_data( $loaded_data_temp );
 				$this->log( "WDGRESTAPI_Route_Declaration::single_get::" . $declaration_id, json_encode( $loaded_data ) );
 				return $loaded_data;
 				
