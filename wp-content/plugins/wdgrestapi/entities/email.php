@@ -10,11 +10,13 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	 * 
 	 */
 	public function save() {
-		date_default_timezone_set( 'Europe/Paris' );
-		$current_date = new DateTime();
-		$this->set_property( 'date', $current_date->format( 'Y-m-d H:i:s' ) );
-		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		$this->set_property( 'caller', $current_client->ID );
+		if ( empty( $this->loaded_data->id ) ) {
+			date_default_timezone_set( 'Europe/Paris' );
+			$current_date = new DateTime();
+			$this->set_property( 'date', $current_date->format( 'Y-m-d H:i:s' ) );
+			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+			$this->set_property( 'caller', $current_client->ID );
+		}
 		parent::save();
 	}
 	
@@ -22,11 +24,90 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	 * Mail sending procedure
 	 */
 	public function send() {
-		
+		switch ( $this->loaded_data->tool ) {
+			case 'sendinblue':
+				$buffer = $this->send_sendinblue_mail();
+				break;
+			case 'sms':
+				$buffer = $this->send_sendinblue_sms();
+				break;
+		}
+		return $buffer;
 	}
 	
+	private function send_sendinblue_mail() {
+		include_once( plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php');
+		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 5000 );
+		
+		$recipients = str_replace( ',', '|', $this->loaded_data->recipient );
+		$data = array(
+			'id'		=> $this->loaded_data->template,
+			"to"		=> 'bonjour@wedogood.co',
+			"bcc"		=> $recipients,
+			"replyto"	=> 'bonjour@wedogood.co'
+		);
+		$sendinblue_result = $mailin->send_transactional_template( $data );
+		
+		$buffer = 'error';
+		if ( $sendinblue_result[ 'code' ] == 'success' ) {
+			$buffer = 'success';
+			$this->loaded_data->result = json_encode( $sendinblue_result );
+		}
+		$this->save();
+		return $buffer;
+	}
 	
-/*******************************************************************************
+	/**
+	 * Processus complet : création d'une nouvelle liste, ajout des e-mails à la liste et création d'une campagne avec la liste
+	 * @return boolean
+	 */
+	private function send_sendinblue_sms() {
+		include_once( plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php');
+		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 5000 );
+		
+		// Création d'une nouvelle liste
+		$current_date = new DateTime();
+		$data_new_list = array(
+			'list_name'		=> "(Supprimer API) Liste temporaire - date : " . $current_date->format( 'Y-m-d H:i:s' ),
+			'list_parent'	=> 1
+		);
+		$create_list_result = $mailin->create_list( $data_new_list );
+		
+		if ( !isset( $create_list_result[ 'data' ] ) || !isset( $create_list_result[ 'data' ][ 'id' ] ) ) {
+			$sendinblue_result = $create_list_result;
+			
+		} else {
+			$new_list_id = $create_list_result[ 'data' ][ 'id' ];
+
+			// Ajout des utilisateurs à la liste
+			$recipient_list = explode( ',', $this->loaded_data->recipient );
+			$data_add_users = array(
+				'id'		=> $new_list_id,
+				'users'		=> $recipient_list
+			);
+			$mailin->add_users_list( $data_add_users );
+
+			// Création de la campagne avec envoi direct
+			$data = array(
+				'name'			=> "(Supprimer API) Campagne temporaire - date : " . $current_date->format( 'Y-m-d H:i:s' ),
+				'sender'		=> "WE DO GOOD",
+				'content'		=> $this->loaded_data->template,
+				'listid'		=> array( $new_list_id ),
+				'send_now'		=> 1
+			);
+			$sendinblue_result = $mailin->create_sms_campaign( $data );
+		}
+		
+		
+		$this->loaded_data->result = json_encode( $sendinblue_result );
+		$this->save();
+		return true;
+	}
+
+
+
+
+	/*******************************************************************************
  * GESTION BDD
  ******************************************************************************/
 	
@@ -37,7 +118,8 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		'caller'				=> array( 'type' => 'id', 'other' => '' ),
 		'tool'					=> array( 'type' => 'varchar', 'other' => '' ),
 		'template'				=> array( 'type' => 'varchar', 'other' => '' ),
-		'recipient'				=> array( 'type' => 'longtext', 'other' => '' )
+		'recipient'				=> array( 'type' => 'longtext', 'other' => '' ),
+		'result'				=> array( 'type' => 'longtext', 'other' => '' ),
 	);
 	
 	// Mise à jour de la bdd
