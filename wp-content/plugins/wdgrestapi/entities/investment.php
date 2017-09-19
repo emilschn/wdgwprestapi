@@ -197,12 +197,92 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 	 * Retourne la liste de tous les investissements
 	 * @return array
 	 */
-	public static function list_get() {
-		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
-		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		$query = "SELECT id, email, project, amount, status FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
-		$results = $wpdb->get_results( $query );
+	public static function list_get( $start_date = FALSE, $end_date = FALSE ) {
+		if ( !empty( $start_date ) && !empty( $end_date ) ) {
+			$test_data = array(
+				array(
+					'id'			=> '1',
+					'datetime'		=> '2017-09-19 17:08',
+					'id_user'		=> '1',
+					'id_project'	=> '12',
+					'amount'		=> '10',
+					'status'		=> WDGRESTAPI_Entity_Investment::$status_canceled
+				),
+				array(
+					'id'			=> '2',
+					'datetime'		=> '2017-09-19 17:10',
+					'id_user'		=> '1',
+					'id_project'	=> '12',
+					'amount'		=> '10',
+					'status'		=> WDGRESTAPI_Entity_Investment::$status_validated
+				),
+				array(
+					'id'			=> '3',
+					'datetime'		=> '2017-09-15 17:08',
+					'id_user'		=> '2',
+					'id_project'	=> '22',
+					'amount'		=> '100',
+					'status'		=> WDGRESTAPI_Entity_Investment::$status_validated
+				),
+				array(
+					'id'			=> '4',
+					'datetime'		=> '2017-09-14 14:08',
+					'id_user'		=> '2',
+					'id_project'	=> '22',
+					'amount'		=> '100',
+					'status'		=> WDGRESTAPI_Entity_Investment::$status_error
+				),
+				array(
+					'id'			=> '5',
+					'datetime'		=> '2017-09-03 13:01',
+					'id_user'		=> '3',
+					'id_project'	=> '14',
+					'amount'		=> '190',
+					'status'		=> WDGRESTAPI_Entity_Investment::$status_validated
+				),
+				array(
+					'id'			=> '6',
+					'datetime'		=> '2017-09-01 14:08',
+					'id_user'		=> '4',
+					'id_project'	=> '12',
+					'amount'		=> '140',
+					'status'		=> WDGRESTAPI_Entity_Investment::$status_validated
+				),
+				array(
+					'id'			=> '7',
+					'datetime'		=> '2017-08-11 19:27',
+					'id_user'		=> '5',
+					'id_project'	=> '15',
+					'amount'		=> '15',
+					'status'		=> WDGRESTAPI_Entity_Investment::$status_error
+				),
+				array(
+					'id'			=> '8',
+					'datetime'		=> '2017-08-01 07:08',
+					'id_user'		=> '6',
+					'id_project'	=> '22',
+					'amount'		=> '1000',
+					'status'		=> WDGRESTAPI_Entity_Investment::$status_canceled
+				),
+			);
+			
+			$results = array();
+			$start_date->setTime( 0, 0, 1 );
+			$end_date->setTime( 23, 59, 59 );
+			foreach ( $test_data as $data ) {
+				$invest_date = new DateTime( $data['datetime'] );
+				if ( $start_date < $invest_date && $invest_date < $end_date ) {
+					array_push( $results, $data );
+				}
+			}
+			
+		} else {
+			global $wpdb;
+			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
+			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+			$query = "SELECT id, email, project, amount, status FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
+			$results = $wpdb->get_results( $query );
+		}
 		return $results;
 	}
 	

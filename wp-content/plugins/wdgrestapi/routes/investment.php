@@ -46,7 +46,11 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		return WDGRESTAPI_Entity_Investment::list_get();
+		$input_start_date = filter_input( INPUT_GET, 'start_date' );
+		$input_end_date = filter_input( INPUT_GET, 'end_date' );
+		$start_date = ( !empty( $input_start_date ) ) ? new DateTime( $input_start_date ) : FALSE;
+		$end_date = ( !empty( $input_end_date ) ) ? new DateTime( $input_end_date ) : FALSE;
+		return WDGRESTAPI_Entity_Investment::list_get( $start_date, $end_date );
 	}
 	
 	/**
