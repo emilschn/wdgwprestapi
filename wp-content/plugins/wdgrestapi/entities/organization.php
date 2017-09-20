@@ -60,7 +60,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	public static function list_get( $authorized_client_id_string ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Organization::$entity_type );
-		$query = "SELECT id, wpref, name FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		$query = "SELECT id, wpref, name, email FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
@@ -83,6 +83,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'wpref'					=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'creation_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'strong_authentication'	=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
