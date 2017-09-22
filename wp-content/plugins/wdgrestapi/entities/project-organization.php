@@ -2,6 +2,8 @@
 class WDGRESTAPI_Entity_ProjectOrganization extends WDGRESTAPI_Entity {
 	public static $entity_type = 'project_organization';
 	
+	public static $link_type_manager = 'manager';
+	
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_ProjectOrganization::$entity_type, WDGRESTAPI_Entity_ProjectOrganization::$db_properties );
 	}

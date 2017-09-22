@@ -140,6 +140,21 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		// Fichiers
 		$buffer[ 'certificate' ] = 'TODO';
 		$buffer[ 'bill' ] = 'TODO';
+		// Infos organisation
+		$project_orga_list = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $result->id_project );
+		$orga_linked_id = 0;
+		foreach ( $project_orga_list as $project_orga_link ) {
+			if ( $project_orga_link->type == WDGRESTAPI_Entity_ProjectOrganization::$link_type_manager ) {
+				$orga_linked_id = $project_orga_link->id_organization;
+			}
+		}
+		$buffer[ 'organization_id' ] = $orga_linked_id;
+		$organization_data = FALSE;
+		if ( $orga_linked_id > 0 ) {
+			$organization_item = new WDGRESTAPI_Entity_Organization( $orga_linked_id );
+			$organization_data = $organization_item->get_loaded_data();
+		}
+		$buffer[ 'organization_email' ] = !empty( $organization_data ) ? $organization_data->email : '';
 		return $buffer;
 	}
 	
