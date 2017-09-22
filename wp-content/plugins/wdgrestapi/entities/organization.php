@@ -83,6 +83,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'wpref'					=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'representative_function'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'creation_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'strong_authentication'	=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
