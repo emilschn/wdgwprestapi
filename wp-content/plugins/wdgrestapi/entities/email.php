@@ -42,9 +42,10 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		$recipients = str_replace( ',', '|', $this->loaded_data->recipient );
 		$data = array(
 			'id'		=> $this->loaded_data->template,
-			"to"		=> 'bonjour@wedogood.co',
-			"bcc"		=> $recipients,
-			"replyto"	=> 'bonjour@wedogood.co'
+			'to'		=> 'bonjour@wedogood.co',
+			'bcc'		=> $recipients,
+			'replyto'	=> 'bonjour@wedogood.co',
+			'attr'		=> json_decode( $this->loaded_data->options )
 		);
 		$sendinblue_result = $mailin->send_transactional_template( $data );
 		
@@ -120,6 +121,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		'template'				=> array( 'type' => 'varchar', 'other' => '' ),
 		'recipient'				=> array( 'type' => 'longtext', 'other' => '' ),
 		'result'				=> array( 'type' => 'longtext', 'other' => '' ),
+		'options'				=> array( 'type' => 'longtext', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd
