@@ -50,6 +50,7 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 						"id"	=> $loaded_data->id,
 						"wpref"	=> $loaded_data->wpref,
 						"name"	=> $loaded_data->name,
+						"email"	=> $loaded_data->email,
 						"type"	=> $link_item->type
 					)
 				);
