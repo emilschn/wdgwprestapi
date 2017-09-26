@@ -60,7 +60,13 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		return WDGRESTAPI_Entity_Declaration::list_get( $this->get_current_client_autorized_ids_string() );
+		$input_start_date = filter_input( INPUT_GET, 'start_date' );
+		$input_end_date = filter_input( INPUT_GET, 'end_date' );
+		$input_type = filter_input( INPUT_GET, 'type' );
+		$start_date = ( !empty( $input_start_date ) ) ? new DateTime( $input_start_date ) : FALSE;
+		$end_date = ( !empty( $input_end_date ) ) ? new DateTime( $input_end_date ) : FALSE;
+		$type = ( !empty( $input_type ) ) ? $input_type : FALSE;
+		return WDGRESTAPI_Entity_Declaration::list_get( $this->get_current_client_autorized_ids_string(), $start_date, $end_date, $type );
 	}
 	
 	/**

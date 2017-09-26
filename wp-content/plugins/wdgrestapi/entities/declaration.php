@@ -35,11 +35,35 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les déclarations
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string ) {
+	public static function list_get( $authorized_client_id_string, $start_date = FALSE, $end_date = FALSE, $type = FALSE  ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
 		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
-		$results = $wpdb->get_results( $query );
+		$result_list = $wpdb->get_results( $query );
+		
+		if ( empty( $start_date ) ) {
+			$results = array();
+			$start_date->setTime( 0, 0, 1 );
+			$end_date->setTime( 23, 59, 59 );
+			foreach ( $result_list as $data ) {
+				$data_date = FALSE;
+				switch ( $type ) {
+					case 'due':
+						$data_date = $data->date_due;
+						break;
+				}
+				if ( !empty( $data_date ) ) {
+					$declaration_date = new DateTime( $data->date_due );
+					$declaration_date->setTime( 10, 30, 0 );
+					if ( $start_date < $declaration_date && $declaration_date < $end_date ) {
+						array_push( $results, $data );
+					}
+				}
+			}
+			
+		} else {
+			$results = $result_list;
+		}
 		return self::complete_data( $results );
 	}
 	
@@ -107,6 +131,9 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		$buffer[ 'name_project' ] = $project_data->name;
 		// CA total
 		$turnover_list = json_decode( $result->turnover );
+		if ( empty( $turnover_list ) ) {
+			$turnover_list = array();
+		}
 		$turnover_total = 0;
 		foreach ( $turnover_list as $turnover_month ) {
 			$turnover_total += $turnover_month;
