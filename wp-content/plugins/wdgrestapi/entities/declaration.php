@@ -41,7 +41,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		$result_list = $wpdb->get_results( $query );
 		
-		if ( empty( $start_date ) ) {
+		if ( !empty( $start_date ) ) {
 			$results = array();
 			$start_date->setTime( 0, 0, 1 );
 			$end_date->setTime( 23, 59, 59 );
