@@ -62,8 +62,15 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 	 * @return boolean
 	 */
 	public function is_authorized_ip( $client_ip ) {
-		$authorized_ips_init = $this->get_authorized_ips();
-		
+		return WDG_RESTAPIUserBasicAccess_Class_Client::get_is_authorized_ip( $this->get_authorized_ips(), $client_ip );
+	}
+	
+	/**
+	 * Returns true if the IP is authorized for this client
+	 * @param string $client_ip
+	 * @return boolean
+	 */
+	public static function get_is_authorized_ip( $authorized_ips_init, $client_ip ) {
 		// Clear spaces
 		$authorized_ips = str_replace( " ", "", $authorized_ips_init );
 		
@@ -120,7 +127,15 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 	 * @return boolean
 	 */
 	public function is_authorized_action( $action_init ) {
-		$authorized_actions_array = $this->get_authorized_actions();
+		WDG_RESTAPIUserBasicAccess_Class_Client::get_is_authorized_action( $this->get_authorized_actions(), $action_init );
+	}
+	
+	/**
+	 * Returns true if the specified action is authorized for this user
+	 * @param string $action_init
+	 * @return boolean
+	 */
+	public static function get_is_authorized_action( $authorized_actions_array, $action_init ) {
 		$action = strtolower( $action_init );
 		if ( isset( $authorized_actions_array->$action ) ) {
 			return ( $authorized_actions_array->$action == '1' );

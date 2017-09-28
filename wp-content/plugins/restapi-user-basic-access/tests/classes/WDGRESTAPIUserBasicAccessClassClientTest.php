@@ -1,5 +1,4 @@
 <?php
-//require_once 'PHPUnit/Autoload.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/class-wp-user.php';
 require_once dirname( __FILE__ ) . '/../../classes/client.php';
 
@@ -9,9 +8,7 @@ class WDGRESTAPIUserBasicAccessClassClientTest extends PHPUnit_Framework_TestCas
      * @dataProvider ipProvider
      */
 	public function testIsAuthorizedIP( $client_ip, $authorized_ip, $expected ) {
-		$client = new WDG_RESTAPIUserBasicAccess_Class_Client();
-		$client->set_authorized_ips( $authorized_ip );
-        $this->assertEquals( $expected, $client->is_authorized_ip( $client_ip ) );
+        $this->assertEquals( $expected, WDG_RESTAPIUserBasicAccess_Class_Client::get_is_authorized_ip( $authorized_ip, $client_ip ) );
 	}
 	
 	public function ipProvider() {
@@ -39,9 +36,7 @@ class WDGRESTAPIUserBasicAccessClassClientTest extends PHPUnit_Framework_TestCas
      * @dataProvider actionProvider
      */
 	public function testIsAuthorizedAction( $client_method, $authorized_method, $expected ) {
-		$client = new WDG_RESTAPIUserBasicAccess_Class_Client();
-		$client->set_authorized_ips( $authorized_method );
-        $this->assertEquals( $expected, $client->is_authorized_action( $client_method ) );
+        $this->assertEquals( $expected, WDG_RESTAPIUserBasicAccess_Class_Client::get_is_authorized_action( $authorized_method, $client_method ) );
 	}
 	
 	public function actionProvider() {
