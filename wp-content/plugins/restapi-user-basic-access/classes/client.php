@@ -142,6 +142,9 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 			$authorized_actions_object = json_decode( $authorized_actions_object );
 		}
 		$action = strtolower( $action_init );
+		if ( $action == 'patch' ) {
+			$action = 'put';
+		}
 		if ( isset( $authorized_actions_object->$action ) ) {
 			return ( $authorized_actions_object->$action == '1' );
 			

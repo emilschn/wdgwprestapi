@@ -23,7 +23,7 @@ class WDGRESTAPIUserBasicAccessClassClientTest extends PHPUnit_Framework_TestCas
             'Localhost, Mult dummy list'			=> [ '127.0.0.1', 'dummy,dummy2', FALSE ],
             'Localhost, Sing space Localhost list'	=> [ '127.0.0.1', ' 127.0.0.1', TRUE ],
             'Localhost, Sing space Localhost list2'	=> [ '127.0.0.1', '127.0.0.1 ', TRUE ],
-            'Localhost, Mult space Localhost list'	=> [ '127.0.0.1', '127.0.0.1, 127.0.0.2 ', FALSE ],
+            'Localhost, Mult space Localhost list'	=> [ '127.0.0.1', '127.0.0.1, 127.0.0.2 ', TRUE ],
             'Localhost, Mult space false list'		=> [ '127.0.0.1', '127.0.0.0, 127.0.0.2 ', FALSE ],
             'Localhost, Sing cont false list'		=> [ '127.0.0.1', '127.0.0.11', FALSE ],
             'Localhost, Mult cont false list'		=> [ '127.0.0.1', '127.0.0.11,127.0.0.12', FALSE ],
