@@ -1,5 +1,5 @@
 <?php
-require_once 'PHPUnit/Autoload.php';
+//require_once 'PHPUnit/Autoload.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/class-wp-user.php';
 require_once dirname( __FILE__ ) . '/../../classes/client.php';
 
