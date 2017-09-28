@@ -185,9 +185,14 @@ class WDGRESTAPI_Entity {
 				$url,
 				array( 'timeout' => 10 )
 			);
-			$buffer = $remote_result["body"];
 			
-			$cached_version_entity->save( $params, $buffer );
+			if ( is_array( $remote_result ) && isset( $remote_result[ 'body' ] ) ) {
+				$buffer = $remote_result["body"];
+				$cached_version_entity->save( $params, $buffer );
+				
+			} else {
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::get_data_on_client_site > error : ' . print_r( $remote_result, TRUE ) );
+			}
 		}
 		return json_decode( $buffer );
 	}
