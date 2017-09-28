@@ -128,7 +128,7 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 	 * @return boolean
 	 */
 	public function is_authorized_action( $action_init ) {
-		WDG_RESTAPIUserBasicAccess_Class_Client::get_is_authorized_action( $this->get_authorized_actions(), $action_init );
+		return WDG_RESTAPIUserBasicAccess_Class_Client::get_is_authorized_action( $this->get_authorized_actions(), $action_init );
 	}
 	
 	/**
