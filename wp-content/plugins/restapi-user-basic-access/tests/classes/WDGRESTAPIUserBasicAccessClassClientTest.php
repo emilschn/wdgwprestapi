@@ -3,7 +3,7 @@
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/class-wp-user.php';
 require_once dirname( __FILE__ ) . '/../../classes/client.php';
 
-class WDGRESTAPIUserBasicAccessClassClientTest extends TestCase {
+class WDGRESTAPIUserBasicAccessClassClientTest extends PHPUnit_Framework_TestCase {
 	
     /**
      * @dataProvider ipProvider
