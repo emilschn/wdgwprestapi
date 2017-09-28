@@ -67,6 +67,7 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 	
 	/**
 	 * Returns true if the IP is authorized for this client
+	 * @param string $authorized_ips_init
 	 * @param string $client_ip
 	 * @return boolean
 	 */
@@ -132,13 +133,17 @@ class WDG_RESTAPIUserBasicAccess_Class_Client extends WP_User {
 	
 	/**
 	 * Returns true if the specified action is authorized for this user
+	 * @param object or string $authorized_actions_object
 	 * @param string $action_init
 	 * @return boolean
 	 */
-	public static function get_is_authorized_action( $authorized_actions_array, $action_init ) {
+	public static function get_is_authorized_action( $authorized_actions_object, $action_init ) {
+		if ( is_string( $authorized_actions_object ) ) {
+			$authorized_actions_object = json_decode( $authorized_actions_object );
+		}
 		$action = strtolower( $action_init );
-		if ( isset( $authorized_actions_array->$action ) ) {
-			return ( $authorized_actions_array->$action == '1' );
+		if ( isset( $authorized_actions_object->$action ) ) {
+			return ( $authorized_actions_object->$action == '1' );
 			
 		} else {
 			return FALSE;

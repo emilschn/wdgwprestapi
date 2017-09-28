@@ -13,17 +13,16 @@ class WDGRESTAPIUserBasicAccessClassClientTest extends PHPUnit_Framework_TestCas
 	
 	public function ipProvider() {
         return [
-            'FAKE Localhost, Empty list'			=> [ '127.0.0.1', '', TRUE ],
             'Localhost, Empty list'					=> [ '127.0.0.1', '', FALSE ],
             'Localhost, Null list'					=> [ '127.0.0.1', null, FALSE ],
             'Localhost, Sing Localhost list'		=> [ '127.0.0.1', '127.0.0.1', TRUE ],
             'Localhost, Sing false list'			=> [ '127.0.0.1', '127.0.0.2', FALSE ],
-            'Localhost, Mult true list'				=> [ '127.0.0.1', '127.0.0.1,127.0.0.2', FALSE ],
+            'Localhost, Mult true list'				=> [ '127.0.0.1', '127.0.0.1,127.0.0.2', TRUE ],
             'Localhost, Mult false list'			=> [ '127.0.0.1', '127.0.0.0,127.0.0.2', FALSE ],
             'Localhost, Sing dummy list'			=> [ '127.0.0.1', 'dummy', FALSE ],
             'Localhost, Mult dummy list'			=> [ '127.0.0.1', 'dummy,dummy2', FALSE ],
-            'Localhost, Sing space Localhost list'	=> [ '127.0.0.1', ' 127.0.0.1', FALSE ],
-            'Localhost, Sing space Localhost list2'	=> [ '127.0.0.1', '127.0.0.1 ', FALSE ],
+            'Localhost, Sing space Localhost list'	=> [ '127.0.0.1', ' 127.0.0.1', TRUE ],
+            'Localhost, Sing space Localhost list2'	=> [ '127.0.0.1', '127.0.0.1 ', TRUE ],
             'Localhost, Mult space Localhost list'	=> [ '127.0.0.1', '127.0.0.1, 127.0.0.2 ', FALSE ],
             'Localhost, Mult space false list'		=> [ '127.0.0.1', '127.0.0.0, 127.0.0.2 ', FALSE ],
             'Localhost, Sing cont false list'		=> [ '127.0.0.1', '127.0.0.11', FALSE ],
