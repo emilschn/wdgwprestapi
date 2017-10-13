@@ -94,6 +94,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'capital'				=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'ape'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'vat'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'fiscal_year_end_month'	=> array( 'type' => 'varchar', 'other' => '' ),
 		'address'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'postalcode'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
