@@ -42,6 +42,13 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
+		WDGRESTAPI_Route::register(
+			'/project/(?P<id>\d+)/declarations',
+			WP_REST_Server::CREATABLE,
+			array( $this, 'single_create_declarations'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
 		WDGRESTAPI_Route::register_external(
 			'/project/(?P<id>\d+)/royalties',
 			WP_REST_Server::READABLE,
@@ -176,7 +183,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	public function single_get_votes( WP_REST_Request $request ) {
 		$project_id = $request->get_param( 'id' );
 		if ( !empty( $project_id ) ) {
-			$project_item = new WDGRESTAPI_Entity_Project( FALSE, $project_id );
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
 			$loaded_data = $project_item->get_loaded_data();
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
@@ -204,7 +211,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	public function single_get_investments( WP_REST_Request $request ) {
 		$project_id = $request->get_param( 'id' );
 		if ( !empty( $project_id ) ) {
-			$project_item = new WDGRESTAPI_Entity_Project( FALSE, $project_id );
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
 			$loaded_data = $project_item->get_loaded_data();
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
@@ -238,6 +245,34 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		$reloaded_data = $project_item->get_loaded_data();
 		$this->log( "WDGRESTAPI_Route_Project::single_create", json_encode( $reloaded_data ) );
 		return $reloaded_data;
+	}
+	
+	
+	/**
+	 * Crée les déclarations manquantes d'un projet
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_create_declarations( WP_REST_Request $request ) {
+		$project_id = $request->get_param( 'id' );
+		if ( !empty( $project_id ) ) {
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
+			$loaded_data = $project_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$project_item->create_missing_declarations();
+				return $project_item->get_declarations();
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_create_declarations::" . $project_id, "404 : Invalid project ID" );
+				return new WP_Error( '404', "Invalid project ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_create_declarations", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
 	}
 	
 	/**

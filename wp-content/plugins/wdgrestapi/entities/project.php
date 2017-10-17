@@ -161,6 +161,13 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
+	/**
+	 * Crée les déclarations manquantes pour un projet spécifique
+	 */
+	public function create_missing_declarations() {
+		//TODO
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD
