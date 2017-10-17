@@ -101,6 +101,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'creation_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'can_go_next'			=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'category'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'impacts'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
