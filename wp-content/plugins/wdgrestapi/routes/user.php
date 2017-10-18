@@ -76,9 +76,10 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	public function list_get() {
 		$input_add_organizations = filter_input( INPUT_GET, 'add_organizations' );
 		$input_full = filter_input( INPUT_GET, 'full' );
+		$input_link_to_project = filter_input( INPUT_GET, 'link_to_project' );
 		$add_organizations = ( $input_add_organizations == '1' ) ? TRUE : FALSE;
 		$full = ( $input_full == '1' ) ? TRUE : FALSE;
-		return WDGRESTAPI_Entity_User::list_get( $this->get_current_client_autorized_ids_string(), $add_organizations, $full );
+		return WDGRESTAPI_Entity_User::list_get( $this->get_current_client_autorized_ids_string(), $add_organizations, $full, $input_link_to_project );
 	}
 	
 	/**

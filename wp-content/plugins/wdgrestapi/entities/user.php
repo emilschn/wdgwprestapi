@@ -98,10 +98,16 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * Retourne la liste de tous les utilisateurs
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $add_organizations, $full ) {
+	public static function list_get( $authorized_client_id_string, $add_organizations = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
-		$query = "SELECT id, wpref, gender, name, surname, username, email FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		
+		if ( !empty( $input_link_to_project ) ) {
+			// TODO : changer requete pour faire liaison avec table votes et table investissements
+			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		} else {
+			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		}
 		$results = $wpdb->get_results( $query );
 		
 		foreach ( $results as $result ) {
@@ -110,7 +116,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		}
 		
 		if ( $add_organizations ) {
-			$list_organizations = WDGRESTAPI_Entity_Organization::list_get( $authorized_client_id_string );
+			$list_organizations = WDGRESTAPI_Entity_Organization::list_get( $authorized_client_id_string, $input_link_to_project );
 			foreach ( $list_organizations as $organization ) {
 				$single_item = array(
 					'id'			=> $organization->id,
