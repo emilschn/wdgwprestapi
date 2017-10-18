@@ -16,6 +16,41 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne la liste des actions effectuées par l'utilisateur
+	 */
+	public function get_activities() {
+		$buffer = array(
+			'projects' => array(
+				array(
+					'id'			=> 1,
+					'name'			=> "Super projet",
+					'vote_validate'		=> 0,
+					'vote_environment'	=> 1,
+					'vote_social'		=> 2,
+					'vote_economy'		=> 3,
+					'vote_risk'			=> 4,
+					'vote_invest_sum'	=> 40,
+					'invest_amount'		=> 50,
+					'contract_url'		=> "https://www.wedogood.co",
+				),
+				array(
+					'id'			=> 2,
+					'name'			=> "Super projet 2",
+					'vote_validate'		=> 1,
+					'vote_environment'	=> 2,
+					'vote_social'		=> 2,
+					'vote_economy'		=> 1,
+					'vote_risk'			=> 1,
+					'vote_invest_sum'	=> 405,
+					'invest_amount'		=> 520,
+					'contract_url'		=> "https://www.wedogood.co",
+				),
+			)
+		);
+		return $buffer;
+	}
+	
+	/**
 	 * Récupération des données de royalties concernant un utilisateur
 	 * @return string
 	 */
