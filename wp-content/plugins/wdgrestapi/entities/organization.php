@@ -60,7 +60,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	public static function list_get( $authorized_client_id_string ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Organization::$entity_type );
-		$query = "SELECT id, wpref, name, email FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}

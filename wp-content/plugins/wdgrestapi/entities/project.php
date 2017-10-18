@@ -125,12 +125,12 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			$result->declarations_start_date = 'TODO';
 			$result->declarations_end_date = 'TODO';
 			$result->organization_name = 'TODO';
-			$result->organization_legal_form = 'TODO';
+			$result->organization_legalform = 'TODO';
 			$result->organization_capital = 'TODO';
 			$result->organization_idnumber = 'TODO';
 			$result->organization_vat = 'TODO';
 			$result->organization_address = 'TODO';
-			$result->organization_postal_code = 'TODO';
+			$result->organization_postalcode = 'TODO';
 			$result->organization_city = 'TODO';
 			$result->organization_country = 'TODO';
 			$result->organization_rcs = 'TODO';

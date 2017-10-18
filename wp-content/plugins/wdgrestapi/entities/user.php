@@ -63,11 +63,66 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * Retourne la liste de tous les utilisateurs
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string ) {
+	public static function list_get( $authorized_client_id_string, $add_organizations, $full ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
 		$query = "SELECT id, wpref, gender, name, surname, username, email FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		$results = $wpdb->get_results( $query );
+		
+		foreach ( $results as $result ) {
+			$result->type = 'user';
+			$result->is_project_manager = FALSE; // TODO
+		}
+		
+		if ( $add_organizations ) {
+			$list_organizations = WDGRESTAPI_Entity_Organization::list_get( $authorized_client_id_string );
+			foreach ( $list_organizations as $organization ) {
+				$single_item = array(
+					'id'			=> $organization->id,
+					'email'			=> $organization->email,
+					'type'			=> 'organization',
+					'address'		=> $organization->address,
+					'postalcode'	=> $organization->postalcode,
+					'city'			=> $organization->city,
+					'country'		=> $organization->country,
+					'bank_owner'	=> $organization->bank_owner,
+					'bank_address'	=> $organization->bank_address,
+					'bank_iban'		=> $organization->bank_iban,
+					'bank_bic'		=> $organization->bank_bic,
+					'document_id'				=> 'TODO',
+					'document_home'				=> 'TODO',
+					'organization_name'			=> $organization->name,
+					'organization_legalform'	=> $organization->legalform,
+					'organization_capital'		=> $organization->capital,
+					'organization_idnumber'		=> $organization->idnumber,
+					'organization_vat'			=> $organization->vat,
+					'organization_rcs'			=> $organization->rcs,
+					'organization_representative_firstname'		=> 'TODO',
+					'organization_representative_lastname'		=> 'TODO',
+					'organization_representative_function'		=> $organization->representative_function,
+					'organization_description'					=> 'TODO',
+					'organization_fiscal_year_end_month'		=> $organization->fiscal_year_end_month,
+					'organization_accounting_contact'			=> $organization->accounting_contact,
+					'organization_document_kbis'				=> 'TODO',
+					'organization_document_rib'					=> 'TODO',
+					'organization_document_status'				=> 'TODO'
+				);
+				$single_item_object = json_decode( json_encode( $single_item ), FALSE );
+				array_push( $results, $single_item_object );
+			}
+		}
+		
+		if ( $full ) {
+			foreach ( $results as $result ) {
+				$result->vote_count = 0;
+				$result->invest_count = 0;
+				$result->invest_amount = 0;
+				$result->invest_amount_royalties = 0;
+				$result->royalties_amount_received = 0;
+				$result->lw_amount_wallet = 0;
+			}
+		}
+		
 		return $results;
 	}
 	
@@ -95,10 +150,21 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'username'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'birthday_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'birthday_city'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'nationality'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'address'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'postalcode'			=> array( 'type' => 'int', 'other' => '' ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'phone_number'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'bank_iban'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'bank_bic'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'bank_holdername'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'bank_address'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'bank_address2'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'document_id'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'document_home'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'authentification_mode'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'picture_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'website_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'twitter_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
