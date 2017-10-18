@@ -69,6 +69,13 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( $this, 'single_get_investments'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
+		
+		WDGRESTAPI_Route::register(
+			'/project/(?P<id>\d+)/documents',
+			WP_REST_Server::CREATABLE,
+			array( $this, 'single_post_documents'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
 	}
 	
 	public static function register() {
@@ -301,6 +308,35 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Project::single_edit", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Demande à envoyer les documents à Lemon Way
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_post_documents( WP_REST_Request $request ) {
+		$project_id = $request->get_param( 'id' );
+		if ( !empty( $project_id ) ) {
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
+			$loaded_data = $project_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$project_item->post_documents();
+				$reloaded_data = $project_item->get_loaded_data();
+				$this->log( "WDGRESTAPI_Route_Project::single_post_documents::" . $project_id, json_encode( $reloaded_data ) );
+				return $reloaded_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_post_documents::" . $project_id, "404 : Invalid project ID" );
+				return new WP_Error( '404', "Invalid project ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_post_documents", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}

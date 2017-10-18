@@ -168,6 +168,13 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		//TODO
 	}
 	
+	/**
+	 * Envoie les documents sur Lemon Way
+	 */
+	public function post_documents() {
+		//TODO
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD
