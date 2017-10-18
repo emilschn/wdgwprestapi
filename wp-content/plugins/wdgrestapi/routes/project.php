@@ -56,14 +56,14 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register_external(
+		WDGRESTAPI_Route::register(
 			'/project/(?P<id>\d+)/votes',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_votes'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register_external(
+		WDGRESTAPI_Route::register(
 			'/project/(?P<id>\d+)/investments',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_investments'),

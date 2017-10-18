@@ -41,28 +41,28 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 				'date'			=> '2017-10-10 20:12:12',
 				'id_user'		=> 10,
 				'email_user'	=> 'test1@temp.fr',
-				'accept'		=> 1,
+				'validate'		=> 1,
 				'amount'		=> 25
 			),
 			array(
 				'date'			=> '2017-09-10 20:12:12',
 				'id_user'		=> 11,
 				'email_user'	=> 'test2@temp.fr',
-				'accept'		=> 1,
+				'validate'		=> 1,
 				'amount'		=> 250
 			),
 			array(
 				'date'			=> '2017-09-10 08:12:12',
 				'id_user'		=> 12,
 				'email_user'	=> 'test3@temp.fr',
-				'accept'		=> 0,
+				'validate'		=> 0,
 				'amount'		=> 15
 			),
 			array(
 				'date'			=> '2017-10-01 00:12:12',
 				'id_user'		=> 13,
 				'email_user'	=> 'test4@temp.fr',
-				'accept'		=> 1,
+				'validate'		=> 1,
 				'amount'		=> 2500
 			),
 		);
