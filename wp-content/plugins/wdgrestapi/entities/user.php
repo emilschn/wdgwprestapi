@@ -98,7 +98,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * Retourne la liste de tous les utilisateurs
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $add_organizations = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
+	public static function list_get( $authorized_client_id_string, $offset = 0, $limit = FALSE, $add_organizations = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
 		
@@ -108,6 +108,22 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		} else {
 			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		}
+		
+		// Gestion offset et limite
+		if ( $offset > 0 || !empty( $limit ) ) {
+			$query .= " LIMIT ";
+			
+			if ( $offset > 0 ) {
+				$query .= $offset . ", ";
+				if ( empty( $limit ) ) {
+					$query .= "0";
+				}
+			}
+			if ( !empty( $limit ) ) {
+				$query .= $limit;
+			}
+		}
+		
 		$results = $wpdb->get_results( $query );
 		
 		foreach ( $results as $result ) {
