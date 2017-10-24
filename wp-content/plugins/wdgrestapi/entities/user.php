@@ -153,6 +153,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			foreach ( $list_organizations as $organization ) {
 				$single_item = array(
 					'id'			=> $organization->id,
+					'wpref'			=> $organization->wpref,
+					'client_user_id'			=> $organization->client_user_id,
 					'email'			=> $organization->email,
 					'type'			=> 'organization',
 					'address'		=> $organization->address,
@@ -179,7 +181,28 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 					'organization_accounting_contact'			=> $organization->accounting_contact,
 					'organization_document_kbis'				=> 'TODO',
 					'organization_document_rib'					=> 'TODO',
-					'organization_document_status'				=> 'TODO'
+					'organization_document_status'				=> 'TODO',
+					// Infos utilisateurs à FALSE
+					'is_project_manager'	=> FALSE,
+					'gender'				=> FALSE,
+					'name'					=> FALSE,
+					'surname'				=> FALSE,
+					'username'				=> FALSE,
+					'birthday_date'			=> FALSE,
+					'birthday_city'			=> FALSE,
+					'nationality'			=> FALSE,
+					'phone_number'			=> FALSE,
+					'bank_address2'			=> FALSE,
+					'authentification_mode'	=> FALSE,
+					'picture_url'			=> FALSE,
+					'website_url'			=> FALSE,
+					'twitter_url'			=> FALSE,
+					'facebook_url'			=> FALSE,
+					'linkedin_url'			=> FALSE,
+					'viadeo_url'			=> FALSE,
+					'activation_key'		=> FALSE,
+					'password'				=> FALSE,
+					'signup_date'			=> FALSE
 				);
 				$single_item_object = json_decode( json_encode( $single_item ), FALSE );
 				array_push( $results, $single_item_object );
