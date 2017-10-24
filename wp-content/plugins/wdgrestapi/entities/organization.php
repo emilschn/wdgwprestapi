@@ -57,7 +57,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les organisations
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $input_link_to_project = FALSE ) {
+	public static function list_get( $authorized_client_id_string, $offset = 0, $limit = FALSE, $input_link_to_project = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Organization::$entity_type );
 		if ( !empty( $input_link_to_project ) ) {
@@ -66,6 +66,22 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		} else {
 			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		}
+		
+		// Gestion offset et limite
+		if ( $offset > 0 || !empty( $limit ) ) {
+			$query .= " LIMIT ";
+			
+			if ( $offset > 0 ) {
+				$query .= $offset . ", ";
+				if ( empty( $limit ) ) {
+					$query .= "0";
+				}
+			}
+			if ( !empty( $limit ) ) {
+				$query .= $limit;
+			}
+		}
+		
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}

@@ -129,10 +129,27 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		foreach ( $results as $result ) {
 			$result->type = 'user';
 			$result->is_project_manager = FALSE; // TODO
+			if ( $add_organizations ) {
+				$result->organization_name = FALSE;
+				$result->organization_legalform = FALSE;
+				$result->organization_capital = FALSE;
+				$result->organization_idnumber = FALSE;
+				$result->organization_vat = FALSE;
+				$result->organization_rcs = FALSE;
+				$result->organization_representative_firstname = FALSE;
+				$result->organization_representative_lastname = FALSE;
+				$result->organization_representative_function = FALSE;
+				$result->organization_description = FALSE;
+				$result->organization_fiscal_year_end_month = FALSE;
+				$result->organization_accounting_contact = FALSE;
+				$result->organization_document_kbis = FALSE;
+				$result->organization_document_rib = FALSE;
+				$result->organization_document_status = FALSE;
+			}
 		}
 		
 		if ( $add_organizations ) {
-			$list_organizations = WDGRESTAPI_Entity_Organization::list_get( $authorized_client_id_string, $input_link_to_project );
+			$list_organizations = WDGRESTAPI_Entity_Organization::list_get( $authorized_client_id_string, $offset, $limit, $input_link_to_project );
 			foreach ( $list_organizations as $organization ) {
 				$single_item = array(
 					'id'			=> $organization->id,
