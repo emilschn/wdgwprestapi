@@ -128,7 +128,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		
 		foreach ( $results as $result ) {
 			$result->type = 'user';
-			$result->is_project_manager = FALSE; // TODO
+			$rand_project_manager = rand( 0, 20 );
+			$result->is_project_manager = ( $rand_project_manager > 17 ); // TODO
 			if ( $add_organizations ) {
 				$result->organization_name = FALSE;
 				$result->organization_legalform = FALSE;
@@ -211,12 +212,12 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		
 		if ( $full ) {
 			foreach ( $results as $result ) {
-				$result->vote_count = 0;
-				$result->invest_count = 0;
-				$result->invest_amount = 0;
-				$result->invest_amount_royalties = 0;
-				$result->royalties_amount_received = 0;
-				$result->lw_amount_wallet = 0;
+				$result->vote_count = rand( 0, 20 ); //TODO
+				$result->invest_count = rand( 0, 30 ); //TODO
+				$result->invest_amount = rand( 0, 20000 ); //TODO
+				$result->invest_amount_royalties = rand( 0, 200 ); //TODO
+				$result->royalties_amount_received = rand( 0, 700 ); //TODO
+				$result->lw_amount_wallet = rand( 0, 500 ); //TODO
 			}
 		}
 		
