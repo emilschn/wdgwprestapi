@@ -40,12 +40,14 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 5000 );
 		
 		$recipients = str_replace( ',', '|', $this->loaded_data->recipient );
+		$options = json_decode( $this->loaded_data->options );
+		$replyto = ( empty( $options->replyto ) ) ? 'bonjour@wedogood.co' : $options->replyto;
 		$data = array(
 			'id'		=> $this->loaded_data->template,
 			'to'		=> 'bonjour@wedogood.co',
 			'bcc'		=> $recipients,
-			'replyto'	=> 'bonjour@wedogood.co',
-			'attr'		=> json_decode( $this->loaded_data->options )
+			'replyto'	=> $replyto,
+			'attr'		=> $options
 		);
 		$sendinblue_result = $mailin->send_transactional_template( $data );
 		
