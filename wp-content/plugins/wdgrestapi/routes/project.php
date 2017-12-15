@@ -9,6 +9,12 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register(
+			'/projects/categories',
+			WP_REST_Server::READABLE,
+			array( $this, 'list_get_categories')
+		);
+		
+		WDGRESTAPI_Route::register(
 			'/projects/stats',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_stats')
@@ -89,6 +95,14 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	 */
 	public function list_get() {
 		return WDGRESTAPI_Entity_Project::list_get( $this->get_current_client_autorized_ids_string() );
+	}
+	
+	/**
+	 * Retourne la liste des catégories de projets
+	 * @return array
+	 */
+	public function list_get_categories() {
+		return WDGRESTAPI_Entity_Project::get_categories();
 	}
 	
 	/**

@@ -164,6 +164,14 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne les catégories qu'on peut lier aux projets
+	 */
+	public static function get_categories() {
+		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_projects_categories' );
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne les statistiques qui concernent les projets
 	 */
 	public static function get_stats() {
