@@ -12,6 +12,16 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		}
 	}
 	
+	public function set_property( $property_name, $property_value ) {
+		parent::set_property( $property_name, $property_value );
+		if ( $property_name == 'url' ) {
+			$posted_params = array(
+				'new_url'	=> $property_value
+			);
+			WDGRESTAPI_Entity::post_data_on_client_site( 'set_project_url', $this->loaded_data->wpref, $posted_params );
+		}
+	}
+	
 	/**
 	 * Retourne la liste des déclarations liées à un projet
 	 * @return array
@@ -188,11 +198,13 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		'creation_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'url'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'can_go_next'			=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'category'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'impacts'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'partners'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'amount_collected'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'roi_percent_estimated'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'roi_percent'			=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
