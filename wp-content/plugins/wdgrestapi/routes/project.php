@@ -41,6 +41,13 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
 		);
 		
+		WDGRESTAPI_Route::register_external(
+			'/project/(?P<wpref>\d+)/status',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_status'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
 		WDGRESTAPI_Route::register(
 			'/project/(?P<id>\d+)/declarations',
 			WP_REST_Server::READABLE,
@@ -136,6 +143,34 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Project::single_get", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne le statut d'un projet par son ID WordPress
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_get_status( WP_REST_Request $request ) {
+		$project_wpref = $request->get_param( 'wpref' );
+		if ( !empty( $project_wpref ) ) {
+			$project_item = new WDGRESTAPI_Entity_Project( FALSE, $project_wpref );
+			$loaded_data = $project_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$loaded_data = $project_item->get_status();
+				$this->log( "WDGRESTAPI_Route_Project::single_get_status::" . $project_wpref, json_encode( $loaded_data ) );
+				return $loaded_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_get_status::" . $project_wpref, "404 : Invalid project WPREF" );
+				return new WP_Error( '404', "Invalid project ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_get_status", "404 : Invalid project WPREF (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}

@@ -23,6 +23,14 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne les données du statut du projet
+	 */
+	public function get_status() {
+		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_status_by_project', $this->loaded_data->wpref );
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne la liste des déclarations liées à un projet
 	 * @return array
 	 */
