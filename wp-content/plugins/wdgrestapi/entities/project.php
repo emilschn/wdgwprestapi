@@ -200,7 +200,35 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	public function post_documents() {
 		//TODO
 	}
-	
+
+	/**
+	 * Crée un projet pour Equitearly, via la plateforme
+	 * @param type $user_login
+	 * @param type $user_password
+	 * @param type $user_firstname
+	 * @param type $user_lastname
+	 * @param type $user_email
+	 * @param type $organization_name
+	 * @param type $organisation_email
+	 * @param type $campaign_name
+	 * @param type $equitearly_investment
+	 * @param type $equitearly_charges
+	 */
+	public static function new_equitearly( $user_login, $user_password, $user_firstname, $user_lastname, $user_email, $organization_name, $organisation_email, $campaign_name, $equitearly_investment, $equitearly_charges ) {
+		$posted_params = array(
+			'user_login'			=> $user_login,
+			'user_password'			=> $user_password,
+			'user_firstname'		=> $user_firstname,
+			'user_lastname'			=> $user_lastname,
+			'user_email'			=> $user_email,
+			'organization_name'		=> $organization_name,
+			'organisation_email'	=> $organisation_email,
+			'campaign_name'			=> $campaign_name,
+			'equitearly_investment'	=> $equitearly_investment,
+			'equitearly_charges'	=> $equitearly_charges
+		);
+		return WDGRESTAPI_Entity::post_data_on_client_site( 'post_project_equitearly', '', $posted_params );
+	}
 	
 /*******************************************************************************
  * GESTION BDD
