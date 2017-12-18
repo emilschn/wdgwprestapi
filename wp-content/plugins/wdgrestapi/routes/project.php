@@ -413,7 +413,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		user_lastname	Nom de famille de l'utilisateur	OUI	STRING	Scully
 		user_email	E-mail de l'utilisateur	OUI	STRING	Queequeg0925@hotmail.com
 		organization_name	Nom de l'entreprise qui lance le projet	OUI	STRING	Ma super entreprise
-		organisation_email	E-mail de contact pour l'entreprise	OUI	STRING	contact@superentreprise.fr
+		organization_email	E-mail de contact pour l'entreprise	OUI	STRING	contact@superentreprise.fr
 		campaign_name	Nom du projet sur la plateforme	OUI	STRING	Mon super projet
 		equitearly_investment	Montant de l'investissement d'Equitearly	OUI	INT	20000
 		equitearly_charges
@@ -445,9 +445,9 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		if ( !WDGRESTAPI_Lib_Validator::is_name( $organization_name ) ) {
 			array_push( $post_errors, __( "Le champ Nom de l'entreprise (organization_name) n'est pas correct.", 'wdgrestapi' ) );
 		}
-		$organisation_email = filter_input( INPUT_POST, 'organisation_email' );
-		if ( !WDGRESTAPI_Lib_Validator::is_email( $organisation_email ) ) {
-			array_push( $post_errors, __( "Le champ E-mail de l'entreprise (organisation_email) n'est pas au bon format.", 'wdgrestapi' ) );
+		$organization_email = filter_input( INPUT_POST, 'organization_email' );
+		if ( !WDGRESTAPI_Lib_Validator::is_email( $organization_email ) ) {
+			array_push( $post_errors, __( "Le champ E-mail de l'entreprise (organization_email) n'est pas au bon format.", 'wdgrestapi' ) );
 		}
 		$campaign_name = filter_input( INPUT_POST, 'campaign_name' );
 		if ( !WDGRESTAPI_Lib_Validator::is_name( $campaign_name ) ) {
@@ -463,7 +463,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		}
 		
 		if ( empty( $post_errors ) ) {
-			$result = WDGRESTAPI_Entity_Project::new_equitearly( $user_login, $user_password, $user_firstname, $user_lastname, $user_email, $organization_name, $organisation_email, $campaign_name, $equitearly_investment, $equitearly_charges );
+			$result = WDGRESTAPI_Entity_Project::new_equitearly( $user_login, $user_password, $user_firstname, $user_lastname, $user_email, $organization_name, $organization_email, $campaign_name, $equitearly_investment, $equitearly_charges );
 			if ( empty( $result ) ) {
 				$this->log( "WDGRESTAPI_Route_Project::single_create_equitearly", "success" );
 			} else {

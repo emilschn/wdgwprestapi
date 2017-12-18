@@ -214,7 +214,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	 * @param type $equitearly_investment
 	 * @param type $equitearly_charges
 	 */
-	public static function new_equitearly( $user_login, $user_password, $user_firstname, $user_lastname, $user_email, $organization_name, $organisation_email, $campaign_name, $equitearly_investment, $equitearly_charges ) {
+	public static function new_equitearly( $user_login, $user_password, $user_firstname, $user_lastname, $user_email, $organization_name, $organization_email, $campaign_name, $equitearly_investment, $equitearly_charges ) {
 		$posted_params = array(
 			'user_login'			=> $user_login,
 			'user_password'			=> $user_password,
@@ -222,7 +222,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			'user_lastname'			=> $user_lastname,
 			'user_email'			=> $user_email,
 			'organization_name'		=> $organization_name,
-			'organisation_email'	=> $organisation_email,
+			'organization_email'	=> $organization_email,
 			'campaign_name'			=> $campaign_name,
 			'equitearly_investment'	=> $equitearly_investment,
 			'equitearly_charges'	=> $equitearly_charges
