@@ -22,14 +22,16 @@ class WDGRESTAPI_Route_Bill extends WDGRESTAPI_Route {
 	}
 	
 	/**
-	 * Retourne la liste des e-mails
+	 * Retourne la liste des factures
 	 */
 	public function list_get() {
-		return WDGRESTAPI_Entity_Bill::list_get( $this->get_current_client_autorized_ids_string() );
+		$buffer = WDGRESTAPI_Entity_Bill::list_get( $this->get_current_client_autorized_ids_string() );
+		$this->log( "WDGRESTAPI_Entity_Bill::list_get", json_encode( $buffer ) );
+		return $buffer;
 	}
 	
 	/**
-	 * Crée un e-mail
+	 * Crée une facture
 	 * @param WP_REST_Request $request
 	 * @return \WP_Error
 	 */
@@ -38,10 +40,16 @@ class WDGRESTAPI_Route_Bill extends WDGRESTAPI_Route {
 		$this->set_posted_properties( $bill_item, WDGRESTAPI_Entity_Bill::$db_properties );
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 		$bill_item->set_property( 'client_user_id', $current_client->ID );
-		$bill_item->save();
-		$reloaded_data = $bill_item->get_loaded_data();
-		$this->log( "WDGRESTAPI_Entity_Bill::single_create", json_encode( $reloaded_data ) );
-		return $reloaded_data;
+		
+		if ( $bill_item->save() ) {
+			$reloaded_data = $bill_item->get_loaded_data();
+			$this->log( "WDGRESTAPI_Entity_Bill::single_create", json_encode( $reloaded_data ) );
+			return $reloaded_data;
+			
+		} else {
+			$this->log( "WDGRESTAPI_Entity_Bill::single_create", $bill_item->get_properties_errors() );
+			return new WP_Error( 'cant-create', 'db-insert-error' );
+		}
 	}
 	
 }
