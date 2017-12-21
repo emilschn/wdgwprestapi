@@ -185,6 +185,17 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
+	public static function get_total_by_turnover_str( $turnover ) {
+		$buffer = 0;
+		$turnover_array = json_decode( $turnover );
+		if ( is_array( $turnover_array ) ) {
+			foreach ( $turnover_array as $turnover_amount ) {
+				$buffer += $turnover_amount;
+			}
+		}
+		return $buffer;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD
