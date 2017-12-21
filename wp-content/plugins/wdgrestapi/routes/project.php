@@ -9,6 +9,12 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register(
+			'/projects/categories',
+			WP_REST_Server::READABLE,
+			array( $this, 'list_get_categories')
+		);
+		
+		WDGRESTAPI_Route::register(
 			'/projects/stats',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_stats')
@@ -33,6 +39,13 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
+		);
+		
+		WDGRESTAPI_Route::register_external(
+			'/project/(?P<wpref>\d+)/status',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_status'),
+			array( 'id' => array( 'default' => 0 ) )
 		);
 		
 		WDGRESTAPI_Route::register(
@@ -76,6 +89,14 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( $this, 'single_post_documents'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
+		
+		// Spécifique Equitearly
+		WDGRESTAPI_Route::register_external(
+			'/project-equitearly',
+			WP_REST_Server::CREATABLE,
+			array( $this, 'single_create_equitearly'),
+			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
+		);
 	}
 	
 	public static function register() {
@@ -89,6 +110,14 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	 */
 	public function list_get() {
 		return WDGRESTAPI_Entity_Project::list_get( $this->get_current_client_autorized_ids_string() );
+	}
+	
+	/**
+	 * Retourne la liste des catégories de projets
+	 * @return array
+	 */
+	public function list_get_categories() {
+		return WDGRESTAPI_Entity_Project::get_categories();
 	}
 	
 	/**
@@ -122,6 +151,34 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Project::single_get", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne le statut d'un projet par son ID WordPress
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_get_status( WP_REST_Request $request ) {
+		$project_wpref = $request->get_param( 'wpref' );
+		if ( !empty( $project_wpref ) ) {
+			$project_item = new WDGRESTAPI_Entity_Project( FALSE, $project_wpref );
+			$loaded_data = $project_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$loaded_data = $project_item->get_status();
+				$this->log( "WDGRESTAPI_Route_Project::single_get_status::" . $project_wpref, json_encode( $loaded_data ) );
+				return $loaded_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_get_status::" . $project_wpref, "404 : Invalid project WPREF" );
+				return new WP_Error( '404', "Invalid project ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_get_status", "404 : Invalid project WPREF (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
@@ -338,6 +395,90 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		} else {
 			$this->log( "WDGRESTAPI_Route_Project::single_post_documents", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+// SPECIFIQUE EQUITEARLY
+	/**
+	 * Crée un projet depuis Equitearly
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_create_equitearly( WP_REST_Request $request ) {
+		// Vérification de toutes les données
+		/*
+		user_login	Login de l'utilisateur	OUI	STRING	Queequeg0925
+		user_password	Mot de passe de l'utilisateur	OUI	STRING	azerty123
+		user_firstname	Prénom de l'utilisateur	OUI	STRING	Dana
+		user_lastname	Nom de famille de l'utilisateur	OUI	STRING	Scully
+		user_email	E-mail de l'utilisateur	OUI	STRING	Queequeg0925@hotmail.com
+		organization_name	Nom de l'entreprise qui lance le projet	OUI	STRING	Ma super entreprise
+		organization_email	E-mail de contact pour l'entreprise	OUI	STRING	contact@superentreprise.fr
+		campaign_name	Nom du projet sur la plateforme	OUI	STRING	Mon super projet
+		equitearly_investment	Montant de l'investissement d'Equitearly	OUI	INT	20000
+		equitearly_charges
+		 * 
+		 */
+		
+		$post_errors = array();
+		$user_login = filter_input( INPUT_POST, 'user_login' );
+		if ( !WDGRESTAPI_Lib_Validator::is_name( $user_login ) ) {
+			array_push( $post_errors, __( "Le champ Login (user_login) n'est pas correct.", 'wdgrestapi' ) );
+		}
+		$user_password = filter_input( INPUT_POST, 'user_password' );
+		if ( empty( $user_password ) ) {
+			array_push( $post_errors, __( "Le champ Mot de passe (user_password) est vide.", 'wdgrestapi' ) );
+		}
+		$user_firstname = filter_input( INPUT_POST, 'user_firstname' );
+		if ( !WDGRESTAPI_Lib_Validator::is_name( $user_firstname ) ) {
+			array_push( $post_errors, __( "Le champ Pr&eacute;nom (user_firstname) n'est pas correct.", 'wdgrestapi' ) );
+		}
+		$user_lastname = filter_input( INPUT_POST, 'user_lastname' );
+		if ( !WDGRESTAPI_Lib_Validator::is_name( $user_lastname ) ) {
+			array_push( $post_errors, __( "Le champ Nom de famille (user_lastname) n'est pas correct.", 'wdgrestapi' ) );
+		}
+		$user_email = filter_input( INPUT_POST, 'user_email' );
+		if ( !WDGRESTAPI_Lib_Validator::is_email( $user_email ) ) {
+			array_push( $post_errors, __( "Le champ E-mail (user_email) n'est pas au bon format.", 'wdgrestapi' ) );
+		}
+		$organization_name = filter_input( INPUT_POST, 'organization_name' );
+		if ( !WDGRESTAPI_Lib_Validator::is_name( $organization_name ) ) {
+			array_push( $post_errors, __( "Le champ Nom de l'entreprise (organization_name) n'est pas correct.", 'wdgrestapi' ) );
+		}
+		$organization_email = filter_input( INPUT_POST, 'organization_email' );
+		if ( !WDGRESTAPI_Lib_Validator::is_email( $organization_email ) ) {
+			array_push( $post_errors, __( "Le champ E-mail de l'entreprise (organization_email) n'est pas au bon format.", 'wdgrestapi' ) );
+		}
+		$campaign_name = filter_input( INPUT_POST, 'campaign_name' );
+		if ( !WDGRESTAPI_Lib_Validator::is_name( $campaign_name ) ) {
+			array_push( $post_errors, __( "Le champ Nom du projet (campaign_name) n'est pas correct.", 'wdgrestapi' ) );
+		}
+		$equitearly_investment = filter_input( INPUT_POST, 'equitearly_investment' );
+		if ( !WDGRESTAPI_Lib_Validator::is_number_positive_integer( $equitearly_investment ) ) {
+			array_push( $post_errors, __( "Le champ Montant de l'investissement Equitearly (equitearly_investment) n'est pas un entier positif.", 'wdgrestapi' ) );
+		}
+		$equitearly_charges = filter_input( INPUT_POST, 'equitearly_charges' );
+		if ( empty( $equitearly_charges ) ) {
+			// Rien, champ facultatif
+		}
+		
+		if ( empty( $post_errors ) ) {
+			$result = WDGRESTAPI_Entity_Project::new_equitearly( $user_login, $user_password, $user_firstname, $user_lastname, $user_email, $organization_name, $organization_email, $campaign_name, $equitearly_investment, $equitearly_charges );
+			if ( empty( $result ) ) {
+				$this->log( "WDGRESTAPI_Route_Project::single_create_equitearly", "success" );
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_create_equitearly", print_r( $result, true ) );
+				return new WP_Error( 'cant-create', 'equitearly-project-create-error' );
+			}
+			
+		} else {
+			$error_buffer = '';
+			foreach ( $post_errors as $error ) {
+				$error_buffer .= $error . " ";
+			}
+			$this->log( "WDGRESTAPI_Route_Project::single_create_equitearly", "failed" );
+			$this->log( "WDGRESTAPI_Route_Project::single_create_equitearly", $error_buffer );
+			return new WP_Error( 'cant-create', $error_buffer );
 		}
 	}
 	

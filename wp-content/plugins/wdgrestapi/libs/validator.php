@@ -295,7 +295,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number_integer( $input ) {
-		return ( is_int( $input ) );
+		return ( ctype_digit( strval( $input ) ) );
 	}
 	
 	/**
@@ -304,7 +304,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number_positive_integer( $input ) {
-		return ( is_int( $input ) && ( $input > 0 ) );
+		return ( WDGRESTAPI_Lib_Validator::is_number_positive( $input ) && WDGRESTAPI_Lib_Validator::is_number_integer( $input ) );
 	}
 
 	/**

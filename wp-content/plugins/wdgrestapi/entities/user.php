@@ -98,7 +98,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * Retourne la liste de tous les utilisateurs
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $add_organizations = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
+	public static function list_get( $authorized_client_id_string, $offset = 0, $limit = FALSE, $add_organizations = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
 		
@@ -108,18 +108,54 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		} else {
 			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		}
+		
+		// Gestion offset et limite
+		if ( $offset > 0 || !empty( $limit ) ) {
+			$query .= " LIMIT ";
+			
+			if ( $offset > 0 ) {
+				$query .= $offset . ", ";
+				if ( empty( $limit ) ) {
+					$query .= "0";
+				}
+			}
+			if ( !empty( $limit ) ) {
+				$query .= $limit;
+			}
+		}
+		
 		$results = $wpdb->get_results( $query );
 		
 		foreach ( $results as $result ) {
 			$result->type = 'user';
-			$result->is_project_manager = FALSE; // TODO
+			$rand_project_manager = rand( 0, 20 );
+			$result->is_project_manager = ( $rand_project_manager > 17 ); // TODO
+			if ( $add_organizations ) {
+				$result->organization_name = FALSE;
+				$result->organization_legalform = FALSE;
+				$result->organization_capital = FALSE;
+				$result->organization_idnumber = FALSE;
+				$result->organization_vat = FALSE;
+				$result->organization_rcs = FALSE;
+				$result->organization_representative_firstname = FALSE;
+				$result->organization_representative_lastname = FALSE;
+				$result->organization_representative_function = FALSE;
+				$result->organization_description = FALSE;
+				$result->organization_fiscal_year_end_month = FALSE;
+				$result->organization_accounting_contact = FALSE;
+				$result->organization_document_kbis = FALSE;
+				$result->organization_document_rib = FALSE;
+				$result->organization_document_status = FALSE;
+			}
 		}
 		
 		if ( $add_organizations ) {
-			$list_organizations = WDGRESTAPI_Entity_Organization::list_get( $authorized_client_id_string, $input_link_to_project );
+			$list_organizations = WDGRESTAPI_Entity_Organization::list_get( $authorized_client_id_string, $offset, $limit, $input_link_to_project );
 			foreach ( $list_organizations as $organization ) {
 				$single_item = array(
 					'id'			=> $organization->id,
+					'wpref'			=> $organization->wpref,
+					'client_user_id'			=> $organization->client_user_id,
 					'email'			=> $organization->email,
 					'type'			=> 'organization',
 					'address'		=> $organization->address,
@@ -146,7 +182,28 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 					'organization_accounting_contact'			=> $organization->accounting_contact,
 					'organization_document_kbis'				=> 'TODO',
 					'organization_document_rib'					=> 'TODO',
-					'organization_document_status'				=> 'TODO'
+					'organization_document_status'				=> 'TODO',
+					// Infos utilisateurs à FALSE
+					'is_project_manager'	=> FALSE,
+					'gender'				=> FALSE,
+					'name'					=> FALSE,
+					'surname'				=> FALSE,
+					'username'				=> FALSE,
+					'birthday_date'			=> FALSE,
+					'birthday_city'			=> FALSE,
+					'nationality'			=> FALSE,
+					'phone_number'			=> FALSE,
+					'bank_address2'			=> FALSE,
+					'authentification_mode'	=> FALSE,
+					'picture_url'			=> FALSE,
+					'website_url'			=> FALSE,
+					'twitter_url'			=> FALSE,
+					'facebook_url'			=> FALSE,
+					'linkedin_url'			=> FALSE,
+					'viadeo_url'			=> FALSE,
+					'activation_key'		=> FALSE,
+					'password'				=> FALSE,
+					'signup_date'			=> FALSE
 				);
 				$single_item_object = json_decode( json_encode( $single_item ), FALSE );
 				array_push( $results, $single_item_object );
@@ -155,12 +212,12 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		
 		if ( $full ) {
 			foreach ( $results as $result ) {
-				$result->vote_count = 0;
-				$result->invest_count = 0;
-				$result->invest_amount = 0;
-				$result->invest_amount_royalties = 0;
-				$result->royalties_amount_received = 0;
-				$result->lw_amount_wallet = 0;
+				$result->vote_count = rand( 0, 20 ); //TODO
+				$result->invest_count = rand( 0, 30 ); //TODO
+				$result->invest_amount = rand( 0, 20000 ); //TODO
+				$result->invest_amount_royalties = rand( 0, 200 ); //TODO
+				$result->royalties_amount_received = rand( 0, 700 ); //TODO
+				$result->lw_amount_wallet = rand( 0, 500 ); //TODO
 			}
 		}
 		
