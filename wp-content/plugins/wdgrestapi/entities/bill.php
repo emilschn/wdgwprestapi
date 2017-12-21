@@ -17,7 +17,10 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 	
 	public static function list_get() {
 		$quickbooks_service = WDGRESTAPI_Entity_Bill::get_quickbooks_service();
-		if ( !is_wp_error( $quickbooks_service ) ) {
+		if ( is_wp_error( $quickbooks_service ) ) {
+			$this->properties_errors = $quickbooks_service->get_error_message();
+			
+		} elseif ( !empty( $quickbooks_service ) ) {
 			return $quickbooks_service->FindAll( 'Invoice', 1, 5 );
 		}
 		return FALSE;
@@ -50,41 +53,49 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 	private function save_on_quickbooks( $options ) {
 		$quickbooks_service = WDGRESTAPI_Entity_Bill::get_quickbooks_service();
 
-		//Add a new Invoice
-		$bill_object = Invoice::create( [
-			"Line"	=> [
-				[
-					"Amount"		=> $options->itemvalue,
-					"Description"	=> $options->itemdescription,
-					"DetailType"	=> "SalesItemLineDetail",
-					"SalesItemLineDetail" => [
-						"TaxCodeRef"	=>	$options->itemtaxid,
-						"ItemRef"		=>	$options->itemtitle
+		if ( is_wp_error( $quickbooks_service ) ) {
+			$this->properties_errors = $quickbooks_service->get_error_message();
+			
+		} elseif ( !empty( $quickbooks_service ) ) {
+			//Add a new Invoice
+			$bill_object = Invoice::create( [
+				"Line"	=> [
+					[
+						"Amount"		=> $options->itemvalue,
+						"Description"	=> $options->itemdescription,
+						"DetailType"	=> "SalesItemLineDetail",
+						"SalesItemLineDetail" => [
+							"TaxCodeRef"	=>	$options->itemtaxid,
+							"ItemRef"		=>	$options->itemtitle
+						]
 					]
+				],
+				"CustomerRef"	=> [
+					"value"	=> $options->customerid
+				],
+				"CustomerMemo"	=> [
+					"value"	=> $options->billdescription
+				],
+				"BillEmail"	=> [
+					"Address"	=> $options->customeremail
+				],
+				"BillEmailBcc"	=> [
+					"Address"	=> "admin@wedogood.co"
 				]
-			],
-			"CustomerRef"	=> [
-				"value"	=> $options->customerid
-			],
-			"CustomerMemo"	=> [
-				"value"	=> $options->billdescription
-			],
-			"BillEmail"	=> [
-				"Address"	=> $options->customeremail
-			],
-			"BillEmailBcc"	=> [
-				"Address"	=> "admin@wedogood.co"
-			]
-		] );
-		$resultingObj = $quickbooks_service->Add( $bill_object );
-		
-		$error = $quickbooks_service->getLastError();
-		if ($error != null) {
-			$this->properties_errors = $error->getResponseBody();
+			] );
+			$resultingObj = $quickbooks_service->Add( $bill_object );
+
+			$error = $quickbooks_service->getLastError();
+			if ($error != null) {
+				$this->properties_errors = $error->getResponseBody();
+				return FALSE;
+			}
+
+			return $resultingObj->Id;
+			
+		} else {
 			return FALSE;
 		}
-		
-		return $resultingObj->Id;
 	}
 	
 	/**
