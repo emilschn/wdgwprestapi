@@ -133,20 +133,21 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$results = $wpdb->get_results( $query );
 		
 		foreach ( $results as $result ) {
-			$project_roideclarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $this->loaded_data->id );
+			$project_roideclarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $result->id );
 			$project_declarations_done_count = 0;
 			$project_declarations_turnover_total = 0;
 			$project_declarations_royalties_total = 0;
-			foreach ( $project_roideclarations as $roideclaration ) {
-				if ( $roideclaration->status == WDGRESTAPI_Entity_Declaration::$status_finished ) {
-					$project_declarations_done_count++;
-					$project_declarations_turnover_total += WDGRESTAPI_Entity_Declaration::get_total_by_turnover_str( $roideclaration->turnover );
-					$project_declarations_royalties_total += $roideclaration->amount;
-				}
-			}
 			$project_first_declaration = $project_roideclarations[0];
 			$project_last_declaration = end( $project_roideclarations );
-			$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $this->loaded_data->id );
+			foreach ( $project_roideclarations as $roideclaration ) {
+				if ( $roideclaration[ 'status' ] == WDGRESTAPI_Entity_Declaration::$status_finished ) {
+					$project_declarations_done_count++;
+					$project_declarations_turnover_total += $roideclaration[ 'turnover_total' ];
+					$project_declarations_royalties_total += $roideclaration[ 'amount' ];
+				}
+			}
+			
+			$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $result->id );
 			$project_organization = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
 			$project_organization_data = $project_organization->get_loaded_data();
 			
