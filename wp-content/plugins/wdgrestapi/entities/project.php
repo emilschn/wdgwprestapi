@@ -2,6 +2,15 @@
 class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	public static $entity_type = 'project';
 	
+	public static $status_preparing = 'preparing';
+	public static $status_validated = 'validated';
+	public static $status_preview = 'preview';
+	public static $status_vote = 'vote';
+	public static $status_collecte = 'collecte';
+	public static $status_funded = 'funded';
+	public static $status_closed = 'closed';
+	public static $status_archive = 'archive';
+	
 	public function __construct( $id = FALSE, $wpref = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Project::$entity_type, WDGRESTAPI_Entity_Project::$db_properties );
 		if ( $wpref != FALSE ) {
@@ -201,7 +210,69 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	 * Retourne les statistiques qui concernent les projets
 	 */
 	public static function get_stats() {
-		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_projects_stats' );
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project::$entity_type );
+		$query = "SELECT * FROM " .$table_name;
+		$results = $wpdb->get_results( $query );
+		
+		$date_now = new DateTime();
+		
+		$buffer = array();
+		$buffer[ 'total' ] = count( $results );
+		$buffer[ 'funded_amount' ] = 0;
+		$buffer[ 'royalties_amount' ] = 0;
+		$buffer[ 'statuses' ] = array();
+		$status_list = array( 'posted', 'preparing', 'vote', 'funding', 'declaring', 'declaring_late', 'funded', 'closed', 'archive' );
+		foreach ( $status_list as $status ) {
+			$buffer[ 'statuses' ][ $status ] = array(
+				'count'		=> 0,
+				'percent'	=> 0
+			);
+		}
+		
+		foreach ( $results as $result ) {
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_preparing ) {
+				$buffer[ 'statuses' ][ 'posted' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_validated ) {
+				$buffer[ 'statuses' ][ 'preparing' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_vote ) {
+				$buffer[ 'statuses' ][ 'vote' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_collecte ) {
+				$buffer[ 'statuses' ][ 'funding' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_funded ) {
+				$buffer[ 'statuses' ][ 'declaring' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_closed ) {
+				$buffer[ 'statuses' ][ 'closed' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_funded || $result->status == WDGRESTAPI_Entity_Project::$status_closed ) {
+				$buffer[ 'funded_amount' ] += $result->amount_collected;
+				$buffer[ 'statuses' ][ 'funded' ][ 'count' ]++;
+				$declarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $result->id );
+				foreach ( $declarations as $declaration ) {
+					$buffer[ 'royalties_amount' ] += $declaration->amount;
+					$date_due = new DateTime( $declaration->date_due );
+					$date_interval = $date_now->diff( $date_due );
+					if ( $declaration->status != WDGRESTAPI_Entity_Declaration::$status_finished && ( $date_due < $date_now || $date_interval->format( '%a' ) < 10 ) ) {
+						$buffer[ 'statuses' ][ 'declaring_late' ][ 'count' ]++;
+						break;
+					}
+				}
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_archive ) {
+				$buffer[ 'statuses' ][ 'archive' ][ 'count' ]++;
+			}
+		}
+		
+		foreach ( $status_list as $status ) {
+			$buffer[ 'statuses' ][ $status ][ 'percent' ] = $buffer[ 'statuses' ][ $status ][ 'count' ] / $buffer[ 'total' ] * 100;
+			$buffer[ 'statuses' ][ $status ][ 'percent' ] = round( $buffer[ 'statuses' ][ $status ][ 'percent' ] * 100 ) / 100;
+		}
+		
 		return $buffer;
 	}
 	
