@@ -44,7 +44,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		$replyto = ( empty( $options->replyto ) ) ? 'bonjour@wedogood.co' : $options->replyto;
 		$data = array(
 			'id'		=> $this->loaded_data->template,
-			'to'		=> 'bonjour@wedogood.co',
+			'to'		=> 'admin@wedogood.co',
 			'bcc'		=> $recipients,
 			'replyto'	=> $replyto,
 			'attr'		=> $options
