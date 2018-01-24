@@ -142,6 +142,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$results = $wpdb->get_results( $query );
 		
 		foreach ( $results as $result ) {
+			// Augmentation des données retournées avec des informations statiques
 			$project_roideclarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $result->id );
 			$project_declarations_done_count = 0;
 			$project_declarations_turnover_total = 0;
@@ -156,10 +157,6 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 				}
 			}
 			
-			$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $result->id );
-			$project_organization = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
-			$project_organization_data = $project_organization->get_loaded_data();
-			
 			$result->lw_amount_wallet = 0;
 			$result->lw_authenticated = 0;
 			$result->lw_sepa_signed = 0;
@@ -170,6 +167,12 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			$result->declarations_start_date = $project_first_declaration->date_due;
 			$result->declarations_end_date = $project_last_declaration->date_due;
 			$result->declarations_list = $project_roideclarations;
+			
+			// Augmentation de la liste des données avec données éditables d'organisation
+			$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $result->id );
+			$project_organization = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
+			$project_organization_data = $project_organization->get_loaded_data();
+			
 			$result->organization_name = $project_organization_data->name;
 			$result->organization_legalform = $project_organization_data->legalform;
 			$result->organization_capital = $project_organization_data->capital;
@@ -183,7 +186,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			$result->organization_representative_firstname = 'TODO';
 			$result->organization_representative_lastname = 'TODO';
 			$result->organization_representative_function = $project_organization_data->representative_function;
-			$result->organization_description = 'TODO';
+			$result->organization_description = $project_organization_data->description;
 			$result->organization_fiscal_year_end_month = $project_organization_data->fiscal_year_end_month;
 			$result->organization_accounting_contact = 'TODO';
 			$result->organization_quickbooks_id = 'TODO';
@@ -194,7 +197,6 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			$result->organization_document_status = 'TODO';
 			$result->organization_document_id = 'TODO';
 			$result->organization_document_home = 'TODO';
-			$result->team_contacts = 'TODO';
 		}
 		
 		return $results;
@@ -368,6 +370,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'costs_to_organization'	=> array( 'type' => 'float', 'other' => '' ),
 		'costs_to_investors'	=> array( 'type' => 'float', 'other' => '' ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => '' ),
+		'team_contacts'			=> array( 'type' => 'longtext', 'other' => '' ),
 	);
 	
 	// Mise à jour de la bdd

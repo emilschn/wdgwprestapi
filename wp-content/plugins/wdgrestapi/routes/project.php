@@ -370,6 +370,27 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	}
 	
 	/**
+	 * Définit les différentes propriétés d'une entité à partir d'informations postées
+	 * Override de la fonction parente pour gérer les données d'organisation transmises
+	 * @param WDGRESTAPI_Entity $entity
+	 * @param array $properties_list
+	 */
+	public function set_posted_properties( WDGRESTAPI_Entity $entity, array $properties_list ) {
+		// On appelle d'abord la fonction parente pour gérer les données du projet
+		parent::set_posted_properties( $entity, $properties_list );
+		// On gère ensuite les données liées à l'organisation
+		$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $entity->get_loaded_data()->id );
+		$project_organization_entity = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
+		foreach ( WDGRESTAPI_Entity_Organization::$db_properties as $property_key => $db_property ) {
+			$property_new_value = filter_input( INPUT_POST, 'organization_' . $property_key );
+			if ( $property_new_value !== null && $property_new_value !== FALSE ) {
+				$project_organization_entity->set_property( $property_key, $property_new_value );
+			}
+		}
+		$project_organization_entity->save();
+	}
+	
+	/**
 	 * Demande à envoyer les documents à Lemon Way
 	 * @param WP_REST_Request $request
 	 * @return \WP_Error
