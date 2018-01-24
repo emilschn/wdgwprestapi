@@ -3,3 +3,4 @@ wp-config.php
 readme.html
 /nbproject/
 wp-content/plugins/wdgrestapi/libs/log_*.txt
+wp-content/plugins/wdgrestapi/files/*

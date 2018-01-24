@@ -143,6 +143,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				$result->organization_description = FALSE;
 				$result->organization_fiscal_year_end_month = FALSE;
 				$result->organization_accounting_contact = FALSE;
+				$result->organization_quickbooks_id = FALSE;
 				$result->organization_document_kbis = FALSE;
 				$result->organization_document_rib = FALSE;
 				$result->organization_document_status = FALSE;
