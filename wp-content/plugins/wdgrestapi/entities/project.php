@@ -169,6 +169,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			$result->royalties_total = $project_declarations_royalties_total;
 			$result->declarations_start_date = $project_first_declaration->date_due;
 			$result->declarations_end_date = $project_last_declaration->date_due;
+			$result->declarations_list = $project_roideclarations;
 			$result->organization_name = $project_organization_data->name;
 			$result->organization_legalform = $project_organization_data->legalform;
 			$result->organization_capital = $project_organization_data->capital;
@@ -185,6 +186,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			$result->organization_description = 'TODO';
 			$result->organization_fiscal_year_end_month = $project_organization_data->fiscal_year_end_month;
 			$result->organization_accounting_contact = 'TODO';
+			$result->organization_quickbooks_id = 'TODO';
 			$result->organization_iban = $project_organization_data->iban;
 			$result->organization_bic = $project_organization_data->bic;
 			$result->organization_document_kbis = 'TODO';
@@ -333,6 +335,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'url'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'description'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'can_go_next'			=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'category'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),

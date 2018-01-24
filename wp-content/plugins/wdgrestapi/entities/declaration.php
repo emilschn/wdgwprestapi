@@ -149,12 +149,13 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		if ( $buffer[ 'status_display' ] == WDGRESTAPI_Entity_Declaration::$status_payment && $current_date > $due_date ) {
 			$buffer[ 'status_display' ] = WDGRESTAPI_Entity_Declaration::$status_payment_late;
 		}
-		// Frais investisseurs (TODO : aller chercher la bonne donnée)
+		// Frais PP et investisseurs (TODO : aller chercher la bonne donnée)
+		$buffer[ 'costs_to_organization' ] = 0;
 		$buffer[ 'cost_to_investors' ] = 0;
 		// Nombre de déclarations de CA (TODO : aller chercher la bonne donnée)
 		$buffer[ 'turnover_nb' ] = count( $turnover_list );
 		// Pourcentage de royalties versé (TODO : aller chercher la bonne donnée)
-		$buffer[ 'royalties_percent' ] = 'TODO';
+		$buffer[ 'royalties_percent' ] = 0;
 		// Ajustement
 		$adjustment = json_decode( $result->adjustment );
 		$buffer[ 'adjustment_needed' ] = ( isset( $adjustment->needed ) && $adjustment->needed == 1 ) ? 1 : 0;
