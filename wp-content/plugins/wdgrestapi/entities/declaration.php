@@ -127,7 +127,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		// Données ajoutées
 		// Nom du projet
 		$project_item = new WDGRESTAPI_Entity_Project( $result->id_project );
-		$project_data = $project_item->get_loaded_data();
+		$project_data = $project_item->get_loaded_data( FALSE );
 		$buffer[ 'name_project' ] = $project_data->name;
 		// CA total
 		$turnover_list = json_decode( $result->turnover );

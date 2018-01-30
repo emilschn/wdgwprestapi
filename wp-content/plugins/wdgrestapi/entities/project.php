@@ -31,9 +31,11 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		}
 	}
 	
-	public function get_loaded_data() {
-		$loaded_data = parent::get_loaded_data();
-		$buffer = WDGRESTAPI_Entity_Project::expand_single_data( $loaded_data );
+	public function get_loaded_data( $expand = TRUE ) {
+		$buffer = parent::get_loaded_data();
+		if ( $expand ) {
+			$buffer = WDGRESTAPI_Entity_Project::expand_single_data( $buffer );
+		}
 		return $buffer;
 	}
 	
