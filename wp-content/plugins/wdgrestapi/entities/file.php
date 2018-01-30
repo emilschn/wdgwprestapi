@@ -11,6 +11,12 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 		parent::__construct( $id, WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
 	}
 	
+	public function get_loaded_data() {
+		$buffer = parent::get_loaded_data();
+		$buffer->url = home_url( '/wp-content/plugins/wdgrestapi/files/' .$this->loaded_data->entity_type. '/' .$this->loaded_data->file_type. '/' .$this->loaded_data->file_name );
+		return $buffer;
+	}
+	
 	public function save( $base64_file_data ) {
 		if ( in_array( $this->loaded_data->entity_type, WDGRESTAPI_Entity_File::$file_entity_types ) && in_array( $this->loaded_data->file_type, WDGRESTAPI_Entity_File::$file_types ) ) {
 			$file_data = base64_decode( $base64_file_data );
