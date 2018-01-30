@@ -5,7 +5,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	
 	public static $file_entity_types = array( 'user', 'organization', 'project', 'declaration' );
 	
-	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'campaign_certificate' );
+	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'campaign_certificate', 'campaign_estimated_budget' );
 	
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
