@@ -11,8 +11,7 @@ class WDGRESTAPI_Route_File extends WDGRESTAPI_Route {
 		WDGRESTAPI_Route::register(
 			'/file/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
-			array( $this, 'single_get'),
-			array( 'token' => array( 'default' => 0 ) )
+			array( $this, 'single_get')
 		);
 		
 		WDGRESTAPI_Route::register(
