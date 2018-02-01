@@ -2,28 +2,28 @@
 class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 	
 	public function __construct() {
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/organizations',
 			WP_REST_Server::READABLE,
 			array( $this, 'get_organizationlist_by_project_id'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/organization/(?P<id>\d+)/projects',
 			WP_REST_Server::READABLE,
 			array( $this, 'get_projectlist_by_organization_id'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/organizations',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'link_organization'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<projectid>\d+)/organization/(?P<organizationid>\d+)/type/(?P<type>[a-z]+)',
 			WP_REST_Server::DELETABLE,
 			array( $this, 'unlink_organization'),

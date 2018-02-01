@@ -2,21 +2,21 @@
 class WDGRESTAPI_Route_OrganizationUser extends WDGRESTAPI_Route {
 	
 	public function __construct() {
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/organization/(?P<id>\d+)/users',
 			WP_REST_Server::READABLE,
 			array( $this, 'get_userlist_by_organization_id'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/user/(?P<id>\d+)/organizations',
 			WP_REST_Server::READABLE,
 			array( $this, 'get_organizationlist_by_user_id'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/organization/(?P<id>\d+)/users',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'link_user'),

@@ -2,7 +2,7 @@
 class WDGRESTAPI_Route_MailTemplate extends WDGRESTAPI_Route {
 	
 	public function __construct() {
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/mail-templates',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get')

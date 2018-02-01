@@ -2,39 +2,39 @@
 class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	
 	public function __construct() {
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/projects',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/projects/categories',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_categories')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/projects/stats',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_stats')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)',
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),
@@ -48,14 +48,14 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/declarations',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_declarations'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/declarations',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create_declarations'),
@@ -69,21 +69,21 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/votes',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_votes'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/investments',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_investments'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/documents',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_post_documents'),

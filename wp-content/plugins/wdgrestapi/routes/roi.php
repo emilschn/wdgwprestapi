@@ -2,33 +2,33 @@
 class WDGRESTAPI_Route_ROI extends WDGRESTAPI_Route {
 	
 	public function __construct() {
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/rois',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/rois/stats',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_stats')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/roi/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
 			array( 'token' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/roi',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/roi/(?P<id>\d+)',
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),

@@ -92,7 +92,7 @@ class WDGRESTAPI_Route extends WP_REST_Controller {
 	 * @param function $callback
 	 * @param array $args
 	 */
-	public static function register( $route, $method, $callback, $args = array() ) {
+	public static function register_wdg( $route, $method, $callback, $args = array() ) {
 		
 		register_rest_route(
 			WDGRESTAPI_Route::$wdg_namespace,

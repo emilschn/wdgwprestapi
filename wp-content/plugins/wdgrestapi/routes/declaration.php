@@ -2,47 +2,47 @@
 class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	
 	public function __construct() {
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/declarations',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/declarations/stats',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_stats')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/declaration/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
 			array( 'token' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/declaration/token/(?P<token>[a-z0-9]+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_by_token'),
 			array( 'token' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/declaration',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/declaration/(?P<id>\d+)',
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/declaration/(?P<id>\d+)/rois',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_rois'),

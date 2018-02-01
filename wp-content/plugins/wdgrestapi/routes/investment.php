@@ -2,13 +2,13 @@
 class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	
 	public function __construct() {
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/investments',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/investments/stats',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_stats')
@@ -28,7 +28,7 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/investment/(?P<token>[a-z0-9]+)',
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),

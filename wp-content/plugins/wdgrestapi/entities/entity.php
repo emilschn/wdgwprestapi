@@ -233,7 +233,7 @@ class WDGRESTAPI_Entity {
 	 * @param string $entity_type
 	 * @param array $db_properties
 	 */
-	public static function upgrade_db( $entity_type, $db_properties ) {
+	public static function upgrade_entity_db( $entity_type, $db_properties ) {
 		global $wpdb;
 		$charset_collate = $wpdb->get_charset_collate();
 		$table_name = WDGRESTAPI_Entity::get_table_name( $entity_type );

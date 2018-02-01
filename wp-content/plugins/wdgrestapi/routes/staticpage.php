@@ -10,7 +10,7 @@ if ( ! function_exists( 'is_admin' ) && ! class_exists( 'TestCase' ) ) {
 class WDGRESTAPI_Route_StaticPage extends WDGRESTAPI_Route {
 	
 	public static function register() {
-		WDGRESTAPI_Route::register( '/staticpages', 'GET', 'WDGRESTAPI_Entity_StaticPage::list_get' );
+		WDGRESTAPI_Route::register_wdg( '/staticpages', 'GET', 'WDGRESTAPI_Entity_StaticPage::list_get' );
 	}
 	
 }

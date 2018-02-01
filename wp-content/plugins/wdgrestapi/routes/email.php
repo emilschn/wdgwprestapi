@@ -2,13 +2,13 @@
 class WDGRESTAPI_Route_Email extends WDGRESTAPI_Route {
 	
 	public function __construct() {
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/emails',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get')
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/email',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create'),

@@ -214,7 +214,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_db( WDGRESTAPI_Entity_Declaration::$entity_type, WDGRESTAPI_Entity_Declaration::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_Declaration::$entity_type, WDGRESTAPI_Entity_Declaration::$db_properties );
 	}
 	
 }

@@ -60,6 +60,6 @@ class ContentWriterSettings
     */
     public static function getAllStrategies()
     {
-        return CoreConstants::CONTENTWRITER_STRATEGIES;
+        return CoreConstants::$CONTENTWRITER_STRATEGIES;
     }
 }
