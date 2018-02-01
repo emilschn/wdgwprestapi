@@ -34,15 +34,13 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 			date_default_timezone_set( 'Europe/Paris' );
 			$current_date = new DateTime();
 			$this->set_property( 'date', $current_date->format( 'Y-m-d H:i:s' ) );
-			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-			$this->set_property( 'caller', $current_client->ID );
 		}
 		
 		if ( $this->loaded_data->tool == WDGRESTAPI_Entity_Bill::$tool_quickbooks ) {
 			$quickbook_invoice_id = $this->save_on_quickbooks( json_decode( $this->loaded_data->options ) );
 			if ( !empty( $quickbook_invoice_id ) ) {
 				parent::save();
-				$this->set_property( 'object_id', $quickbook_invoice_id );
+				$this->set_property( 'tool_id', $quickbook_invoice_id );
 				return TRUE;
 			}
 		}
@@ -139,9 +137,10 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
+		'client_user_id'		=> array( 'type' => 'id', 'other' => '' ),
 		'date'					=> array( 'type' => 'datetime', 'other' => '' ),
-		'caller'				=> array( 'type' => 'id', 'other' => '' ),
 		'tool'					=> array( 'type' => 'varchar', 'other' => '' ),
+		'tool_id'				=> array( 'type' => 'id', 'other' => '' ),
 		'object'				=> array( 'type' => 'varchar', 'other' => '' ),
 		'object_id'				=> array( 'type' => 'id', 'other' => '' ),
 		'options'				=> array( 'type' => 'longtext', 'other' => '' ),
