@@ -80,7 +80,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_db( WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
 	}
 	
 }
