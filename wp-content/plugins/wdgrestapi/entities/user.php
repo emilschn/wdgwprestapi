@@ -143,6 +143,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				$result->organization_description = FALSE;
 				$result->organization_fiscal_year_end_month = FALSE;
 				$result->organization_accounting_contact = FALSE;
+				$result->organization_quickbooks_id = FALSE;
 				$result->organization_document_kbis = FALSE;
 				$result->organization_document_rib = FALSE;
 				$result->organization_document_status = FALSE;
@@ -180,8 +181,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 					'organization_description'					=> 'TODO',
 					'organization_fiscal_year_end_month'		=> $organization->fiscal_year_end_month,
 					'organization_accounting_contact'			=> $organization->accounting_contact,
+					'organization_quickbooks_id'				=> 'TODO',
 					'organization_document_kbis'				=> 'TODO',
-					'organization_document_rib'					=> 'TODO',
 					'organization_document_status'				=> 'TODO',
 					// Infos utilisateurs à FALSE
 					'is_project_manager'	=> FALSE,
@@ -262,6 +263,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'bank_address2'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'document_id'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'document_home'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'document_rib'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'authentification_mode'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'picture_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'website_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),

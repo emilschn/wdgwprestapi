@@ -2,6 +2,15 @@
 class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	public static $entity_type = 'project';
 	
+	public static $status_preparing = 'preparing';
+	public static $status_validated = 'validated';
+	public static $status_preview = 'preview';
+	public static $status_vote = 'vote';
+	public static $status_collecte = 'collecte';
+	public static $status_funded = 'funded';
+	public static $status_closed = 'closed';
+	public static $status_archive = 'archive';
+	
 	public function __construct( $id = FALSE, $wpref = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Project::$entity_type, WDGRESTAPI_Entity_Project::$db_properties );
 		if ( $wpref != FALSE ) {
@@ -21,6 +30,15 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			WDGRESTAPI_Entity::post_data_on_client_site( 'set_project_url', $this->loaded_data->wpref, $posted_params );
 		}
 	}
+	
+	public function get_loaded_data( $expand = TRUE ) {
+		$buffer = parent::get_loaded_data();
+		if ( $expand ) {
+			$buffer = WDGRESTAPI_Entity_Project::expand_single_data( $buffer );
+		}
+		return $buffer;
+	}
+	
 	
 	/**
 	 * Retourne les données du statut du projet
@@ -122,6 +140,74 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
+	public function get_contract_models_data() {
+		return WDGRESTAPI_Entity_ContractModel::get_by_entity_id( 'project', $this->loaded_data->id );
+	}
+	
+	public function get_contracts_data() {
+		return WDGRESTAPI_Entity_Contract::list_get( 'project', $this->loaded_data->id );
+	}
+	
+	public static function expand_single_data( $item ) {
+		// Augmentation des données retournées avec des informations statiques
+		$project_roideclarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $item->id );
+		$project_declarations_done_count = 0;
+		$project_declarations_turnover_total = 0;
+		$project_declarations_royalties_total = 0;
+		$project_first_declaration = $project_roideclarations[0];
+		$project_last_declaration = end( $project_roideclarations );
+		foreach ( $project_roideclarations as $roideclaration ) {
+			if ( $roideclaration[ 'status' ] == WDGRESTAPI_Entity_Declaration::$status_finished ) {
+				$project_declarations_done_count++;
+				$project_declarations_turnover_total += $roideclaration[ 'turnover_total' ];
+				$project_declarations_royalties_total += $roideclaration[ 'amount' ];
+			}
+		}
+
+		$item->lw_amount_wallet = 0;
+		$item->lw_authenticated = 0;
+		$item->lw_sepa_signed = 0;
+		$item->roi_declarations_done_count = $project_declarations_done_count;
+		$item->roi_declarations_total = count( $project_roideclarations );
+		$item->turnover_total = $project_declarations_turnover_total;
+		$item->royalties_total = $project_declarations_royalties_total;
+		$item->declarations_start_date = $project_first_declaration->date_due;
+		$item->declarations_end_date = $project_last_declaration->date_due;
+		$item->declarations_list = $project_roideclarations;
+
+		// Augmentation de la liste des données avec données éditables d'organisation
+		$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $item->id );
+		$project_organization = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
+		$project_organization_data = $project_organization->get_loaded_data();
+
+		$item->organization_name = $project_organization_data->name;
+		$item->organization_legalform = $project_organization_data->legalform;
+		$item->organization_capital = $project_organization_data->capital;
+		$item->organization_idnumber = $project_organization_data->idnumber;
+		$item->organization_vat = $project_organization_data->vat;
+		$item->organization_address = $project_organization_data->address;
+		$item->organization_postalcode = $project_organization_data->postalcode;
+		$item->organization_city = $project_organization_data->city;
+		$item->organization_country = $project_organization_data->country;
+		$item->organization_rcs = $project_organization_data->rcs;
+		$item->organization_representative_firstname = 'TODO';
+		$item->organization_representative_lastname = 'TODO';
+		$item->organization_representative_function = $project_organization_data->representative_function;
+		$item->organization_description = $project_organization_data->description;
+		$item->organization_fiscal_year_end_month = $project_organization_data->fiscal_year_end_month;
+		$item->organization_accounting_contact = 'TODO';
+		$item->organization_quickbooks_id = 'TODO';
+		$item->organization_iban = $project_organization_data->iban;
+		$item->organization_bic = $project_organization_data->bic;
+		$item->organization_document_kbis = 'TODO';
+		$item->organization_document_rib = 'TODO';
+		$item->organization_document_status = 'TODO';
+		$item->organization_document_id = 'TODO';
+		$item->organization_document_home = 'TODO';
+		
+		return $item;
+	}
+	
 	/**
 	 * Retourne la liste de tous les projets
 	 * @return array
@@ -133,39 +219,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$results = $wpdb->get_results( $query );
 		
 		foreach ( $results as $result ) {
-			$result->lw_amount_wallet = 'TODO';
-			$result->lw_authenticated = 'TODO';
-			$result->lw_sepa_signed = 'TODO';
-			$result->roi_declarations_done_count = 'TODO';
-			$result->roi_declarations_total = 'TODO';
-			$result->turnover_total = 'TODO';
-			$result->royalties_total = 'TODO';
-			$result->declarations_start_date = 'TODO';
-			$result->declarations_end_date = 'TODO';
-			$result->organization_name = 'TODO';
-			$result->organization_legalform = 'TODO';
-			$result->organization_capital = 'TODO';
-			$result->organization_idnumber = 'TODO';
-			$result->organization_vat = 'TODO';
-			$result->organization_address = 'TODO';
-			$result->organization_postalcode = 'TODO';
-			$result->organization_city = 'TODO';
-			$result->organization_country = 'TODO';
-			$result->organization_rcs = 'TODO';
-			$result->organization_representative_firstname = 'TODO';
-			$result->organization_representative_lastname = 'TODO';
-			$result->organization_representative_function = 'TODO';
-			$result->organization_description = 'TODO';
-			$result->organization_fiscal_year_end_month = 'TODO';
-			$result->organization_accounting_contact = 'TODO';
-			$result->organization_iban = 'TODO';
-			$result->organization_bic = 'TODO';
-			$result->organization_document_kbis = 'TODO';
-			$result->organization_document_rib = 'TODO';
-			$result->organization_document_status = 'TODO';
-			$result->organization_document_id = 'TODO';
-			$result->organization_document_home = 'TODO';
-			$result->team_contacts = 'TODO';
+			$result = WDGRESTAPI_Entity_Project::expand_single_data( $result );
 		}
 		
 		return $results;
@@ -183,7 +237,69 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	 * Retourne les statistiques qui concernent les projets
 	 */
 	public static function get_stats() {
-		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_projects_stats' );
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project::$entity_type );
+		$query = "SELECT * FROM " .$table_name;
+		$results = $wpdb->get_results( $query );
+		
+		$date_now = new DateTime();
+		
+		$buffer = array();
+		$buffer[ 'total' ] = count( $results );
+		$buffer[ 'funded_amount' ] = 0;
+		$buffer[ 'royalties_amount' ] = 0;
+		$buffer[ 'statuses' ] = array();
+		$status_list = array( 'posted', 'preparing', 'vote', 'funding', 'declaring', 'declaring_late', 'funded', 'closed', 'archive' );
+		foreach ( $status_list as $status ) {
+			$buffer[ 'statuses' ][ $status ] = array(
+				'count'		=> 0,
+				'percent'	=> 0
+			);
+		}
+		
+		foreach ( $results as $result ) {
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_preparing ) {
+				$buffer[ 'statuses' ][ 'posted' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_validated ) {
+				$buffer[ 'statuses' ][ 'preparing' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_vote ) {
+				$buffer[ 'statuses' ][ 'vote' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_collecte ) {
+				$buffer[ 'statuses' ][ 'funding' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_funded ) {
+				$buffer[ 'statuses' ][ 'declaring' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_closed ) {
+				$buffer[ 'statuses' ][ 'closed' ][ 'count' ]++;
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_funded || $result->status == WDGRESTAPI_Entity_Project::$status_closed ) {
+				$buffer[ 'funded_amount' ] += $result->amount_collected;
+				$buffer[ 'statuses' ][ 'funded' ][ 'count' ]++;
+				$declarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $result->id );
+				foreach ( $declarations as $declaration ) {
+					$buffer[ 'royalties_amount' ] += $declaration->amount;
+					$date_due = new DateTime( $declaration->date_due );
+					$date_interval = $date_now->diff( $date_due );
+					if ( $declaration->status != WDGRESTAPI_Entity_Declaration::$status_finished && ( $date_due < $date_now || $date_interval->format( '%a' ) < 10 ) ) {
+						$buffer[ 'statuses' ][ 'declaring_late' ][ 'count' ]++;
+						break;
+					}
+				}
+			}
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_archive ) {
+				$buffer[ 'statuses' ][ 'archive' ][ 'count' ]++;
+			}
+		}
+		
+		foreach ( $status_list as $status ) {
+			$buffer[ 'statuses' ][ $status ][ 'percent' ] = $buffer[ 'statuses' ][ $status ][ 'count' ] / $buffer[ 'total' ] * 100;
+			$buffer[ 'statuses' ][ $status ][ 'percent' ] = round( $buffer[ 'statuses' ][ $status ][ 'percent' ] * 100 ) / 100;
+		}
+		
 		return $buffer;
 	}
 	
@@ -209,7 +325,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	 * @param type $user_lastname
 	 * @param type $user_email
 	 * @param type $organization_name
-	 * @param type $organisation_email
+	 * @param type $organization_email
 	 * @param type $campaign_name
 	 * @param type $equitearly_investment
 	 * @param type $equitearly_charges
@@ -244,6 +360,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'url'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'description'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'can_go_next'			=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'category'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
@@ -276,6 +393,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'costs_to_organization'	=> array( 'type' => 'float', 'other' => '' ),
 		'costs_to_investors'	=> array( 'type' => 'float', 'other' => '' ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => '' ),
+		'team_contacts'			=> array( 'type' => 'longtext', 'other' => '' ),
 	);
 	
 	// Mise à jour de la bdd

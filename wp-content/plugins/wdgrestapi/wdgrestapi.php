@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.733';
+	private $version = '0.0.745';
     
 	/**
 	 * Instanciation du singleton
@@ -82,6 +82,9 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'bankinfo' );
 		$this->add_include_entity( 'declaration' );
 		$this->add_include_entity( 'roi' );
+		$this->add_include_entity( 'file' );
+		$this->add_include_entity( 'contract-model' );
+		$this->add_include_entity( 'contract' );
 		$this->add_include_entity( 'organization-user' );
 		$this->add_include_entity( 'project-user' );
 		$this->add_include_entity( 'project-organization' );
@@ -104,6 +107,9 @@ class WDGRESTAPI {
 		$this->add_include_route( 'bankinfo' );
 		$this->add_include_route( 'declaration' );
 		$this->add_include_route( 'roi' );
+		$this->add_include_route( 'file' );
+		$this->add_include_route( 'contract-model' );
+		$this->add_include_route( 'contract' );
 		$this->add_include_route( 'organization-user' );
 		$this->add_include_route( 'project-user' );
 		$this->add_include_route( 'project-organization' );
@@ -127,6 +133,9 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_MailTemplate::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Email::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Bill::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_File::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ContractModel::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Contract::register');
 	}
 	
 	
@@ -150,6 +159,9 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_BankInfo::upgrade_db();
 			WDGRESTAPI_Entity_Declaration::upgrade_db();
 			WDGRESTAPI_Entity_ROI::upgrade_db();
+			WDGRESTAPI_Entity_File::upgrade_db();
+			WDGRESTAPI_Entity_ContractModel::upgrade_db();
+			WDGRESTAPI_Entity_Contract::upgrade_db();
 			WDGRESTAPI_Entity_OrganizationUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectOrganization::upgrade_db();

@@ -90,6 +90,20 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
+		WDGRESTAPI_Route::register(
+			'/project/(?P<id>\d+)/contract-models',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_contract_models'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
+		WDGRESTAPI_Route::register(
+			'/project/(?P<id>\d+)/contracts',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_contracts'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
 		// Spécifique Equitearly
 		WDGRESTAPI_Route::register_external(
 			'/project-equitearly',
@@ -296,6 +310,62 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	}
 	
 	/**
+	 * Retourne les modèles de contrats d'un projet par son ID
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_contract_models( WP_REST_Request $request ) {
+		$project_id = $request->get_param( 'id' );
+		if ( !empty( $project_id ) ) {
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
+			$loaded_data = $project_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$contract_models_data = $project_item->get_contract_models_data();
+				$this->log( "WDGRESTAPI_Route_Project::single_get_contract_models::" . $project_id, json_encode( $contract_models_data ) );
+				return $contract_models_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_get_contract_models::" . $project_id, "404 : Invalid project ID" );
+				return new WP_Error( '404', "Invalid project ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_get_contract_models", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les contrats d'un projet par son ID
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_contracts( WP_REST_Request $request ) {
+		$project_id = $request->get_param( 'id' );
+		if ( !empty( $project_id ) ) {
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
+			$loaded_data = $project_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$contracts_data = $project_item->get_contracts_data();
+				$this->log( "WDGRESTAPI_Route_Project::single_get_contracts::" . $project_id, json_encode( $contracts_data ) );
+				return $contracts_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_get_contracts::" . $project_id, "404 : Invalid project ID" );
+				return new WP_Error( '404', "Invalid project ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_get_contracts", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+	/**
 	 * Crée un projet
 	 * @param WP_REST_Request $request
 	 * @return \WP_Error
@@ -367,6 +437,27 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			$this->log( "WDGRESTAPI_Route_Project::single_edit", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
+	}
+	
+	/**
+	 * Définit les différentes propriétés d'une entité à partir d'informations postées
+	 * Override de la fonction parente pour gérer les données d'organisation transmises
+	 * @param WDGRESTAPI_Entity $entity
+	 * @param array $properties_list
+	 */
+	public function set_posted_properties( WDGRESTAPI_Entity $entity, array $properties_list ) {
+		// On appelle d'abord la fonction parente pour gérer les données du projet
+		parent::set_posted_properties( $entity, $properties_list );
+		// On gère ensuite les données liées à l'organisation
+		$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $entity->get_loaded_data()->id );
+		$project_organization_entity = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
+		foreach ( WDGRESTAPI_Entity_Organization::$db_properties as $property_key => $db_property ) {
+			$property_new_value = filter_input( INPUT_POST, 'organization_' . $property_key );
+			if ( $property_new_value !== null && $property_new_value !== FALSE ) {
+				$project_organization_entity->set_property( $property_key, $property_new_value );
+			}
+		}
+		$project_organization_entity->save();
 	}
 	
 	/**
