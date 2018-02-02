@@ -18,7 +18,7 @@ class WDGRESTAPI_Entity_ContractModel extends WDGRESTAPI_Entity {
 			$this->loaded_data->status = 'draft';
 		}
 		$current_datetime = new DateTime();
-		$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d h:i:s' );
+		$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d H:i:s' );
 		parent::save();
 	}
 	

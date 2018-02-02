@@ -26,7 +26,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 			file_put_contents( $path . $random_filename, $file_data );
 			$current_datetime = new DateTime();
 			$this->loaded_data->file_name = $random_filename;
-			$this->loaded_data->update = $current_datetime->format( 'Y-m-d h:i:s' );
+			$this->loaded_data->update = $current_datetime->format( 'Y-m-d H:i:s' );
 			$this->loaded_data->status = 'uploaded';
 			parent::save();
 			
