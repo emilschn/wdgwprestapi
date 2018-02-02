@@ -140,6 +140,10 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
+	public function get_contract_models_data() {
+		return WDGRESTAPI_Entity_ContractModel::get_by_entity_id( 'project', $this->loaded_data->id );
+	}
+	
 	public function get_contracts_data() {
 		return WDGRESTAPI_Entity_Contract::list_get( 'project', $this->loaded_data->id );
 	}

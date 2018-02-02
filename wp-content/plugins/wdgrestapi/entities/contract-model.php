@@ -13,6 +13,15 @@ class WDGRESTAPI_Entity_ContractModel extends WDGRESTAPI_Entity {
 		parent::__construct( $id, WDGRESTAPI_Entity_ContractModel::$entity_type, WDGRESTAPI_Entity_ContractModel::$db_properties );
 	}
 	
+	public function save() {
+		if ( empty( $this->loaded_data->status ) ) {
+			$this->loaded_data->status = 'draft';
+		}
+		$current_datetime = new DateTime();
+		$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d h:i:s' );
+		parent::save();
+	}
+	
 	public static function get_by_entity_id( $entity_type, $entity_id ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ContractModel::$entity_type );
