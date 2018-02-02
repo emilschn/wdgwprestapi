@@ -90,14 +90,14 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/contract-models',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_contract_models'),
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register(
+		WDGRESTAPI_Route::register_wdg(
 			'/project/(?P<id>\d+)/contracts',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_contracts'),
