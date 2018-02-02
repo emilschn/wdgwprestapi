@@ -11,10 +11,13 @@ class WDGRESTAPI_Entity_Contract extends WDGRESTAPI_Entity {
 	
 	public static function list_get( $entity_type, $entity_id ) {
 		$contract_model = WDGRESTAPI_Entity_ContractModel::get_by_entity_id( $entity_type, $entity_id );
-		
+		return WDGRESTAPI_Entity_Contract::list_get_by_model( $contract_model->id );
+	}
+	
+	public static function list_get_by_model( $model_id ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Contract::$entity_type );
-		$query = "SELECT * FROM " .$table_name. " WHERE model_id = '" .$contract_model->id;
+		$query = "SELECT * FROM " .$table_name. " WHERE model_id = '" .$model_id;
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}

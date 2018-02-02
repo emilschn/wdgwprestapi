@@ -22,6 +22,10 @@ class WDGRESTAPI_Entity_ContractModel extends WDGRESTAPI_Entity {
 		parent::save();
 	}
 	
+	public function get_contracts_data() {
+		return WDGRESTAPI_Entity_Contract::list_get_by_model( $this->loaded_data->id );
+	}
+	
 	public static function get_by_entity_id( $entity_type, $entity_id ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ContractModel::$entity_type );

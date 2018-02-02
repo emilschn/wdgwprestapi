@@ -27,6 +27,12 @@ class WDGRESTAPI_Route_ContractModel extends WDGRESTAPI_Route {
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
 		);
+		
+		WDGRESTAPI_Route::register_wdg(
+			'/contract-model/(?P<id>\d+)/contracts',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_contracts')
+		);
 	}
 	
 	public static function register() {
@@ -137,6 +143,34 @@ class WDGRESTAPI_Route_ContractModel extends WDGRESTAPI_Route {
 		} else {
 			$this->log( "WDGRESTAPI_Route_ContractModel::single_edit", "404 : Invalid contract model id (empty)" );
 			return new WP_Error( '404', "Invalid contract model id (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les contrats créés à partir d'un modèle
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_contracts( WP_REST_Request $request ) {
+		$contract_model_id = $request->get_param( 'id' );
+		if ( !empty( $contract_model_id ) ) {
+			$contract_model_item = new WDGRESTAPI_Entity_ContractModel( $contract_model_id );
+			$loaded_data = $contract_model_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$contracts_data = $contract_model_item->get_contracts_data();
+				$this->log( "WDGRESTAPI_Route_ContractModel::single_get_contracts::" . $contract_model_id, json_encode( $contracts_data ) );
+				return $contracts_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_ContractModel::single_get_contracts::" . $contract_model_id, "404 : Invalid contract model ID" );
+				return new WP_Error( '404', "Invalid contract model ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_ContractModel::single_get_contracts", "404 : Invalid contract model ID (empty)" );
+			return new WP_Error( '404', "Invalid contract model ID (empty)" );
 		}
 	}
 	
