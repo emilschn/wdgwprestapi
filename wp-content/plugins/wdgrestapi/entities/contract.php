@@ -5,8 +5,17 @@ class WDGRESTAPI_Entity_Contract extends WDGRESTAPI_Entity {
 	
 	public static $contract_entity_types = array( 'user' );
 	
+	public static $contract_statuses = array( 'init', 'waiting-signature', 'validated' );
+	
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Contract::$entity_type, WDGRESTAPI_Entity_Contract::$db_properties );
+	}
+	
+	public function save() {
+		if ( empty( $this->loaded_data->status ) ) {
+			$this->loaded_data->status = 'init';
+		}
+		parent::save();
 	}
 	
 	public static function list_get( $entity_type, $entity_id ) {
