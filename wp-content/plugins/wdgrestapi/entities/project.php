@@ -154,13 +154,17 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$project_declarations_done_count = 0;
 		$project_declarations_turnover_total = 0;
 		$project_declarations_royalties_total = 0;
-		$project_first_declaration = $project_roideclarations[0];
-		$project_last_declaration = end( $project_roideclarations );
-		foreach ( $project_roideclarations as $roideclaration ) {
-			if ( $roideclaration[ 'status' ] == WDGRESTAPI_Entity_Declaration::$status_finished ) {
-				$project_declarations_done_count++;
-				$project_declarations_turnover_total += $roideclaration[ 'turnover_total' ];
-				$project_declarations_royalties_total += $roideclaration[ 'amount' ];
+		$project_first_declaration = FALSE;
+		$project_last_declaration = FALSE;
+		if ( $project_roideclarations ) {
+			$project_first_declaration = $project_roideclarations[0];
+			$project_last_declaration = end( $project_roideclarations );
+			foreach ( $project_roideclarations as $roideclaration ) {
+				if ( $roideclaration[ 'status' ] == WDGRESTAPI_Entity_Declaration::$status_finished ) {
+					$project_declarations_done_count++;
+					$project_declarations_turnover_total += $roideclaration[ 'turnover_total' ];
+					$project_declarations_royalties_total += $roideclaration[ 'amount' ];
+				}
 			}
 		}
 
@@ -171,9 +175,15 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$item->roi_declarations_total = count( $project_roideclarations );
 		$item->turnover_total = $project_declarations_turnover_total;
 		$item->royalties_total = $project_declarations_royalties_total;
-		$item->declarations_start_date = $project_first_declaration->date_due;
-		$item->declarations_end_date = $project_last_declaration->date_due;
 		$item->declarations_list = $project_roideclarations;
+		if ( $project_first_declaration ) {
+			$item->declarations_start_date = $project_first_declaration->date_due;
+		}
+		if ( $project_last_declaration ) {
+			$item->declarations_end_date = $project_last_declaration->date_due;
+		} else {
+			$item->declarations_end_date = FALSE;
+		}
 
 		// Augmentation de la liste des données avec données éditables d'organisation
 		$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $item->id );
@@ -377,6 +387,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'maximum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'minimum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'contract_start_date'	=> array( 'type' => 'date', 'other' => '' ),
+		'declarations_start_date'	=> array( 'type' => 'date', 'other' => '' ),
 		'spendings_description'	=> array( 'type' => 'longtext', 'other' => '' ),
 		'earnings_description'	=> array( 'type' => 'longtext', 'other' => '' ),
 		'simple_info'			=> array( 'type' => 'longtext', 'other' => '' ),

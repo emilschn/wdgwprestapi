@@ -448,6 +448,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	public function set_posted_properties( WDGRESTAPI_Entity $entity, array $properties_list ) {
 		// On appelle d'abord la fonction parente pour gérer les données du projet
 		parent::set_posted_properties( $entity, $properties_list );
+		
 		// On gère ensuite les données liées à l'organisation
 		$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $entity->get_loaded_data()->id );
 		$project_organization_entity = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
@@ -457,6 +458,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 				$project_organization_entity->set_property( $property_key, $property_new_value );
 			}
 		}
+		
 		$project_organization_entity->save();
 	}
 	
