@@ -403,6 +403,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'investments_count'		=> array( 'type' => 'int', 'other' => '' ),
 		'costs_to_organization'	=> array( 'type' => 'float', 'other' => '' ),
 		'costs_to_investors'	=> array( 'type' => 'float', 'other' => '' ),
+		'turnover_per_declaration'	=> array( 'type' => 'int', 'other' => '' ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => '' ),
 		'team_contacts'			=> array( 'type' => 'longtext', 'other' => '' ),
 	);

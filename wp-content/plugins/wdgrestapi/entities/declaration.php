@@ -149,25 +149,32 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		if ( $buffer[ 'status_display' ] == WDGRESTAPI_Entity_Declaration::$status_payment && $current_date > $due_date ) {
 			$buffer[ 'status_display' ] = WDGRESTAPI_Entity_Declaration::$status_payment_late;
 		}
-		// Frais PP et investisseurs (TODO : aller chercher la bonne donnée)
-		$buffer[ 'costs_to_organization' ] = 0;
-		$buffer[ 'cost_to_investors' ] = 0;
-		// Nombre de déclarations de CA (TODO : aller chercher la bonne donnée)
-		$buffer[ 'turnover_nb' ] = count( $turnover_list );
-		// Pourcentage de royalties versé (TODO : aller chercher la bonne donnée)
-		$buffer[ 'royalties_percent' ] = 0;
+		// Frais PP et investisseurs
+		$buffer[ 'costs_to_organization' ] = $project_data->costs_to_organization;
+		$buffer[ 'costs_to_investors' ] = $project_data->costs_to_investors;
+		// Nombre de déclarations de CA
+		$buffer[ 'turnover_nb' ] = $project_data->turnover_per_declaration;
+		// Pourcentage de royalties versé
+		$buffer[ 'royalties_percent' ] = $project_data->roi_percent;
 		// Ajustement
 		$adjustment = json_decode( $result->adjustment );
 		$buffer[ 'adjustment_needed' ] = ( isset( $adjustment->needed ) && $adjustment->needed == 1 ) ? 1 : 0;
 		$buffer[ 'adjustment_value' ] = ( isset( $adjustment->value ) ) ? $adjustment->value : 0;
 		$buffer[ 'adjustment_turnover_difference' ] = ( isset( $adjustment->turnover_difference ) ) ? $adjustment->turnover_difference : 0;
 		$buffer[ 'adjustment_msg_to_author' ] = ( isset( $adjustment->msg_to_author ) ) ? $adjustment->msg_to_author : 0;
-		// Contact
-		$buffer[ 'organization_email' ] = 'TODO';
-		$buffer[ 'organization_phone' ] = 'TODO';
 		// Fichiers
-		$buffer[ 'certificate' ] = 'TODO';
-		$buffer[ 'bill' ] = 'TODO';
+		$buffer[ 'certificate' ] = '';
+		$certificate_file_entity = WDGRESTAPI_Entity_File::get_single( 'declaration', $result->id, 'campaign_certificate' );
+		if ( !empty( $certificate_file_entity ) ) {
+			$certificate_loaded_data = $certificate_file_entity->get_loaded_data();
+			$buffer[ 'certificate' ] = $certificate_loaded_data->url;
+		}
+		$buffer[ 'bill' ] = '';
+		$bill_file_entity = WDGRESTAPI_Entity_File::get_single( 'declaration', $result->id, 'campaign_bill' );
+		if ( !empty( $bill_file_entity ) ) {
+			$bill_loaded_data = $bill_file_entity->get_loaded_data();
+			$buffer[ 'bill' ] = $bill_loaded_data->url;
+		}
 		// Infos organisation
 		$project_orga_list = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $result->id_project );
 		$orga_linked_id = 0;
@@ -183,6 +190,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 			$organization_data = $organization_item->get_loaded_data();
 		}
 		$buffer[ 'organization_email' ] = !empty( $organization_data ) ? $organization_data->email : '';
+		$buffer[ 'team_contacts' ] = $project_data->team_contacts;
 		return $buffer;
 	}
 	

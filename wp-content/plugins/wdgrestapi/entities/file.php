@@ -11,9 +11,33 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 		parent::__construct( $id, WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
 	}
 	
+	/**
+	 * Retourne un élément File en fonction de ses paramètres
+	 * @param string $entity_type
+	 * @param int $entity_id
+	 * @param string $file_type
+	 * @return WDGRESTAPI_Entity_File
+	 */
+	public static function get_single( $entity_type, $entity_id, $file_type ) {
+		$buffer = FALSE;
+		
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( $entity_type );
+		$query = "SELECT id FROM " .$table_name. " WHERE entity_type='" .$entity_type. "' AND entity_id=" .$entity_id. " AND file_type='" .$file_type. "'";
+		$loaded_data = $wpdb->get_row( $query );
+		if ( !empty( $loaded_data->id ) ) {
+			$buffer = new WDGRESTAPI_Entity_File( $loaded_data->id );
+		}
+		
+		return $buffer;
+	}
+	
 	public function get_loaded_data() {
 		$buffer = parent::get_loaded_data();
-		$buffer->url = home_url( '/wp-content/plugins/wdgrestapi/files/' .$this->loaded_data->entity_type. '/' .$this->loaded_data->file_type. '/' .$this->loaded_data->file_name );
+		$buffer->url = '';
+		if ( !empty( $this->loaded_data->file_name ) ) {
+			$buffer->url = home_url( '/wp-content/plugins/wdgrestapi/files/' .$this->loaded_data->entity_type. '/' .$this->loaded_data->file_type. '/' .$this->loaded_data->file_name );
+		}
 		return $buffer;
 	}
 	
