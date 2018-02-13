@@ -42,7 +42,7 @@ class WDGRESTAPI_Entity_Contract extends WDGRESTAPI_Entity {
 		'entity_type'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'entity_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'partner'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'partner_id'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'partner_id'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'update_date'			=> array( 'type' => 'datetime', 'other' => '' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => '' )
 	);
