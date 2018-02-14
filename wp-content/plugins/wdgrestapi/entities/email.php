@@ -54,8 +54,8 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		$buffer = 'error';
 		if ( $sendinblue_result[ 'code' ] == 'success' ) {
 			$buffer = 'success';
-			$this->loaded_data->result = json_encode( $sendinblue_result );
 		}
+		$this->loaded_data->result = json_encode( $sendinblue_result );
 		$this->save();
 		return $buffer;
 	}
