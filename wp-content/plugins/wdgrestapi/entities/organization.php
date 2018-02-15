@@ -105,7 +105,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		'name'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'description'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'description'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'representative_function'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'creation_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'strong_authentication'	=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
