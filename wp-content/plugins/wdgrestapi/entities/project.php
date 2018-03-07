@@ -406,6 +406,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'turnover_per_declaration'	=> array( 'type' => 'int', 'other' => '' ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => '' ),
 		'team_contacts'			=> array( 'type' => 'longtext', 'other' => '' ),
+		'minimum_goal_display'	=> array( 'type' => 'varchar', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd
