@@ -129,10 +129,12 @@ class WDGRESTAPI_Entity {
 					'id' => $this->loaded_data->id
 				)
 			);
+			if ( $wpdb->last_query !== '' ) {
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > update > $wpdb->last_query = ' . $wpdb->last_query );
+			}
 			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > update > $result = ' . print_r( $result, TRUE ) );
 			if ( $wpdb->last_error !== '' ) {
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > update > $wpdb->last_result = ' . print_r( $wpdb->last_result, TRUE ) );
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > update > $wpdb->last_query = ' . $wpdb->last_query );
 			}
 		
 		// Sinon, on crée un nouvel objet et met à jour l'identifiant
@@ -145,10 +147,12 @@ class WDGRESTAPI_Entity {
 			if ($result !== FALSE) {
 				$this->loaded_data->id = $wpdb->insert_id;
 			}
+			if ( $wpdb->last_query !== '' ) {
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > update > $wpdb->last_query = ' . $wpdb->last_query );
+			}
 			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > insert > $result = ' . print_r( $result, TRUE ) );
 			if ( $wpdb->last_error !== '' ) {
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > insert > $wpdb->last_result = ' . print_r( $wpdb->last_result, TRUE ) );
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > insert > $wpdb->last_query = ' . $wpdb->last_query );
 			}
 		}
 		return $result;
