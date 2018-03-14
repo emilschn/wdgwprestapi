@@ -22,7 +22,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 		$buffer = FALSE;
 		
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( $entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_File::$entity_type );
 		$query = "SELECT id FROM " .$table_name. " WHERE entity_type='" .$entity_type. "' AND entity_id=" .$entity_id. " AND file_type='" .$file_type. "'";
 		$loaded_data = $wpdb->get_row( $query );
 		if ( !empty( $loaded_data->id ) ) {
