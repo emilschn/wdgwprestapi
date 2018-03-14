@@ -98,18 +98,23 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * Retourne la liste de tous les utilisateurs
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $offset = 0, $limit = FALSE, $add_organizations = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
+	public static function list_get( $authorized_client_id_string, $offset = 0, $limit = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
 		
 		if ( !empty( $input_link_to_project ) ) {
 			// TODO : changer requete pour faire liaison avec table votes et table investissements
 			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+			$count_query = "SELECT COUNT(*) AS nb FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		} else {
 			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+			$count_query = "SELECT COUNT(*) AS nb FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		}
 		
 		// Gestion offset et limite
+		if ( empty( $limit ) ) {
+			$limit = 100;
+		}
 		if ( $offset > 0 || !empty( $limit ) ) {
 			$query .= " LIMIT ";
 			
@@ -125,90 +130,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		}
 		
 		$results = $wpdb->get_results( $query );
-		
 		foreach ( $results as $result ) {
 			$result->type = 'user';
 			$rand_project_manager = rand( 0, 20 );
 			$result->is_project_manager = ( $rand_project_manager > 17 ); // TODO
-			if ( $add_organizations ) {
-				$result->organization_name = FALSE;
-				$result->organization_legalform = FALSE;
-				$result->organization_capital = FALSE;
-				$result->organization_idnumber = FALSE;
-				$result->organization_vat = FALSE;
-				$result->organization_rcs = FALSE;
-				$result->organization_representative_firstname = FALSE;
-				$result->organization_representative_lastname = FALSE;
-				$result->organization_representative_function = FALSE;
-				$result->organization_description = FALSE;
-				$result->organization_fiscal_year_end_month = FALSE;
-				$result->organization_accounting_contact = FALSE;
-				$result->organization_quickbooks_id = FALSE;
-				$result->organization_document_kbis = FALSE;
-				$result->organization_document_rib = FALSE;
-				$result->organization_document_status = FALSE;
-			}
-		}
-		
-		if ( $add_organizations ) {
-			$list_organizations = WDGRESTAPI_Entity_Organization::list_get( $authorized_client_id_string, $offset, $limit, $input_link_to_project );
-			foreach ( $list_organizations as $organization ) {
-				$single_item = array(
-					'id'			=> $organization->id,
-					'wpref'			=> $organization->wpref,
-					'client_user_id'			=> $organization->client_user_id,
-					'email'			=> $organization->email,
-					'type'			=> 'organization',
-					'address'		=> $organization->address,
-					'postalcode'	=> $organization->postalcode,
-					'city'			=> $organization->city,
-					'country'		=> $organization->country,
-					'bank_owner'	=> $organization->bank_owner,
-					'bank_address'	=> $organization->bank_address,
-					'bank_iban'		=> $organization->bank_iban,
-					'bank_bic'		=> $organization->bank_bic,
-					'document_id'				=> 'TODO',
-					'document_home'				=> 'TODO',
-					'organization_name'			=> $organization->name,
-					'organization_legalform'	=> $organization->legalform,
-					'organization_capital'		=> $organization->capital,
-					'organization_idnumber'		=> $organization->idnumber,
-					'organization_vat'			=> $organization->vat,
-					'organization_rcs'			=> $organization->rcs,
-					'organization_representative_firstname'		=> 'TODO',
-					'organization_representative_lastname'		=> 'TODO',
-					'organization_representative_function'		=> $organization->representative_function,
-					'organization_description'					=> 'TODO',
-					'organization_fiscal_year_end_month'		=> $organization->fiscal_year_end_month,
-					'organization_accounting_contact'			=> $organization->accounting_contact,
-					'organization_quickbooks_id'				=> 'TODO',
-					'organization_document_kbis'				=> 'TODO',
-					'organization_document_status'				=> 'TODO',
-					// Infos utilisateurs à FALSE
-					'is_project_manager'	=> FALSE,
-					'gender'				=> FALSE,
-					'name'					=> FALSE,
-					'surname'				=> FALSE,
-					'username'				=> FALSE,
-					'birthday_date'			=> FALSE,
-					'birthday_city'			=> FALSE,
-					'nationality'			=> FALSE,
-					'phone_number'			=> FALSE,
-					'bank_address2'			=> FALSE,
-					'authentification_mode'	=> FALSE,
-					'picture_url'			=> FALSE,
-					'website_url'			=> FALSE,
-					'twitter_url'			=> FALSE,
-					'facebook_url'			=> FALSE,
-					'linkedin_url'			=> FALSE,
-					'viadeo_url'			=> FALSE,
-					'activation_key'		=> FALSE,
-					'password'				=> FALSE,
-					'signup_date'			=> FALSE
-				);
-				$single_item_object = json_decode( json_encode( $single_item ), FALSE );
-				array_push( $results, $single_item_object );
-			}
 		}
 		
 		if ( $full ) {
@@ -222,7 +147,17 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			}
 		}
 		
-		return $results;
+		$count_results = $wpdb->get_results( $count_query );
+		
+		$buffer = array(
+			'offset'	=> $offset,
+			'limit'		=> $limit,
+			'count'		=> count( $results ),
+			'total'		=> $count_results[ 0 ]->nb,
+			'results'	=> $results
+		);
+		
+		return $buffer;
 	}
 	
 	/**
