@@ -82,7 +82,24 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		$offset = ( !empty( $input_offset ) ) ? $input_offset : 0;
 		$full = ( $input_full == '1' ) ? TRUE : FALSE;
 		
-		return WDGRESTAPI_Entity_User::list_get( $this->get_current_client_autorized_ids_string(), $offset, $input_limit, $full, $input_link_to_project );
+		// Gestion cache
+		$cache_name = '/users?offset=' .$input_offset;
+		if ( !empty( $input_limit ) ) { $cache_name .= '&limit=' .$input_limit; }
+		if ( !empty( $input_full ) ) { $cache_name .= '&full=' .$input_full; }
+		if ( !empty( $input_link_to_project ) ) { $cache_name .= '&link_to_project=' .$input_link_to_project; }
+		$cached_version_entity = new WDGRESTAPI_Entity_Cache( FALSE, $cache_name );
+		$cached_value = $cached_version_entity->get_value( 60 );
+		
+		if ( !empty( $cached_value ) ) {
+			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_User::use cache');
+			$buffer = json_decode( $cached_value );
+		} else {
+			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_User::use request');
+			$buffer = WDGRESTAPI_Entity_User::list_get( $this->get_current_client_autorized_ids_string(), $offset, $input_limit, $full, $input_link_to_project );
+			$cached_version_entity->save( $cache_name, json_encode( $buffer ) );
+		}
+		
+		return $buffer;
 	}
 	
 	/**

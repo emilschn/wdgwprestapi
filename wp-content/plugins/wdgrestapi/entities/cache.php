@@ -14,6 +14,11 @@ class WDGRESTAPI_Entity_Cache extends WDGRESTAPI_Entity {
 		}
 	}
 	
+	/**
+	 * Ajoute ou met à jour une ligne dans la bdd
+	 * @param string $name
+	 * @param string $value
+	 */
 	public function save( $name, $value ) {
 		$this->set_property( 'name', $name );
 		$this->set_property( 'value', $value );
@@ -57,10 +62,20 @@ class WDGRESTAPI_Entity_Cache extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
+	public static function delete_by_name_like( $like_pattern ) {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
+		$wpdb->query( 
+			$wpdb->prepare( 
+				"DELETE FROM ".$table_name." WHERE name LIKE '%%s%'",
+				$like_pattern
+			)
+		);
+	}
+	
 /*******************************************************************************
  * GESTION BDD
  ******************************************************************************/
-	
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),

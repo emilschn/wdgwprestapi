@@ -7,6 +7,14 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Override de la fonction de sauvegarde pour supprimer le cache des listes d'utilisateur
+	 */
+	public function save() {
+		parent::save();
+		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/users' );
+	}
+	
+	/**
 	 * Retourne la liste des ROIs de cet utilisateur
 	 * @return array
 	 */

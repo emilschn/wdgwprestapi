@@ -10,6 +10,7 @@ class WDGRESTAPI_Entity {
 		$this->current_entity_type = $entity_type;
 		$this->current_db_properties = $db_properties;
 		$this->properties_errors = array();
+		$this->loaded_data = json_decode('{}');
 		
 		// Si un id est passé, on construit à partir de la base de données
 		if ( $id != FALSE ) {
@@ -21,7 +22,6 @@ class WDGRESTAPI_Entity {
 		// Sinon, on initialise avec les différents champs
 		} else {
 			
-			$this->loaded_data = json_decode('{}');
 			foreach ($db_properties as $db_key => $db_property) {
 				if ( $db_key != 'unique_key' && $db_key != 'id' ) {
 					$this->loaded_data->$db_key = FALSE;
