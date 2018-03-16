@@ -123,7 +123,21 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		return WDGRESTAPI_Entity_Project::list_get( $this->get_current_client_autorized_ids_string() );
+		// Gestion cache
+		$cache_name = '/projects';
+		$cached_version_entity = new WDGRESTAPI_Entity_Cache( FALSE, $cache_name );
+		$cached_value = $cached_version_entity->get_value( 60 );
+		
+		if ( !empty( $cached_value ) ) {
+			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_Project::use cache');
+			$buffer = json_decode( $cached_value );
+		} else {
+			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_Project::use request');
+			$buffer = WDGRESTAPI_Entity_Project::list_get( $this->get_current_client_autorized_ids_string() );
+			$cached_version_entity->save( $cache_name, json_encode( $buffer ) );
+		}
+		
+		return $buffer;
 	}
 	
 	/**

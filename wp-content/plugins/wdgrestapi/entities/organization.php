@@ -5,6 +5,11 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Organization::$entity_type, WDGRESTAPI_Entity_Organization::$db_properties );
 	}
+	
+	public function save() {
+		parent::save();
+		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/projects' );
+	}
 
 	/**
 	* Surcharge la fonction de récupération de données

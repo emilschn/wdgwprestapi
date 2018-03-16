@@ -21,6 +21,11 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		}
 	}
 	
+	public function save() {
+		parent::save();
+		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/projects' );
+	}
+	
 	public function set_property( $property_name, $property_value ) {
 		parent::set_property( $property_name, $property_value );
 		if ( $property_name == 'url' ) {
