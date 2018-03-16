@@ -376,6 +376,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'category'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'impacts'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'partners'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'tousnosprojets'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'amount_collected'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'roi_percent_estimated'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'roi_percent'			=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
