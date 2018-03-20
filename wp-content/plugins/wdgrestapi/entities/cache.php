@@ -64,7 +64,7 @@ class WDGRESTAPI_Entity_Cache extends WDGRESTAPI_Entity {
 	
 	public static function delete_by_name_like( $like_pattern ) {
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Cache::$entity_type );
 		$wpdb->query( 
 			$wpdb->prepare( 
 				"DELETE FROM ".$table_name." WHERE name LIKE '%%s%'",
