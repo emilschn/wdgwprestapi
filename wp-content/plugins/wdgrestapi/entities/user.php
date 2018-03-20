@@ -14,6 +14,21 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/users' );
 	}
 	
+	public function get_loaded_data() {
+		$buffer = parent::get_loaded_data();
+		$buffer = WDGRESTAPI_Entity_User::standardize_data( $buffer );
+		return $buffer;
+	}
+	
+	/**
+	 * Refait un tour des données pour les retourner au meilleur format
+	 * @param type $item
+	 */
+	public static function standardize_data( $item ) {
+		$item->birthday_date = WDGRESTAPI_Entity::standardize_date( $item->birthday_date );
+		return $item;
+	}
+	
 	/**
 	 * Retourne la liste des ROIs de cet utilisateur
 	 * @return array
@@ -142,6 +157,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			$result->type = 'user';
 			$rand_project_manager = rand( 0, 20 );
 			$result->is_project_manager = ( $rand_project_manager > 17 ); // TODO
+			$result = WDGRESTAPI_Entity_Project::standardize_data( $result );
 		}
 		
 		if ( $full ) {

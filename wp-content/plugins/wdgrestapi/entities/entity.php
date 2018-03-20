@@ -343,4 +343,30 @@ class WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
+	/**
+	 * Vérifie le format d'une date et corrige si nécessaire
+	 * @param string $value
+	 * @return string
+	 */
+	protected static function standardize_date( $value ) {
+		$buffer = $value;
+		if ( empty( $value ) || $value == null ) {
+			$buffer = '0000-00-00';
+		}
+		return $buffer;
+	}
+	
+	/**
+	 * Vérifie le format d'une chaine datetime et corrige si nécessaire
+	 * @param string $value
+	 * @return string
+	 */
+	protected static function standardize_datetime( $value ) {
+		$buffer = $value;
+		if ( empty( $value ) || $value == null ) {
+			$buffer = '0000-00-00 00:00:00';
+		}
+		return $buffer;
+	}
+	
 }

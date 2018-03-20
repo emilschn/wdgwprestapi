@@ -41,7 +41,24 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		if ( $expand ) {
 			$buffer = WDGRESTAPI_Entity_Project::expand_single_data( $buffer );
 		}
+		$buffer = WDGRESTAPI_Entity_Project::standardize_data( $buffer );
 		return $buffer;
+	}
+	
+	/**
+	 * Refait un tour des données pour les retourner au meilleur format
+	 * @param type $item
+	 */
+	public static function standardize_data( $item ) {
+		$item->creation_date = WDGRESTAPI_Entity::standardize_date( $item->creation_date );
+		$item->contract_start_date = WDGRESTAPI_Entity::standardize_date( $item->contract_start_date );
+		$item->declarations_start_date = WDGRESTAPI_Entity::standardize_date( $item->declarations_start_date );
+		$item->declarations_end_date = WDGRESTAPI_Entity::standardize_date( $item->declarations_end_date );
+		$item->vote_start_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->vote_start_datetime );
+		$item->vote_end_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->vote_end_datetime );
+		$item->funding_start_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->funding_start_datetime );
+		$item->funding_end_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->funding_end_datetime );
+		return $item;
 	}
 	
 	
@@ -235,6 +252,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		
 		foreach ( $results as $result ) {
 			$result = WDGRESTAPI_Entity_Project::expand_single_data( $result );
+			$result = WDGRESTAPI_Entity_Project::standardize_data( $result );
 		}
 		
 		return $results;
