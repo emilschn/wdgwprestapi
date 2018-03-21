@@ -17,7 +17,9 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	*/
 	public function get_loaded_data() {
 		$this->check_geolocation_data();
-		return parent::get_loaded_data();
+		$buffer = parent::get_loaded_data();
+		$buffer = WDGRESTAPI_Entity_Organization::expand_data( $buffer );
+		return $buffer;
 	}
 
 	/**
@@ -91,6 +93,21 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		return $results;
 	}
 	
+	public static function expand_data( $item ) {
+		$rand_project_manager = rand( 0, 20 );
+		$item->is_project_manager = ( $rand_project_manager > 17 ); // TODO
+		$item->representative_firstname = 'John'; // TODO
+		$item->representative_lastname = 'Doe'; // TODO
+		$item->accounting_contact = 'TODO'; // TODO
+		$item->invest_count = rand( 0, 30 ); //TODO
+		$item->invest_amount = rand( 0, 20000 ); //TODO
+		$item->invest_amount_royalties = rand( 0, 200 ); //TODO
+		$item->royalties_amount_received = rand( 0, 700 ); //TODO
+		$item->lw_amount_wallet = rand( 0, 500 ); //TODO
+		
+		return $item;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD
@@ -130,6 +147,11 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'bank_address'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'bank_iban'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'bank_bic'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'document_id'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'document_home'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'document_rib'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'document_kbis'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'document_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'id_quickbooks'			=> array( 'type' => 'id', 'other' => '' ),
 		'website_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'twitter_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
