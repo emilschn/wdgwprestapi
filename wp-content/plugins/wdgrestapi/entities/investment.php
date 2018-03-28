@@ -314,6 +314,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'birthday_month'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_year'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_city'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'age'					=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		
 		'address'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
@@ -332,10 +333,14 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		
 		'project'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'amount'				=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'cents_with_royalties'	=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'redirect_url_ok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'redirect_url_nok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'notification_url'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'contract_url'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		
+		'invest_datetime'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
+		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'token_expiration'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' )
