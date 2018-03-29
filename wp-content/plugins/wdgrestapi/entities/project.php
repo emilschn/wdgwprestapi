@@ -417,7 +417,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'simple_info'			=> array( 'type' => 'longtext', 'other' => '' ),
 		'detailed_info'			=> array( 'type' => 'longtext', 'other' => '' ),
 		'estimated_turnover'	=> array( 'type' => 'varchar', 'other' => '' ),
-		'blank_contract_file'	=> array( 'type' => 'varchar', 'other' => '' ),
+		'blank_contract_file'	=> array( 'type' => 'longtext', 'other' => '' ),
 		'vote_start_datetime'	=> array( 'type' => 'datetime', 'other' => '' ),
 		'vote_end_datetime'		=> array( 'type' => 'datetime', 'other' => '' ),
 		'vote_count'			=> array( 'type' => 'int', 'other' => '' ),
