@@ -301,9 +301,11 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
+		'wpref'					=> array( 'type' => 'id', 'other' => '' ),
 		'token'					=> array( 'type' => 'uid', 'other' => 'NOT NULL' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		
+		'user_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gender'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'firstname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
