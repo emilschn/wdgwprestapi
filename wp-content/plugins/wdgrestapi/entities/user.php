@@ -14,9 +14,48 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/users' );
 	}
 	
-	public function get_loaded_data() {
+	public function get_loaded_data( $with_links = FALSE ) {
 		$buffer = parent::get_loaded_data();
 		$buffer = WDGRESTAPI_Entity_User::standardize_data( $buffer );
+		
+		if ( !empty( $with_links ) ) {
+			// Récupération des projets liés
+			$project_list_by_user_id = WDGRESTAPI_Entity_ProjectUser::get_list_by_user_id( $this->loaded_data->id );
+			$project_list = array();
+			foreach ( $project_list_by_user_id as $link_item ) {
+				$project = new WDGRESTAPI_Entity_Project( $link_item->id_project );
+				$loaded_data = $project->get_loaded_data();
+				array_push( 
+					$project_list,
+					array( 
+						"id"	=> $loaded_data->id,
+						"wpref"	=> $loaded_data->wpref,
+						"name"	=> $loaded_data->name,
+						"type"	=> $link_item->type
+					)
+				);
+			}
+			$buffer->projects = $project_list;
+			
+			// Récupération des organisations liées
+			$organization_list_by_user_id = WDGRESTAPI_Entity_OrganizationUser::get_list_by_user_id( $this->loaded_data->id );
+			$organization_list = array();
+			foreach ( $organization_list_by_user_id as $link_item ) {
+				$organization = new WDGRESTAPI_Entity_Organization( $link_item->id_organization );
+				$loaded_data = $organization->get_loaded_data();
+				array_push( 
+					$organization_list,
+					array( 
+						"id"	=> $loaded_data->id,
+						"wpref"	=> $loaded_data->wpref,
+						"name"	=> $loaded_data->name,
+						"type"	=> $link_item->type
+					)
+				);
+			}
+			$buffer->organizations = $organization_list;
+		}
+		
 		return $buffer;
 	}
 	

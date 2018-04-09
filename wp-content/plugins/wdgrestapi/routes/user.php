@@ -116,10 +116,12 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return \WDGRESTAPI_Entity_Project
 	 */
 	public function single_get( WP_REST_Request $request ) {
+		$input_with_links = filter_input( INPUT_GET, 'with_links' );
+		
 		$user_id = $request->get_param( 'id' );
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
-			$loaded_data = $user_item->get_loaded_data();
+			$loaded_data = $user_item->get_loaded_data( ( $input_with_links == '1' ) );
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->log( "WDGRESTAPI_Route_User::single_get::" . $user_id, json_encode( $loaded_data ) );
