@@ -162,10 +162,12 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	 * @return \WDGRESTAPI_Entity_Project
 	 */
 	public function single_get( WP_REST_Request $request ) {
+		$input_with_investments = filter_input( INPUT_GET, 'with_investments' );
+		
 		$project_id = $request->get_param( 'id' );
 		if ( !empty( $project_id ) ) {
 			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
-			$loaded_data = $project_item->get_loaded_data();
+			$loaded_data = $project_item->get_loaded_data( FALSE, ( $input_with_investments == '1' ) );
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->log( "WDGRESTAPI_Route_Project::single_get::" . $project_id, json_encode( $loaded_data ) );

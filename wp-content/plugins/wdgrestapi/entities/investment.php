@@ -197,7 +197,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 	 * Retourne la liste de tous les investissements
 	 * @return array
 	 */
-	public static function list_get( $start_date = FALSE, $end_date = FALSE ) {
+	public static function list_get( $start_date = FALSE, $end_date = FALSE, $project_id = FALSE ) {
 		if ( !empty( $start_date ) && !empty( $end_date ) ) {
 			$test_data = array(
 				array(
@@ -280,7 +280,10 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 			global $wpdb;
 			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
 			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-			$query = "SELECT id, email, project, amount, status FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
+			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
+			if ( !empty( $project_id ) ) {
+				$query .= " AND project=" .$project_id;
+			}
 			$results = $wpdb->get_results( $query );
 		}
 		return $results;

@@ -36,10 +36,14 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		}
 	}
 	
-	public function get_loaded_data( $expand = TRUE ) {
+	public function get_loaded_data( $expand = TRUE, $with_investments = FALSE ) {
 		$buffer = parent::get_loaded_data();
 		if ( $expand ) {
 			$buffer = WDGRESTAPI_Entity_Project::expand_single_data( $buffer );
+		}
+		if ( $with_investments ) {
+			$investments_list = WDGRESTAPI_Entity_Investment::list_get( FALSE, FALSE, $buffer->id );
+			$buffer->investments = $investments_list;
 		}
 		$buffer = WDGRESTAPI_Entity_Project::standardize_data( $buffer );
 		return $buffer;
