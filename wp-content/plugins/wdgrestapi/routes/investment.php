@@ -21,10 +21,17 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 			array( 'token' => array( 'default' => 0 ) )
 		);
 		
-		WDGRESTAPI_Route::register_external(
+		WDGRESTAPI_Route::register_wdg(
 			'/investment',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create'),
+			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
+		);
+		
+		WDGRESTAPI_Route::register_external(
+			'/investment',
+			WP_REST_Server::CREATABLE,
+			array( $this, 'single_create_external'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
 		
@@ -100,11 +107,6 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 		if ( $investment_item->has_checked_properties() ) {
 			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			$investment_item->set_property( 'client_user_id', $current_client->ID );
-			$investment_item->set_property( 'token', $investment_item->make_uid() );
-			$investment_item->set_property( 'status', WDGRESTAPI_Entity_Investment::$status_init );
-			$date_expiration = new DateTime();
-			$date_expiration->add( new DateInterval( 'PT1H' ) );
-			$investment_item->set_property( 'token_expiration', $date_expiration->format('Y-m-d H:i:s') );
 			$save_result = $investment_item->save();
 			$reloaded_data = $investment_item->get_loaded_data();
 			$this->log( "WDGRESTAPI_Route_Investment::single_create", json_encode( $reloaded_data ) );
@@ -125,6 +127,47 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 			}
 			$this->log( "WDGRESTAPI_Route_Investment::single_create", "failed" );
 			$this->log( "WDGRESTAPI_Route_Investment::single_create", $error_buffer );
+			return new WP_Error( 'cant-create', $error_buffer );
+		}
+	}
+	
+	/**
+	 * Crée un investissement depuis un client externe
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_create_external( WP_REST_Request $request ) {
+		$this->log( "WDGRESTAPI_Route_Investment::single_create_external", json_encode( $_POST ) );
+		$investment_item = new WDGRESTAPI_Entity_Investment();
+		$this->set_posted_properties( $investment_item, WDGRESTAPI_Entity_Investment::$db_properties );
+		if ( $investment_item->has_checked_properties() ) {
+			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+			$investment_item->set_property( 'client_user_id', $current_client->ID );
+			$investment_item->set_property( 'token', $investment_item->make_uid() );
+			$investment_item->set_property( 'status', WDGRESTAPI_Entity_Investment::$status_init );
+			$date_expiration = new DateTime();
+			$date_expiration->add( new DateInterval( 'PT1H' ) );
+			$investment_item->set_property( 'token_expiration', $date_expiration->format('Y-m-d H:i:s') );
+			$save_result = $investment_item->save();
+			$reloaded_data = $investment_item->get_loaded_data();
+			$this->log( "WDGRESTAPI_Route_Investment::single_create_external", json_encode( $reloaded_data ) );
+			if ( $save_result === false ) {
+				global $wpdb;
+				$this->log( "WDGRESTAPI_Route_Investment::single_create_external", print_r( $wpdb, true ) );
+				return new WP_Error( 'cant-create', 'db-insert-error' );
+			} else {
+				$this->log( "WDGRESTAPI_Route_Investment::single_create_external", "success" );
+				return $reloaded_data;
+			}
+			
+		} else {
+			$error_list = $investment_item->get_properties_errors();
+			$error_buffer = '';
+			foreach ( $error_list as $error ) {
+				$error_buffer .= $error . " ";
+			}
+			$this->log( "WDGRESTAPI_Route_Investment::single_create_external", "failed" );
+			$this->log( "WDGRESTAPI_Route_Investment::single_create_external", $error_buffer );
 			return new WP_Error( 'cant-create', $error_buffer );
 		}
 	}
