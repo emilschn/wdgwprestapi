@@ -342,7 +342,14 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'contract_url'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
 		'invest_datetime'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
+		'is_preinvestment'		=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
+		
 		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'payment_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'payment_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		
+		'signature_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'signature_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'token_expiration'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' )
