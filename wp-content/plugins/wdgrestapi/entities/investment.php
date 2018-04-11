@@ -309,6 +309,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		
 		'user_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'user_wpref'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gender'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'firstname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
@@ -325,6 +326,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'phone_number'			=> array( 'type' => 'varchar', 'other' => '' ),
 		
 		'is_legal_entity'			=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'legal_entity_form'			=> array( 'type' => 'varchar', 'other' => '' ),
@@ -348,6 +350,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'is_preinvestment'		=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		
 		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'payment_provider'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'payment_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'payment_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
