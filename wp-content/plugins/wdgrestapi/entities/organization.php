@@ -61,6 +61,15 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne la liste des ROIs de cette organisation
+	 * @return array
+	 */
+	public function get_rois() {
+		$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_orga );
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne la liste de toutes les organisations
 	 * @return array
 	 */

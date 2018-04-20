@@ -3,6 +3,9 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 	
 	public static $entity_type = 'roi';
 	
+	public static $recipient_type_user = 'user';
+	public static $recipient_type_orga = 'orga';
+	
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_ROI::$entity_type, WDGRESTAPI_Entity_ROI::$db_properties );
 	}
@@ -37,10 +40,10 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 	 * @param int $user_id
 	 * @return array
 	 */
-	public static function list_get_by_user_id( $user_id ) {
+	public static function list_get_by_recipient_id( $recipient_id, $recipient_type = 'user' ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ROI::$entity_type );
-		$query = "SELECT id, id_investment, id_project, id_orga, id_user, id_declaration, date_transfer, amount, id_transfer, status FROM " .$table_name. " WHERE id_user = " .$user_id. " ORDER BY date_transfer ASC";
+		$query = "SELECT id, id_investment, id_project, id_orga, id_user, id_declaration, date_transfer, amount, id_transfer, status FROM " .$table_name. " WHERE id_user = " .$recipient_id. " AND recipient_type = '" .$recipient_type. "' ORDER BY date_transfer ASC";
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
@@ -57,6 +60,7 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 		'id_project'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'id_orga'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'id_user'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'recipient_type'		=> array( 'type' => 'varchar', 'other' => 'DEFAULT \'user\'' ),
 		'id_declaration'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'date_transfer'			=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
 		'amount'				=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
