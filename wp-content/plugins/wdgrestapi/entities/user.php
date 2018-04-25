@@ -166,10 +166,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		
 		if ( !empty( $input_link_to_project ) ) {
 			// TODO : changer requete pour faire liaison avec table votes et table investissements
-			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string. " ORDER BY email ASC";
 			$count_query = "SELECT COUNT(*) AS nb FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		} else {
-			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string. " ORDER BY email ASC";
 			$count_query = "SELECT COUNT(*) AS nb FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		}
 		
