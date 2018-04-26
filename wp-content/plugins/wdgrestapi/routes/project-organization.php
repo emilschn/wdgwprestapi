@@ -68,7 +68,7 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 	public function get_projectlist_by_organization_id( WP_REST_Request $request ) {
 		$organization_id = $request->get_param( 'id' );
 		if ( !empty( $organization_id ) ) {
-			$result = WDGRESTAPI_Entity_ProjectUser::get_list_by_organization_id( $organization_id );
+			$result = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_organization_id( $organization_id );
 			$project_list = array();
 			foreach ( $result as $link_item ) {
 				$project = new WDGRESTAPI_Entity_Project( $link_item->id_project );

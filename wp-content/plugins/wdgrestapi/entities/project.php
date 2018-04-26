@@ -36,16 +36,34 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		}
 	}
 	
-	public function get_loaded_data( $expand = TRUE, $with_investments = FALSE ) {
+	public function get_loaded_data( $expand = TRUE, $with_investments = FALSE, $with_organization = FALSE ) {
 		$buffer = parent::get_loaded_data();
 		if ( $expand ) {
 			$buffer = WDGRESTAPI_Entity_Project::expand_single_data( $buffer );
 		}
+		$buffer = WDGRESTAPI_Entity_Project::standardize_data( $buffer );
+		
 		if ( $with_investments ) {
 			$investments_list = WDGRESTAPI_Entity_Investment::list_get( FALSE, FALSE, $buffer->id );
 			$buffer->investments = $investments_list;
 		}
-		$buffer = WDGRESTAPI_Entity_Project::standardize_data( $buffer );
+		
+		if ( $with_organization ) {
+			$organizations_linked = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $buffer->id );
+			$orga_linked_id = 0;
+			foreach ( $organizations_linked as $project_orga_link ) {
+				if ( $project_orga_link->type == WDGRESTAPI_Entity_ProjectOrganization::$link_type_manager ) {
+					$orga_linked_id = $project_orga_link->id_organization;
+				}
+			}
+			$organization_data = FALSE;
+			if ( $orga_linked_id > 0 ) {
+				$organization_item = new WDGRESTAPI_Entity_Organization( $orga_linked_id );
+				$organization_data = $organization_item->get_loaded_data();
+			}
+			$buffer->organization = $organization_data;
+		}
+		
 		return $buffer;
 	}
 	
