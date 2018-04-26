@@ -329,9 +329,14 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 				$buffer[ 'statuses' ][ 'declaring' ][ 'count' ]++;
 			}
 			if ( $result->status == WDGRESTAPI_Entity_Project::$status_closed ) {
+				$buffer[ 'funded_amount' ] += $result->amount_collected;
 				$buffer[ 'statuses' ][ 'closed' ][ 'count' ]++;
+				$declarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $result->id );
+				foreach ( $declarations as $declaration ) {
+					$buffer[ 'royalties_amount' ] += $declaration->amount;
+				}
 			}
-			if ( $result->status == WDGRESTAPI_Entity_Project::$status_funded || $result->status == WDGRESTAPI_Entity_Project::$status_closed ) {
+			if ( $result->status == WDGRESTAPI_Entity_Project::$status_funded ) {
 				$buffer[ 'funded_amount' ] += $result->amount_collected;
 				$buffer[ 'statuses' ][ 'funded' ][ 'count' ]++;
 				$declarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $result->id );

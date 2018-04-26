@@ -293,7 +293,60 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 	 * Retourne les statistiques qui concernent les investissements
 	 */
 	public static function get_stats() {
-		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_investments_stats' );
+		$buffer = array();
+		
+		global $wpdb;
+		$table_investments = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
+		
+		$count_query_success = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'publish'";
+		$count_results_success = $wpdb->get_results( $count_query_success );
+		$buffer[ 'total' ] = $count_results_success[ 0 ]->nb;
+		
+		$count_query_failed = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'failed'";
+		$count_results_failed = $wpdb->get_results( $count_query_failed );
+		$buffer[ 'payment_errors' ] = $count_results_failed[ 0 ]->nb;
+		
+		$count_query_total_30_days = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'publish' AND DATEDIFF( NOW(), invest_datetime ) < 31";
+		$count_results_total_30_days = $wpdb->get_results( $count_query_total_30_days );
+		$buffer[ 'total_last_30_days' ] = $count_results_total_30_days[ 0 ]->nb;
+		
+		$count_query_failed_30_days = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'failed' AND DATEDIFF( NOW(), invest_datetime ) < 31";
+		$count_results_failed_30_days = $wpdb->get_results( $count_query_failed_30_days );
+		$buffer[ 'payment_errors_monthly' ] = $count_results_failed_30_days[ 0 ]->nb;
+		
+		$date_now = new DateTime();
+		$buffer[ 'total_by_month' ] = array();
+		for ( $i = 1; $i <= 12; $i++ ) {
+			$buffer[ 'total_by_month' ][ $i ] = array();
+			$count_query_by_month_success = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'publish' AND MONTH( invest_datetime ) = " .$i. " AND YEAR( invest_datetime ) = " .$date_now->format( 'Y' );
+			$count_results_by_month_success = $wpdb->get_results( $count_query_by_month_success );
+			$buffer[ 'total_by_month' ][ $i ][ 'success' ] = $count_results_by_month_success[ 0 ]->nb;
+			
+			$count_query_by_month_failed = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'failed' AND MONTH( invest_datetime ) = " .$i. " AND YEAR( invest_datetime ) = " .$date_now->format( 'Y' );
+			$count_results_by_month_failed = $wpdb->get_results( $count_query_by_month_failed );
+			$buffer[ 'total_by_month' ][ $i ][ 'failed' ] = $count_results_by_month_failed[ 0 ]->nb;
+		}
+		
+		$buffer[ 'total_by_day_this_month' ] = array();
+		for ( $i = 1; $i <= 31; $i++ ) {
+			$buffer[ 'total_by_day_this_month' ][ $i ] = array();
+			$count_query_by_day_this_month_success = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'publish' AND DAY( invest_datetime ) = " .$i. " AND MONTH( invest_datetime ) = " .$date_now->format( 'm' ). " AND YEAR( invest_datetime ) = " .$date_now->format( 'Y' );
+			$count_results_by_day_this_month_success = $wpdb->get_results( $count_query_by_day_this_month_success );
+			$buffer[ 'total_by_day_this_month' ][ $i ][ 'success' ] = $count_results_by_day_this_month_success[ 0 ]->nb;
+			
+			$count_query_by_day_this_month_failed = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'failed' AND DAY( invest_datetime ) = " .$i. " AND MONTH( invest_datetime ) = " .$date_now->format( 'm' ). " AND YEAR( invest_datetime ) = " .$date_now->format( 'Y' );
+			$count_results_by_day_this_month_failed = $wpdb->get_results( $count_query_by_day_this_month_failed );
+			$buffer[ 'total_by_day_this_month' ][ $i ][ 'failed' ] = $count_results_by_day_this_month_failed[ 0 ]->nb;
+		}
+		
+		$count_query_total_with_roi = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE cents_with_royalties > 0";
+		$count_results_total_with_roi = $wpdb->get_results( $count_query_total_with_roi );
+		$buffer[ 'total_with_royalties' ] = $count_results_total_with_roi[ 0 ]->nb;
+		
+		$count_query_sum_with_roi = "SELECT SUM(cents_with_royalties) AS nb FROM " .$table_investments. " WHERE cents_with_royalties > 0";
+		$count_results_sum_with_roi = $wpdb->get_results( $count_query_sum_with_roi );
+		$buffer[ 'amount_with_royalties' ] = $count_results_sum_with_roi[ 0 ]->nb;
+		
 		return $buffer;
 	}
 	
