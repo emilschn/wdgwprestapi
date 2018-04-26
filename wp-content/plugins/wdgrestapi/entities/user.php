@@ -231,13 +231,13 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		
 		global $wpdb;
 		$table_investments = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
-		$count_query = "SELECT DISTINCT COUNT(*) AS nb FROM " .$table_investments;
+		$count_query = "SELECT COUNT( DISTINCT user_id ) AS nb FROM " .$table_investments;
 		$count_results = $wpdb->get_results( $count_query );
-		$buffer[ 'investors_count' ] = $count_results[ 0 ]->nb;
+		$buffer->investors_count = $count_results[ 0 ]->nb;
 		
-		$count_multi_query = "SELECT COUNT( user_id ) AS nb FROM " .$table_investments. " GROUP BY user_id HAVING COUNT( user_id ) > 1";
+		$count_multi_query = "SELECT COUNT( DISTINCT user_id ) AS nb FROM " .$table_investments. " GROUP BY user_id HAVING COUNT( user_id ) > 1";
 		$count_multi_results = $wpdb->get_results( $count_multi_query );
-		$buffer[ 'investors_multi_count' ] = $count_multi_results[ 0 ]->nb;
+		$buffer->investors_multi_count = $count_multi_results[ 0 ]->nb;
 
 		return $buffer;
 	}
