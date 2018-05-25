@@ -55,7 +55,8 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 		'user_id'				=> array( 'type' => 'varchar', 'other' => '' ),
 		'user_age'				=> array( 'type' => 'int', 'other' => '' ),
 		'user_postal_code'		=> array( 'type' => 'varchar', 'other' => '' ),
-		'user_gender'			=> array( 'type' => 'varchar', 'other' => '' )
+		'user_gender'			=> array( 'type' => 'varchar', 'other' => '' ),
+		'user_email'			=> array( 'type' => 'varchar', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd
