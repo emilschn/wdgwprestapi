@@ -36,7 +36,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		}
 	}
 	
-	public function get_loaded_data( $expand = TRUE, $with_investments = FALSE, $with_organization = FALSE ) {
+	public function get_loaded_data( $expand = TRUE, $with_investments = FALSE, $with_organization = FALSE, $with_poll_answers = FALSE ) {
 		$buffer = parent::get_loaded_data();
 		if ( $expand ) {
 			$buffer = WDGRESTAPI_Entity_Project::expand_single_data( $buffer );
@@ -62,6 +62,11 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 				$organization_data = $organization_item->get_loaded_data();
 			}
 			$buffer->organization = $organization_data;
+		}
+		
+		if ( $with_poll_answers ) {
+			$poll_answers_list = WDGRESTAPI_Entity_PollAnswer::list_get( '(' .$buffer->client_user_id. ')', FALSE, $buffer->id, FALSE );
+			$buffer->poll_answers = $poll_answers_list;
 		}
 		
 		return $buffer;
