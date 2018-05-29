@@ -19,7 +19,7 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 	 */
 	public static function list_get( $authorized_client_id_string, $user_id, $project_id, $poll_slug ) {
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_PollAnswer::$entity_type );
 		
 		$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		if ( !empty( $user_id ) ) {
@@ -29,7 +29,7 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 			$query .= " AND project_id=" .$project_id;
 		}
 		if ( !empty( $poll_slug ) ) {
-			$query .= " AND poll_slug=" .$poll_slug;
+			$query .= " AND poll_slug='" .$poll_slug. "'";
 		}
 		
 		$buffer = $wpdb->get_results( $query );
