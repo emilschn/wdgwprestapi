@@ -49,6 +49,13 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 			'replyto'	=> $replyto,
 			'attr'		=> $options
 		);
+		
+		// Pour certains templates, on n'envoie pas de copie à admin, on envoie directement à l'utilisateur
+		if ( $this->loaded_data->template == 181 ) {
+			$data[ 'to' ] = $data[ 'bcc' ];
+			$data[ 'bcc' ] = '';
+		}
+		
 		$sendinblue_result = $mailin->send_transactional_template( $data );
 		
 		$buffer = 'error';
