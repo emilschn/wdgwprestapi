@@ -154,6 +154,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'bank_owner'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'bank_address'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'bank_address2'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'bank_iban'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'bank_bic'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'document_id'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
