@@ -113,6 +113,8 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		$item->invest_amount_royalties = rand( 0, 200 ); //TODO
 		$item->royalties_amount_received = rand( 0, 700 ); //TODO
 		$item->lw_amount_wallet = rand( 0, 500 ); //TODO
+		$item->lw_wallet_authentication = 'todo'; //TODO
+		$item->lw_iban_authentication = 'todo'; //TODO
 		
 		return $item;
 	}

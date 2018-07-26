@@ -207,6 +207,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				$result->invest_amount_royalties = rand( 0, 200 ); //TODO
 				$result->royalties_amount_received = rand( 0, 700 ); //TODO
 				$result->lw_amount_wallet = rand( 0, 500 ); //TODO
+				$result->lw_wallet_authentication = 'todo'; //TODO
+				$result->lw_iban_authentication = 'todo'; //TODO
 			}
 		}
 		
