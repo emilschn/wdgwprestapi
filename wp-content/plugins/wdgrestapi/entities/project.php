@@ -444,6 +444,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'goal_maximum'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'yield_for_investors'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'maximum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'maximum_profit_precision'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'minimum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'contract_start_date'	=> array( 'type' => 'date', 'other' => '' ),
 		'declarations_start_date'	=> array( 'type' => 'date', 'other' => '' ),
