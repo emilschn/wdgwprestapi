@@ -200,6 +200,10 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		return WDGRESTAPI_Entity_Contract::list_get( 'project', $this->loaded_data->id );
 	}
 	
+	public function get_investment_contracts_data() {
+		return WDGRESTAPI_Entity_InvestmentContract::list_get_by_project( $this->loaded_data->id );
+	}
+	
 	public static function expand_single_data( $item ) {
 		// Augmentation des données retournées avec des informations statiques
 		$project_roideclarations = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $item->id );

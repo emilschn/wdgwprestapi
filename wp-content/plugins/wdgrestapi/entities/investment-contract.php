@@ -11,6 +11,14 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 		parent::__construct( $id, WDGRESTAPI_Entity_InvestmentContract::$entity_type, WDGRESTAPI_Entity_InvestmentContract::$db_properties );
 	}
 	
+	public static function list_get_by_project( $project_id ) {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_InvestmentContract::$entity_type );
+		$query = "SELECT * FROM " .$table_name. " WHERE project_id = " .$project_id;
+		$results = $wpdb->get_results( $query );
+		return $results;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD
@@ -35,7 +43,7 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 		'end_date'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'frequency'				=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		
-		'turnover_type'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'turnover_type'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'turnover_percent'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		
 		'amount_received'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
