@@ -425,7 +425,7 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	 */
 	public function single_create( WP_REST_Request $request ) {
 		$project_item = new WDGRESTAPI_Entity_Project();
-		$this->set_posted_properties( $project_item, WDGRESTAPI_Entity_Project::$db_properties );
+		$this->set_posted_properties( $project_item, WDGRESTAPI_Entity_Project::$db_properties, FALSE );
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 		$project_item->set_property( 'client_user_id', $current_client->ID );
 		$project_item->save();
@@ -498,21 +498,25 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 	 * @param WDGRESTAPI_Entity $entity
 	 * @param array $properties_list
 	 */
-	public function set_posted_properties( WDGRESTAPI_Entity $entity, array $properties_list ) {
+	public function set_posted_properties( WDGRESTAPI_Entity $entity, array $properties_list, $update_organization_data = TRUE ) {
 		// On appelle d'abord la fonction parente pour gérer les données du projet
 		parent::set_posted_properties( $entity, $properties_list );
 		
 		// On gère ensuite les données liées à l'organisation
-		$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $entity->get_loaded_data()->id );
-		$project_organization_entity = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
-		foreach ( WDGRESTAPI_Entity_Organization::$db_properties as $property_key => $db_property ) {
-			$property_new_value = filter_input( INPUT_POST, 'organization_' . $property_key );
-			if ( $property_new_value !== null && $property_new_value !== FALSE ) {
-				$project_organization_entity->set_property( $property_key, $property_new_value );
+		if ( $update_organization_data ) {
+			$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $entity->get_loaded_data()->id );
+			if ( !empty( $project_organizations[0]->id_organization ) ) {
+				$project_organization_entity = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
+				foreach ( WDGRESTAPI_Entity_Organization::$db_properties as $property_key => $db_property ) {
+					$property_new_value = filter_input( INPUT_POST, 'organization_' . $property_key );
+					if ( $property_new_value !== null && $property_new_value !== FALSE ) {
+						$project_organization_entity->set_property( $property_key, $property_new_value );
+					}
+				}
+
+				$project_organization_entity->save();
 			}
 		}
-		
-		$project_organization_entity->save();
 	}
 	
 	/**
