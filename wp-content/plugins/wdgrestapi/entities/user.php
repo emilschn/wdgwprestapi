@@ -268,6 +268,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'phone_number'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'description'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'contact_if_deceased'	=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'bank_iban'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'bank_bic'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'bank_holdername'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
