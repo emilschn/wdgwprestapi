@@ -465,6 +465,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'funding_start_datetime'	=> array( 'type' => 'datetime', 'other' => '' ),
 		'funding_end_datetime'	=> array( 'type' => 'datetime', 'other' => '' ),
 		'investments_count'		=> array( 'type' => 'int', 'other' => '' ),
+		'minimum_costs_to_organization'	=> array( 'type' => 'float', 'other' => '' ),
 		'costs_to_organization'	=> array( 'type' => 'float', 'other' => '' ),
 		'costs_to_investors'	=> array( 'type' => 'float', 'other' => '' ),
 		'turnover_per_declaration'	=> array( 'type' => 'int', 'other' => '' ),
