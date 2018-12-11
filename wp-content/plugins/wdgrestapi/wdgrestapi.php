@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.77';
+	private $version = '0.0.781';
     
 	/**
 	 * Instanciation du singleton
@@ -90,6 +90,7 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'organization-user' );
 		$this->add_include_entity( 'project-user' );
 		$this->add_include_entity( 'project-organization' );
+		$this->add_include_entity( 'queued-action' );
 	}
 	public function add_include_entity( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'entities/' . $include_name . '.php');
@@ -114,10 +115,11 @@ class WDGRESTAPI {
 		$this->add_include_route( 'poll-answer' );
 		$this->add_include_route( 'contract-model' );
 		$this->add_include_route( 'contract' );
+		$this->add_include_route( 'mail-template' );
 		$this->add_include_route( 'organization-user' );
 		$this->add_include_route( 'project-user' );
 		$this->add_include_route( 'project-organization' );
-		$this->add_include_route( 'mail-template' );
+		$this->add_include_route( 'queued-action' );
 	}
 	public function add_include_route( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php');
@@ -142,6 +144,7 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ContractModel::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Contract::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_PollAnswer::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_QueuedAction::register');
 	}
 	
 	
@@ -173,6 +176,7 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_OrganizationUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectOrganization::upgrade_db();
+			WDGRESTAPI_Entity_QueuedAction::upgrade_db();
 			update_option('wdgwpapi_version', $this->version);
 		}
 	}
