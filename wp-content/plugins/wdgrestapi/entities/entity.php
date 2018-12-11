@@ -312,7 +312,7 @@ class WDGRESTAPI_Entity {
 				break;
 			
 			case 'varchar':
-				$buffer = 'varchar(100)';
+				$buffer = 'varchar(200)';
 				break;
 			
 			case 'longtext':
