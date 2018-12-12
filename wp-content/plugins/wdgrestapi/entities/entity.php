@@ -196,7 +196,7 @@ class WDGRESTAPI_Entity {
 			
 		} else {
 			$url = $ref_client_url . $route . $params;
-			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::get_data_on_client_site > $url : ' . $url);
+//			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::get_data_on_client_site > $url : ' . $url);
 
 			$remote_result = wp_remote_get(
 				$url,
@@ -208,7 +208,7 @@ class WDGRESTAPI_Entity {
 				$cached_version_entity->save( $params, $buffer );
 				
 			} else {
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::get_data_on_client_site > error : ' . print_r( $remote_result, TRUE ) );
+//				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::get_data_on_client_site > error : ' . print_r( $remote_result, TRUE ) );
 			}
 		}
 		return json_decode( $buffer );
@@ -235,7 +235,7 @@ class WDGRESTAPI_Entity {
 				'body'	=> $posted_params
 			)
 		);
-		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::post_data_on_client_site > $buffer : ' . print_r( $buffer, true ) );
+//		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::post_data_on_client_site > $buffer : ' . print_r( $buffer, true ) );
 		
 		return $buffer["body"];
 	}
