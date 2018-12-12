@@ -29,7 +29,7 @@ class WDGRESTAPI_Entity_QueuedAction extends WDGRESTAPI_Entity {
 		parent::save();
 	}
 	
-	private static function make_list_get_query( $authorized_client_id_string, $limit = FALSE, $entity_id = FALSE, $action = FALSE, $priority = FALSE ) {
+	private static function make_list_get_query( $authorized_client_id_string, $limit = FALSE, $next_to_execute = FALSE, $entity_id = FALSE, $action = FALSE, $priority = FALSE ) {
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		
 		$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string. " AND status LIKE '" .WDGRESTAPI_Entity_QueuedAction::$status_init. "'";
@@ -43,7 +43,7 @@ class WDGRESTAPI_Entity_QueuedAction extends WDGRESTAPI_Entity {
 		}
 		if ( !empty( $priority ) ) {
 			$where_condition .= " AND priority LIKE '" .$priority. "'";
-			if ( $priority == 'date' ) {
+			if ( $priority == 'date' && !empty( $next_to_execute ) ) {
 				date_default_timezone_set( 'Europe/Paris' );
 				$current_date = new DateTime();
 				$where_condition .= " AND date_priority < '" .$current_date->format( 'Y-m-d H:i:s' ). "'";
@@ -61,26 +61,40 @@ class WDGRESTAPI_Entity_QueuedAction extends WDGRESTAPI_Entity {
 		return $query;
 	}
 
-	public static function list_get( $authorized_client_id_string, $limit = FALSE, $entity_id = FALSE, $action = FALSE ) {
+	public static function list_get( $authorized_client_id_string, $limit = FALSE, $next_to_execute = FALSE, $entity_id = FALSE, $action = FALSE ) {
+		WDGRESTAPI_Lib_Logs::log( 'list_get' );
 		global $wpdb;
+		$buffer = array();
 		
 		// D'abord, on veut les plus actions avec la priorité la plus élevée
-		$query_high = self::make_list_get_query( $authorized_client_id_string, $limit, $entity_id, $action, WDGRESTAPI_Entity_QueuedAction::$priority_high );
+		$query_high = self::make_list_get_query( $authorized_client_id_string, $limit, $next_to_execute, $entity_id, $action, WDGRESTAPI_Entity_QueuedAction::$priority_high );
 		$results = $wpdb->get_results( $query_high );
-		$buffer = $results;
+		WDGRESTAPI_Lib_Logs::log( '$query_high > ' . $query_high );
+		if ( !empty( $results ) ) {
+			$buffer = array_merge( $buffer, $results );
+		}
 		
 		// Si il reste de la place, on prend celle qui ont une date dépassée
-		if ( count( $buffer ) < $limit  ) {
-			$query_date = self::make_list_get_query( $authorized_client_id_string, $limit - count( $buffer ), $entity_id, $action, WDGRESTAPI_Entity_QueuedAction::$priority_date );
+		if ( empty( $limit ) || count( $buffer ) < $limit  ) {
+			$limit_input = FALSE;
+			if ( !empty( $limit ) ) {
+				$limit_input = $limit - count( $buffer );
+			}
+			$query_date = self::make_list_get_query( $authorized_client_id_string, $limit_input, $next_to_execute, $entity_id, $action, WDGRESTAPI_Entity_QueuedAction::$priority_date );
 			$results = $wpdb->get_results( $query_date );
+			WDGRESTAPI_Lib_Logs::log( '$query_date > ' . $query_date );
 			if ( !empty( $results ) ) {
 				$buffer = array_merge( $buffer, $results );
 			}
 		}
 		
 		// Si il reste de la place, on prend celle qui ont une priorité par défaut
-		if ( count( $buffer ) < $limit  ) {
-			$query_default = self::make_list_get_query( $authorized_client_id_string, $limit - count( $buffer ), $entity_id, $action, WDGRESTAPI_Entity_QueuedAction::$priority_default );
+		if ( empty( $limit ) || count( $buffer ) < $limit  ) {
+			$limit_input = FALSE;
+			if ( !empty( $limit ) ) {
+				$limit_input = $limit - count( $buffer );
+			}
+			$query_default = self::make_list_get_query( $authorized_client_id_string, $limit_input, $next_to_execute, $entity_id, $action, WDGRESTAPI_Entity_QueuedAction::$priority_default );
 			$results = $wpdb->get_results( $query_default );
 			if ( !empty( $results ) ) {
 				$buffer = array_merge( $buffer, $results );

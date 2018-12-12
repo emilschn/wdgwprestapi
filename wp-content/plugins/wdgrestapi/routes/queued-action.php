@@ -14,6 +14,13 @@ class WDGRESTAPI_Route_QueuedAction extends WDGRESTAPI_Route {
 			array( $this, 'single_create'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
+		
+		WDGRESTAPI_Route::register_wdg(
+			'/queued-action/(?P<id>\d+)',
+			WP_REST_Server::EDITABLE,
+			array( $this, 'single_edit'),
+			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
+		);
 	}
 	
 	public static function register() {
@@ -26,9 +33,10 @@ class WDGRESTAPI_Route_QueuedAction extends WDGRESTAPI_Route {
 	 */
 	public function list_get() {
 		$input_limit = filter_input( INPUT_GET, 'limit' );
+		$input_next_to_execute = filter_input( INPUT_GET, 'next_to_execute' );
 		$input_entity_id = filter_input( INPUT_GET, 'entity_id' );
 		$input_action = filter_input( INPUT_GET, 'action' );
-		return WDGRESTAPI_Entity_QueuedAction::list_get( $this->get_current_client_autorized_ids_string(), $input_limit, $input_entity_id, $input_action );
+		return WDGRESTAPI_Entity_QueuedAction::list_get( $this->get_current_client_autorized_ids_string(), $input_limit, $input_next_to_execute, $input_entity_id, $input_action );
 	}
 	
 	/**
@@ -45,6 +53,36 @@ class WDGRESTAPI_Route_QueuedAction extends WDGRESTAPI_Route {
 		$reloaded_data = $queued_action_item->get_loaded_data();
 		$this->log( "WDGRESTAPI_Entity_QueuedAction::single_create", json_encode( $reloaded_data ) );
 		return $reloaded_data;
+	}
+	
+	/**
+	 * Edite une action dans la queue
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_edit( WP_REST_Request $request ) {
+		$queued_action_id = $request->get_param( 'id' );
+		if ( !empty( $queued_action_id ) ) {
+			$queued_action_item = new WDGRESTAPI_Entity_QueuedAction( $queued_action_id );
+			$loaded_data = $queued_action_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$this->set_posted_properties( $queued_action_item, WDGRESTAPI_Entity_QueuedAction::$db_properties );
+				$queued_action_item->save();
+				$reloaded_data = $queued_action_item->get_loaded_data();
+				$this->log( "WDGRESTAPI_Route_QueuedAction::single_edit::" . $queued_action_id, json_encode( $reloaded_data ) );
+				return $reloaded_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_QueuedAction::single_edit::" . $queued_action_id, "404 : Invalid queued action ID" );
+				return new WP_Error( '404', "Invalid queued action ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_QueuedAction::single_edit", "404 : Invalid queued action ID (empty)" );
+			return new WP_Error( '404', "Invalid queued action ID (empty)" );
+		}
 	}
 	
 }
