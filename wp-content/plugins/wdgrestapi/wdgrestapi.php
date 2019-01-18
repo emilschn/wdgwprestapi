@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.781';
+	private $version = '0.0.782';
     
 	/**
 	 * Instanciation du singleton

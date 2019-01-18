@@ -262,6 +262,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'birthday_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'birthday_city'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'birthday_department'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'birthday_country'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'nationality'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'address_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'address_number_comp'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
