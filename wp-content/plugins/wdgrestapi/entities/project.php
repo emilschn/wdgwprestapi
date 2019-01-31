@@ -444,6 +444,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'roi_percent'			=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'estimated_budget_file'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'funding_duration'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'declaration_periodicity'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'goal_minimum'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'goal_maximum'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'yield_for_investors'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
