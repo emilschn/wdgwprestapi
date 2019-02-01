@@ -237,7 +237,11 @@ class WDGRESTAPI_Entity {
 		);
 //		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity::post_data_on_client_site > $buffer : ' . print_r( $buffer, true ) );
 		
-		return $buffer["body"];
+		if ( !is_wp_error( $buffer ) ) {
+			return $buffer["body"];
+		} else {
+			return FALSE;
+		}
 	}
 
 
