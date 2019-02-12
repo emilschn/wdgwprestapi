@@ -11,6 +11,21 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 		parent::__construct( $id, WDGRESTAPI_Entity_InvestmentContract::$entity_type, WDGRESTAPI_Entity_InvestmentContract::$db_properties );
 	}
 	
+	/**
+	 * Retourne la liste de tous les contrats d'investissement
+	 * @return array
+	 */
+	public static function list_get( $authorized_client_id_string, $subscription_id = FALSE ) {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_InvestmentContract::$entity_type );
+		$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		if ( !empty( $subscription_id ) ) {
+			$query .= " AND subscription_id=" .$subscription_id;
+		}
+		$results = $wpdb->get_results( $query );
+		return $results;
+	}
+	
 	public static function list_get_by_project( $project_id ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_InvestmentContract::$entity_type );
