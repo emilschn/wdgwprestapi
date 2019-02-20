@@ -3,7 +3,15 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	public static $entity_type = 'email';
 	
 	public function __construct( $id = FALSE ) {
-		parent::__construct( $id, WDGRESTAPI_Entity_Email::$entity_type, WDGRESTAPI_Entity_Email::$db_properties );
+		parent::__construct( $id, self::$entity_type, self::$db_properties );
+	}
+	
+	public static function list_get_by_project( $project_id ) {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = "SELECT * FROM " .$table_name. " WHERE id_project = " .$project_id;
+		$results = $wpdb->get_results( $query );
+		return $results;
 	}
 	
 	/**
@@ -129,6 +137,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		'tool'					=> array( 'type' => 'varchar', 'other' => '' ),
 		'template'				=> array( 'type' => 'varchar', 'other' => '' ),
 		'recipient'				=> array( 'type' => 'longtext', 'other' => '' ),
+		'id_project'			=> array( 'type' => 'id', 'other' => '' ),
 		'result'				=> array( 'type' => 'longtext', 'other' => '' ),
 		'options'				=> array( 'type' => 'longtext', 'other' => '' )
 	);

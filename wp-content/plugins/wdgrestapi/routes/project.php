@@ -111,6 +111,13 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
+		WDGRESTAPI_Route::register_wdg(
+			'/project/(?P<id>\d+)/emails',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_investment_emails'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
 		// Spécifique Equitearly
 		WDGRESTAPI_Route::register_external(
 			'/project-equitearly',
@@ -414,6 +421,34 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Project::single_get_investment_contracts", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les emails envoyés en liaison avec un projet par son ID
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_investment_emails( WP_REST_Request $request ) {
+		$project_id = $request->get_param( 'id' );
+		if ( !empty( $project_id ) ) {
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
+			$loaded_data = $project_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$emails_data = $project_item->get_emails_data();
+				$this->log( "WDGRESTAPI_Route_Project::single_get_investment_emails::" . $project_id, json_encode( $emails_data ) );
+				return $emails_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_get_investment_emails::" . $project_id, "404 : Invalid project ID" );
+				return new WP_Error( '404', "Invalid project ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_get_investment_emails", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
