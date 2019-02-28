@@ -16,6 +16,7 @@ class WDGRESTAPI_Entity_InvestmentContractHistory extends WDGRESTAPI_Entity {
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
+		'investment_contract_id'	=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		
 		'date'					=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
 		'data_modified'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
