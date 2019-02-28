@@ -19,6 +19,7 @@ class WDGRESTAPI_Entity_InvestmentContractHistory extends WDGRESTAPI_Entity {
 		
 		'date'					=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
 		'data_modified'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'old_value'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'new_value'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
 		'list_new_contracts'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
