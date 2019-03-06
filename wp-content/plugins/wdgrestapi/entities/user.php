@@ -69,6 +69,15 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne la liste des contrats d'investissement de cet utilisateur
+	 * @return array
+	 */
+	public function get_investment_contracts() {
+		$buffer = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne la liste des ROIs de cet utilisateur
 	 * @return array
 	 */

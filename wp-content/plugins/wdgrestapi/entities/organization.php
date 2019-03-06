@@ -61,6 +61,15 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne la liste des contrats d'investissement de cette organisation
+	 * @return array
+	 */
+	public function get_investment_contracts() {
+		$buffer = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'organization' );
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne la liste des ROIs de cette organisation
 	 * @return array
 	 */

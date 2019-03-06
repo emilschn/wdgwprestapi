@@ -8,7 +8,7 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 	public static $status_finished = 'finished';
 	
 	public function __construct( $id = FALSE ) {
-		parent::__construct( $id, WDGRESTAPI_Entity_InvestmentContract::$entity_type, WDGRESTAPI_Entity_InvestmentContract::$db_properties );
+		parent::__construct( $id, self::$entity_type, self::$db_properties );
 	}
 	
 	/**
@@ -17,7 +17,7 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 	 */
 	public static function list_get( $authorized_client_id_string, $subscription_id = FALSE ) {
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_InvestmentContract::$entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		if ( !empty( $subscription_id ) ) {
 			$query .= " AND subscription_id=" .$subscription_id;
@@ -28,8 +28,16 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 	
 	public static function list_get_by_project( $project_id ) {
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_InvestmentContract::$entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT * FROM " .$table_name. " WHERE project_id = " .$project_id;
+		$results = $wpdb->get_results( $query );
+		return $results;
+	}
+	
+	public static function list_get_by_investor( $user_id, $user_type ) {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = "SELECT * FROM " .$table_name. " WHERE investor_id = " .$user_id. " AND investor_type='" .$user_type. "'";
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
@@ -68,7 +76,7 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 	
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_InvestmentContract::$entity_type, WDGRESTAPI_Entity_InvestmentContract::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
 	
 }

@@ -22,6 +22,13 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
+			'/organization/(?P<id>\d+)/investment-contracts',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_investment_contracts'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
+		WDGRESTAPI_Route::register_wdg(
 			'/organization/(?P<id>\d+)/rois',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_rois'),
@@ -89,6 +96,34 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Organization::single_get", "404 : Invalid organization ID (empty)" );
+			return new WP_Error( '404', "Invalid organization ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les contrats d'investissement liés à une organisation (par l'ID de l'organisation)
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_investment_contracts( WP_REST_Request $request ) {
+		$organization_id = $request->get_param( 'id' );
+		if ( !empty( $organization_id ) ) {
+			$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
+			$loaded_data = $organization_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$rois_data = $organization_item->get_investment_contracts();
+				$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $organization_id, json_encode( $rois_data ) );
+				return $rois_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $organization_id, "404 : Invalid organization ID" );
+				return new WP_Error( '404', "Invalid organization ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts", "404 : Invalid organization ID (empty)" );
 			return new WP_Error( '404', "Invalid organization ID (empty)" );
 		}
 	}
