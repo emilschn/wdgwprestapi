@@ -58,8 +58,16 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 			'attr'		=> $options
 		);
 		
+		$is_personal = ( isset( $options->personal ) && !empty( $options->personal ) );
+		$is_admin_skipped = ( isset( $options->skip_admin ) && !empty( $options->skip_admin ) );
+		
+		// Est-ce qu'on envoie directement à l'utilisateur ?
+		if ( $is_personal ) {
+			$data[ 'to' ] = $data[ 'bcc' ];
+			$data[ 'bcc' ] = 'admin@wedogood.co';
+			
 		// Pour certains templates, on n'envoie pas de copie à admin, on envoie directement à l'utilisateur
-		if ( $this->loaded_data->template == 181 ) {
+		} else if ( $is_admin_skipped ) {
 			$data[ 'to' ] = $data[ 'bcc' ];
 			$data[ 'bcc' ] = '';
 		}
