@@ -47,7 +47,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 			$investments_list = WDGRESTAPI_Entity_Investment::list_get( FALSE, FALSE, $buffer->id );
 			$buffer->investments = $investments_list;
 			
-			$investment_drafts_list = WDGRESTAPI_Entity_InvestmentDraft::list_get( FALSE, $buffer->id );
+			$investment_drafts_list = WDGRESTAPI_Entity_InvestmentDraft::list_get( $authorized_client_id_string, $buffer->id );
 			$buffer->investment_drafts = $investment_drafts_list;
 		}
 		
