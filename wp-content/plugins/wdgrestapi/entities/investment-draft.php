@@ -20,7 +20,45 @@ class WDGRESTAPI_Entity_InvestmentDraft extends WDGRESTAPI_Entity {
 		}
 		
 		$results = $wpdb->get_results( $query );
-		return $results;
+		return self::complete_data( $results );
+	}
+	
+	/**
+	 * Parcourt les données pour ajouter celles qu'il manque
+	 * @param array $results
+	 * @return array
+	 */
+	private static function complete_data( $results ) {
+		$buffer = array();
+		
+		foreach ( $results as $result ) {
+			$buffer_item = self::complete_single_data( $result );
+			array_push( $buffer, $buffer_item );
+		}
+		
+		return $buffer;
+	}
+	
+	/**
+	 * Ajoute les données manquantes
+	 * @param object $result
+	 * @return array
+	 */
+	public static function complete_single_data( $result ) {
+		// Fichiers
+		$result->check = '';
+		$check_file_entity = WDGRESTAPI_Entity_File::get_single( 'investment-draft', $result->id, 'picture-check' );
+		if ( !empty( $check_file_entity ) ) {
+			$check_loaded_data = $check_file_entity->get_loaded_data();
+			$result->check = $check_loaded_data->url;
+		}
+		$result->contract = '';
+		$contract_file_entity = WDGRESTAPI_Entity_File::get_single( 'investment-draft', $result->id, 'picture-contract' );
+		if ( !empty( $contract_file_entity ) ) {
+			$contract_loaded_data = $contract_file_entity->get_loaded_data();
+			$result->contract = $contract_loaded_data->url;
+		}
+		return $result;
 	}
 	
 	
