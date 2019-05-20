@@ -72,6 +72,11 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 			$data[ 'bcc' ] = '';
 		}
 		
+		// Possibilité d'ajouter une pièce jointe
+		if ( isset( $options->url_attachment ) && !empty( $options->url_attachment ) ) {
+			$data[ 'attachment_url' ] = $options->url_attachment;
+		}
+		
 		$sendinblue_result = $mailin->send_transactional_template( $data );
 		
 		$buffer = 'error';
