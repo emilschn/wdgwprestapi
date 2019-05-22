@@ -11,6 +11,7 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 		$current_datetime = new DateTime();
 		$this->loaded_data->date = $current_datetime->format( 'Y-m-d H:i:s' );
 		parent::save();
+		WDGRESTAPI_Lib_GoogleAPI::set_poll_values( $this->loaded_data->id, $this->loaded_data );
 	}
 	
 	/**
@@ -43,20 +44,20 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 	
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
-		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
+		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => '' ),
-		'date'					=> array( 'type' => 'datetime', 'other' => '' ),
-		'poll_slug'				=> array( 'type' => 'varchar', 'other' => '' ),
-		'poll_version'			=> array( 'type' => 'id', 'other' => '' ),
-		'answers'				=> array( 'type' => 'longtext', 'other' => '' ),
-		'context'				=> array( 'type' => 'varchar', 'other' => '' ),
-		'context_amount'		=> array( 'type' => 'int', 'other' => '' ),
-		'project_id'			=> array( 'type' => 'varchar', 'other' => '' ),
-		'user_id'				=> array( 'type' => 'varchar', 'other' => '' ),
-		'user_age'				=> array( 'type' => 'int', 'other' => '' ),
-		'user_postal_code'		=> array( 'type' => 'varchar', 'other' => '' ),
-		'user_gender'			=> array( 'type' => 'varchar', 'other' => '' ),
-		'user_email'			=> array( 'type' => 'varchar', 'other' => '' )
+		'date'					=> array( 'type' => 'datetime', 'other' => '', 'gs_col_index' => 2 ),
+		'poll_slug'				=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 3 ),
+		'poll_version'			=> array( 'type' => 'id', 'other' => '', 'gs_col_index' => 4 ),
+		'answers'				=> array( 'type' => 'longtext', 'other' => '', 'gs_col_index' => 5 ),
+		'context'				=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 6 ),
+		'context_amount'		=> array( 'type' => 'int', 'other' => '', 'gs_col_index' => 7 ),
+		'project_id'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 8 ),
+		'user_id'				=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 9 ),
+		'user_age'				=> array( 'type' => 'int', 'other' => '', 'gs_col_index' => 10 ),
+		'user_postal_code'		=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 11 ),
+		'user_gender'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 12 ),
+		'user_email'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 13 )
 	);
 	
 	// Mise à jour de la bdd

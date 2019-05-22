@@ -24,16 +24,18 @@ class WDGRESTAPI_Lib_GoogleAPI {
 		}
 	}
 	
-	/*public static function get_test_values() {
-		self::init_client();
-		$service = new Google_Service_Sheets( self::$client );
-		$spreadsheetid = WDG_SPREADSHEETS_STATS_ID;
-		$range = "A1:I350";
-		$response = $service->spreadsheets_values->get( $spreadsheetid, $range );
-		$values = $response->getValues();
-		print_r( $values );
-	}*/
 	
+	public static function set_project_values( $id, $data ) {
+		$row_data = array();
+		for ( $i = 0; $i < 50; $i++ ) { array_push( $row_data, '' ); }
+		foreach ( $data as $data_name => $data_value ) {
+			if ( isset( WDGRESTAPI_Entity_Project::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Project::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
+				$index = WDGRESTAPI_Entity_Project::$db_properties[ $data_name ][ 'gs_col_index' ];
+				$row_data[ $index - 1 ] = $data_value;
+			}
+		}
+		self::set_values( 'PROJECTS', $id + 1, $row_data );
+	}
 	
 	public static function set_user_values( $id, $data ) {
 		$row_data = array();
@@ -47,16 +49,52 @@ class WDGRESTAPI_Lib_GoogleAPI {
 		self::set_values( 'USERS', $id + 1, $row_data );
 	}
 	
-	public static function set_project_values( $id, $data ) {
+	public static function set_organizations_values( $id, $data ) {
 		$row_data = array();
-		for ( $i = 0; $i < 50; $i++ ) { array_push( $row_data, '' ); }
+		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
 		foreach ( $data as $data_name => $data_value ) {
-			if ( isset( WDGRESTAPI_Entity_Project::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Project::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
-				$index = WDGRESTAPI_Entity_Project::$db_properties[ $data_name ][ 'gs_col_index' ];
+			if ( isset( WDGRESTAPI_Entity_Organization::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Organization::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
+				$index = WDGRESTAPI_Entity_Organization::$db_properties[ $data_name ][ 'gs_col_index' ];
 				$row_data[ $index - 1 ] = $data_value;
 			}
 		}
-		self::set_values( 'PROJECTS', $id + 1, $row_data );
+		self::set_values( 'ORGANIZATIONS', $id + 1, $row_data );
+	}
+	
+	public static function set_investment_contract_values( $id, $data ) {
+		$row_data = array();
+		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
+		foreach ( $data as $data_name => $data_value ) {
+			if ( isset( WDGRESTAPI_Entity_InvestmentContract::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_InvestmentContract::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
+				$index = WDGRESTAPI_Entity_InvestmentContract::$db_properties[ $data_name ][ 'gs_col_index' ];
+				$row_data[ $index - 1 ] = $data_value;
+			}
+		}
+		self::set_values( 'CONTRACTS', $id + 1, $row_data );
+	}
+	
+	public static function set_declaration_values( $id, $data ) {
+		$row_data = array();
+		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
+		foreach ( $data as $data_name => $data_value ) {
+			if ( isset( WDGRESTAPI_Entity_Declaration::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Declaration::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
+				$index = WDGRESTAPI_Entity_Declaration::$db_properties[ $data_name ][ 'gs_col_index' ];
+				$row_data[ $index - 1 ] = $data_value;
+			}
+		}
+		self::set_values( 'DECLARATIONS', $id + 1, $row_data );
+	}
+	
+	public static function set_poll_values( $id, $data ) {
+		$row_data = array();
+		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
+		foreach ( $data as $data_name => $data_value ) {
+			if ( isset( WDGRESTAPI_Entity_PollAnswer::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_PollAnswer::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
+				$index = WDGRESTAPI_Entity_PollAnswer::$db_properties[ $data_name ][ 'gs_col_index' ];
+				$row_data[ $index - 1 ] = $data_value;
+			}
+		}
+		self::set_values( 'POLLS', $id + 1, $row_data );
 	}
 
 	public static function set_values( $sheet_id, $row_index, $row_data ) {

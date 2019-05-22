@@ -11,6 +11,11 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 		parent::__construct( $id, self::$entity_type, self::$db_properties );
 	}
 	
+	public function save() {
+		parent::save();
+		WDGRESTAPI_Lib_GoogleAPI::set_investment_contract_values( $this->loaded_data->id, $this->loaded_data );
+	}
+	
 	/**
 	 * Retourne la liste de tous les contrats d'investissement
 	 * @return array
@@ -48,30 +53,30 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
  ******************************************************************************/
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
-		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
+		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		
-		'investor_id'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
-		'investor_type'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'investor_id'			=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
+		'investor_type'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 3 ),
 		
-		'project_id'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
-		'organization_id'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'project_id'			=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 4 ),
+		'organization_id'		=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 5 ),
 		
 		'subscription_id'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
-		'subscription_date'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
-		'subscription_amount'	=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'subscription_date'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL', 'gs_col_index' => 6 ),
+		'subscription_amount'	=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 7 ),
 		
-		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'start_date'			=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
-		'end_date'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'frequency'				=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 8 ),
+		'start_date'			=> array( 'type' => 'datetime', 'other' => 'NOT NULL', 'gs_col_index' => 9 ),
+		'end_date'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 10 ),
+		'frequency'				=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 11 ),
 		
-		'turnover_type'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'turnover_percent'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'turnover_type'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 12 ),
+		'turnover_percent'		=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 13 ),
 		
-		'amount_received'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
-		'minimum_to_receive'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
-		'maximum_to_receive'	=> array( 'type' => 'float', 'other' => 'NOT NULL' )
+		'amount_received'		=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 14 ),
+		'minimum_to_receive'	=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 15 ),
+		'maximum_to_receive'	=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 16 )
 	);
 	
 	// Mise à jour de la bdd

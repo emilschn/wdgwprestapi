@@ -22,6 +22,11 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		}
 	}
 	
+	public function save() {
+		parent::save();
+		WDGRESTAPI_Lib_GoogleAPI::set_declaration_values( $this->loaded_data->id, $this->loaded_data );
+	}
+	
 	/**
 	 * Retourne la liste des ROIs de cette déclaration
 	 * @return array
@@ -211,25 +216,25 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
  ******************************************************************************/
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
-		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
+		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
-		'id_project'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
-		'date_due'				=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
-		'date_paid'				=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
-		'date_transfer'			=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
-		'amount'				=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
-		'remaining_amount'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
-		'transfered_previous_remaining_amount'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
-		'percent_commission'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
-		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'id_project'			=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
+		'date_due'				=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'', 'gs_col_index' => 3 ),
+		'date_paid'				=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'', 'gs_col_index' => 4 ),
+		'date_transfer'			=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'', 'gs_col_index' => 5 ),
+		'amount'				=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 6 ),
+		'remaining_amount'		=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 7 ),
+		'transfered_previous_remaining_amount'	=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 8 ),
+		'percent_commission'	=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 9 ),
+		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 10 ),
+		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 11 ),
 		'payment_token'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'file_list'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'turnover'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'message'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'employees_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
-		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL' )
+		'turnover'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 12 ),
+		'message'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 13 ),
+		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 14 ),
+		'employees_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 15 ),
+		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 16 )
 	);
 	
 	// Mise à jour de la bdd
