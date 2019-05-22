@@ -32,14 +32,14 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		$geolocation_address = $loaded_data->address . ' ' . $loaded_data->postalcode . ' ' . $loaded_data->city;
 		$geolocation_addr_md5 = md5( $geolocation_address );
 		$current_geolocation_addr_md5 = $this->get_metadata( 'geolocation_addr_md5' );
-		WDGRESTAPI_Lib_Logs::log( 'check_geolocation_data > ' . $geolocation_addr_md5 . ' | ' . $current_geolocation_addr_md5 );
+//		WDGRESTAPI_Lib_Logs::log( 'check_geolocation_data > ' . $geolocation_addr_md5 . ' | ' . $current_geolocation_addr_md5 );
 
 		// Si la géolocalisation de l'organisation n'a pas été récupérée
 			// ou si le nouveau MD5 de l'adresse est différent de celui qui a déjà été enregistré
 		if ( empty( $loaded_data->geolocation ) || $current_geolocation_addr_md5 != $geolocation_addr_md5 ) {
 
 			// Récupération des données de géolocalisation
-			WDGRESTAPI_Lib_Logs::log( 'check_geolocation_data >> get_geolocation_data' );
+//			WDGRESTAPI_Lib_Logs::log( 'check_geolocation_data >> get_geolocation_data' );
 			$geolocation_data = WDGRESTAPI_Lib_Geolocation::get_geolocation_data( $geolocation_address );
 
 			// Si l'API a retourné des valeurs exploitables, on les enregistre

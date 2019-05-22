@@ -61,6 +61,7 @@ class WDGRESTAPI {
 		$this->add_include_lib( 'logs' );
 		$this->add_include_lib( 'geolocation' );
 		$this->add_include_lib( 'validator' );
+		$this->add_include_lib( 'google-api' );
 	}
 	public function add_include_lib( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'libs/' . $include_name . '.php');

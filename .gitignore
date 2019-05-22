@@ -1,6 +1,7 @@
 .htaccess
 wp-config.php
 readme.html
+wdg-gs.pkey
 /nbproject/
 wp-content/plugins/wdgrestapi/libs/log_*.txt
 wp-content/plugins/wdgrestapi/files/*
