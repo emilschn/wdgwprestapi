@@ -44,7 +44,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 				$row_data[ $index - 1 ] = $data_value;
 			}
 		}
-		self::set_values( 'USERS', $id, $row_data );
+		self::set_values( 'USERS', $id + 1, $row_data );
 	}
 	
 	public static function set_project_values( $id, $data ) {
@@ -56,7 +56,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 				$row_data[ $index - 1 ] = $data_value;
 			}
 		}
-		self::set_values( 'PROJECTS', $id, $row_data );
+		self::set_values( 'PROJECTS', $id + 1, $row_data );
 	}
 
 	public static function set_values( $sheet_id, $row_index, $row_data ) {
