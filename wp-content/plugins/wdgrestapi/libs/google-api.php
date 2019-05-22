@@ -49,7 +49,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 		self::set_values( 'USERS', $id + 1, $row_data );
 	}
 	
-	public static function set_organizations_values( $id, $data ) {
+	public static function set_organization_values( $id, $data ) {
 		$row_data = array();
 		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
 		foreach ( $data as $data_name => $data_value ) {
@@ -112,8 +112,12 @@ class WDGRESTAPI_Lib_GoogleAPI {
 		$params = array(
 			'valueInputOption' => "USER_ENTERED"
 		);
-		$result = $service->spreadsheets_values->update( $spreadsheetid, $range, $body, $params );
-		WDGRESTAPI_Lib_Logs::log( 'set_values > $result : ' . print_r( $result, true ) );
+		try {
+			$result = $service->spreadsheets_values->update( $spreadsheetid, $range, $body, $params );
+			WDGRESTAPI_Lib_Logs::log( 'set_values > $result : ' . print_r( $result, true ) );
+		} catch ( Exception $ex ) {
+			WDGRESTAPI_Lib_Logs::log( 'set_values > exception : ' . print_r( $ex, true ) );
+		}
 	}
 	
 }

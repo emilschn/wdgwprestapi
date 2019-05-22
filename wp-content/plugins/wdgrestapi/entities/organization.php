@@ -8,7 +8,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	
 	public function save() {
 		parent::save();
-		WDGRESTAPI_Lib_GoogleAPI::set_organization_values( $this->loaded_data->id, $this->loaded_data );
+//		WDGRESTAPI_Lib_GoogleAPI::set_organization_values( $this->loaded_data->id, $this->loaded_data );
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/organizations' );
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/projects' );
 	}
