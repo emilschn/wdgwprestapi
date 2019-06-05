@@ -234,7 +234,8 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		'message'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 13 ),
 		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 14 ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 15 ),
-		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 16 )
+		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 16 ),
+		'declared_by'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 17 )
 	);
 	
 	// Mise à jour de la bdd
