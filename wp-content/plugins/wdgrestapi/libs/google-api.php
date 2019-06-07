@@ -98,6 +98,9 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	}
 
 	public static function set_values( $sheet_id, $row_index, $row_data ) {
+		if ( defined( 'WDG_DEV' ) ) {
+			return;
+		}
 		self::init_client();
 		$service = new Google_Service_Sheets( self::$client );
 		$spreadsheetid = WDG_SPREADSHEETS_STATS_ID;
