@@ -18,7 +18,7 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les réponses aux questions
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $user_id, $project_id, $poll_slug ) {
+	public static function list_get( $authorized_client_id_string, $user_id, $project_id, $poll_slug, $offset = 0, $limit = FALSE, $apply_in_google = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_PollAnswer::$entity_type );
 		
@@ -33,7 +33,28 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 			$query .= " AND poll_slug='" .$poll_slug. "'";
 		}
 		
+		if ( $offset > 0 || !empty( $limit ) ) {
+			$query .= " LIMIT ";
+			
+			if ( $offset > 0 ) {
+				$query .= $offset . ", ";
+				if ( empty( $limit ) ) {
+					$query .= "0";
+				}
+			}
+			if ( !empty( $limit ) ) {
+				$query .= $limit;
+			}
+		}
+		
 		$buffer = $wpdb->get_results( $query );
+		
+		if ( !empty( $apply_in_google ) ) {
+			foreach ( $buffer as $item ) {
+				WDGRESTAPI_Lib_GoogleAPI::set_poll_values( $item->id, $item );
+			}
+		}
+		
 		return $buffer;
 	}
 

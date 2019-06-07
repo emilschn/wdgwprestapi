@@ -42,9 +42,12 @@ class WDGRESTAPI_Route_PollAnswer extends WDGRESTAPI_Route {
 		$input_user = filter_input( INPUT_GET, 'user_id' );
 		$input_project = filter_input( INPUT_GET, 'project_id' );
 		$input_poll_slug = filter_input( INPUT_GET, 'poll_slug' );
+		$limit = filter_input( INPUT_GET, 'limit' );
+		$offset = filter_input( INPUT_GET, 'offset' );
+		$apply_in_google = filter_input( INPUT_GET, 'apply_in_google' );
 		
 		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_PollAnswer::list_get');
-		$buffer = WDGRESTAPI_Entity_PollAnswer::list_get( $this->get_current_client_autorized_ids_string(), $input_user, $input_project, $input_poll_slug );
+		$buffer = WDGRESTAPI_Entity_PollAnswer::list_get( $this->get_current_client_autorized_ids_string(), $input_user, $input_project, $input_poll_slug, $limit, $offset, $apply_in_google );
 		
 		return $buffer;
 	}
