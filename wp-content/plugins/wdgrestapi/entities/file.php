@@ -5,7 +5,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	
 	public static $file_entity_types = array( 'user', 'organization', 'project', 'declaration', 'investment', 'investment-draft' );
 	
-	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'campaign_certificate', 'campaign_estimated_budget', 'contract', 'amendment', 'picture-check', 'picture-contract' );
+	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'project_certificate', 'project_estimated_budget', 'project_document', 'contract', 'amendment', 'picture-check', 'picture-contract' );
 	
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
@@ -50,7 +50,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 			file_put_contents( $path . $random_filename, $file_data );
 			$current_datetime = new DateTime();
 			$this->loaded_data->file_name = $random_filename;
-			$this->loaded_data->update = $current_datetime->format( 'Y-m-d H:i:s' );
+			$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d H:i:s' );
 			$this->loaded_data->status = 'uploaded';
 			parent::save();
 			
@@ -99,7 +99,8 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 		'file_name'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'file_signature'		=> array( 'type' => 'longtext', 'other' => '' ),
 		'update_date'			=> array( 'type' => 'datetime', 'other' => '' ),
-		'status'				=> array( 'type' => 'varchar', 'other' => '' )
+		'status'				=> array( 'type' => 'varchar', 'other' => '' ),
+		'metadata'				=> array( 'type' => 'longtext', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd
