@@ -118,6 +118,13 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
+		WDGRESTAPI_Route::register_wdg(
+			'/project/(?P<id>\d+)/files',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_files'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
 		// Spécifique Equitearly
 		WDGRESTAPI_Route::register_external(
 			'/project-equitearly',
@@ -449,6 +456,26 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Project::single_get_investment_emails", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les fichiers liés à un projet
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_get_files( WP_REST_Request $request ) {
+		$project_id = $request->get_param( 'id' );
+		if ( !empty( $project_id ) ) {
+			$file_type = filter_input( INPUT_GET, 'file_type' );
+			$exclude_linked_to_adjustment = filter_input( INPUT_GET, 'exclude_linked_to_adjustment' );
+			$result = WDGRESTAPI_Entity_File::get_list( 'project', $project_id, $file_type, $exclude_linked_to_adjustment );
+			$this->log( "WDGRESTAPI_Route_Project::single_get_files::" . $project_id, json_encode( $result ) );
+			return $result;
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_get_files", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}

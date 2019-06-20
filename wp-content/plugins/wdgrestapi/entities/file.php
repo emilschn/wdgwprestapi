@@ -22,7 +22,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 		$buffer = FALSE;
 		
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_File::$entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT id FROM " .$table_name. " WHERE entity_type='" .$entity_type. "' AND entity_id=" .$entity_id. " AND file_type='" .$file_type. "'";
 		$loaded_data = $wpdb->get_row( $query );
 		if ( !empty( $loaded_data->id ) ) {
@@ -38,6 +38,54 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 		if ( !empty( $this->loaded_data->file_name ) ) {
 			$buffer->url = home_url( '/wp-content/plugins/wdgrestapi/files/' .$this->loaded_data->entity_type. '/' .$this->loaded_data->file_type. '/' .$this->loaded_data->file_name );
 		}
+		return $buffer;
+	}
+	
+	public function get_list( $entity_type = '', $entity_id = '', $file_type = '', $exclude_linked_to_adjustment = FALSE ) {
+		$buffer = array();
+		
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		
+		$query = "SELECT f.id FROM " .$table_name. " f";
+		if ( !empty( $entity_type ) || !empty( $file_type ) ) {
+			$query .= " WHERE ";
+			$query_where = "";
+			
+			if ( !empty( $entity_type ) ) {
+				$query_where = "f.entity_type='" .$entity_type. "'";
+				
+				if ( !empty( $entity_id ) ) {
+					$query_where .= " AND f.entity_id=" .$entity_id;
+				}
+			}
+			
+			if ( !empty( $file_type ) ) {
+				if ( !empty( $query_where ) ) {
+					$query_where .= " AND ";
+				}
+				$query_where .= "f.file_type='" .$file_type. "'";
+			}
+			
+			$query .= $query_where;
+		}
+		
+		if ( !empty( $exclude_linked_to_adjustment ) ) {
+			$query .= " AND f.id NOT IN ( ";
+				$link_table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_AdjustmentFile::$entity_type );
+				$query .= "SELECT af.id_file FROM " .$link_table_name. " af WHERE af.id_file=f.id";
+			$query .= " )";
+		}
+		
+		$loaded_data = $wpdb->get_results( $query );
+		
+		if ( !empty( $loaded_data ) ) {
+			foreach ( $loaded_data as $file_data ) {
+				$file_temp = new WDGRESTAPI_Entity_File( $file_data->id );
+				array_push( $buffer, $file_temp->get_loaded_data() );
+			}
+		}
+		
 		return $buffer;
 	}
 	

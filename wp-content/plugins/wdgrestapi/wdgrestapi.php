@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.794';
+	private $version = '0.0.801';
     
 	/**
 	 * Instanciation du singleton
@@ -85,15 +85,19 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'investment-contract-history' );
 		$this->add_include_entity( 'bankinfo' );
 		$this->add_include_entity( 'declaration' );
+		$this->add_include_entity( 'adjustment' );
 		$this->add_include_entity( 'roi' );
 		$this->add_include_entity( 'file' );
 		$this->add_include_entity( 'poll-answer' );
 		$this->add_include_entity( 'contract-model' );
 		$this->add_include_entity( 'contract' );
+		$this->add_include_entity( 'queued-action' );
+		
 		$this->add_include_entity( 'organization-user' );
 		$this->add_include_entity( 'project-user' );
 		$this->add_include_entity( 'project-organization' );
-		$this->add_include_entity( 'queued-action' );
+		$this->add_include_entity( 'adjustment-file' );
+		$this->add_include_entity( 'adjustment-declaration' );
 	}
 	public function add_include_entity( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'entities/' . $include_name . '.php');
@@ -115,6 +119,7 @@ class WDGRESTAPI {
 		$this->add_include_route( 'investment-contract-history' );
 		$this->add_include_route( 'bankinfo' );
 		$this->add_include_route( 'declaration' );
+		$this->add_include_route( 'adjustment' );
 		$this->add_include_route( 'roi' );
 		$this->add_include_route( 'file' );
 		$this->add_include_route( 'poll-answer' );
@@ -140,10 +145,8 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_InvestmentContractHistory::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_BankInfo::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Declaration::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Adjustment::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ROI::register');
-		add_action( 'rest_api_init', 'WDGRESTAPI_Route_OrganizationUser::register');
-		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectUser::register');
-		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectOrganization::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_MailTemplate::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Email::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Bill::register');
@@ -152,6 +155,10 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Contract::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_PollAnswer::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_QueuedAction::register');
+		
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_OrganizationUser::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectUser::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectOrganization::register');
 	}
 	
 	
@@ -177,15 +184,20 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_InvestmentContractHistory::upgrade_db();
 			WDGRESTAPI_Entity_BankInfo::upgrade_db();
 			WDGRESTAPI_Entity_Declaration::upgrade_db();
+			WDGRESTAPI_Entity_Adjustment::upgrade_db();
 			WDGRESTAPI_Entity_ROI::upgrade_db();
 			WDGRESTAPI_Entity_File::upgrade_db();
 			WDGRESTAPI_Entity_PollAnswer::upgrade_db();
 			WDGRESTAPI_Entity_ContractModel::upgrade_db();
 			WDGRESTAPI_Entity_Contract::upgrade_db();
+			WDGRESTAPI_Entity_QueuedAction::upgrade_db();
+			
 			WDGRESTAPI_Entity_OrganizationUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectOrganization::upgrade_db();
-			WDGRESTAPI_Entity_QueuedAction::upgrade_db();
+			WDGRESTAPI_Entity_AdjustmentFile::upgrade_db();
+			WDGRESTAPI_Entity_AdjustmentDeclaration::upgrade_db();
+			
 			update_option('wdgwpapi_version', $this->version);
 		}
 	}
