@@ -48,6 +48,13 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 			array( $this, 'single_get_rois'),
 			array( 'token' => array( 'default' => 0 ) )
 		);
+		
+		WDGRESTAPI_Route::register_wdg(
+			'/declaration/(?P<id>\d+)/adjustments',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_adjustments'),
+			array( 'token' => array( 'default' => 0 ) )
+		);
 	}
 	
 	public static function register() {
@@ -221,6 +228,34 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Declaration::single_get_rois", "404 : Invalid declaration ID (empty)" );
+			return new WP_Error( '404', "Invalid declaration ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les ajustements appliqués à une déclaration (par l'ID de la déclaration)
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_adjustments( WP_REST_Request $request ) {
+		$declaration_id = $request->get_param( 'id' );
+		if ( !empty( $declaration_id ) ) {
+			$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
+			$loaded_data = $declaration_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$rois_data = $declaration_item->get_adjustments();
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_adjustments::" . $declaration_id, json_encode( $rois_data ) );
+				return $rois_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_adjustments::" . $declaration_id, "404 : Invalid declaration ID" );
+				return new WP_Error( '404', "Invalid declaration ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Declaration::single_get_adjustments", "404 : Invalid declaration ID (empty)" );
 			return new WP_Error( '404', "Invalid declaration ID (empty)" );
 		}
 	}
