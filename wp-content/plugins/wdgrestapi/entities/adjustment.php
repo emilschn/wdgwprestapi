@@ -26,6 +26,19 @@ class WDGRESTAPI_Entity_Adjustment extends WDGRESTAPI_Entity {
 		return $results;
 	}
 	
+	/**
+	 * Retourne la liste des ajustements liés à une déclaration
+	 * @param int $project_id
+	 * @return array
+	 */
+	public static function list_get_by_project_id( $project_id ) {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = "SELECT * FROM " .$table_name. " WHERE id_project = " .$project_id. " ORDER BY date_created ASC";
+		$results = $wpdb->get_results( $query );
+		return $results;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD

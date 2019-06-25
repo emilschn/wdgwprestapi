@@ -62,6 +62,13 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			array( 'id' => array( 'default' => 0 ) )
 		);
 		
+		WDGRESTAPI_Route::register_wdg(
+			'/project/(?P<id>\d+)/adjustments',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_adjustments'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
 		WDGRESTAPI_Route::register_external(
 			'/project/(?P<id>\d+)/royalties',
 			WP_REST_Server::READABLE,
@@ -260,6 +267,34 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Project::single_get_declarations", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne les ajustements liés à un projet (par l'ID du projet)
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_adjustments( WP_REST_Request $request ) {
+		$project_id = $request->get_param( 'id' );
+		if ( !empty( $project_id ) ) {
+			$project_item = new WDGRESTAPI_Entity_Project( $project_id );
+			$loaded_data = $project_item->get_loaded_data();
+			
+			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+				$royalties_data = $project_item->get_adjustments();
+				$this->log( "WDGRESTAPI_Route_Project::single_get_adjustments::" . $project_id, json_encode( $royalties_data ) );
+				return $royalties_data;
+				
+			} else {
+				$this->log( "WDGRESTAPI_Route_Project::single_get_adjustments::" . $project_id, "404 : Invalid project ID" );
+				return new WP_Error( '404', "Invalid project ID" );
+				
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project::single_get_adjustments", "404 : Invalid project ID (empty)" );
 			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
