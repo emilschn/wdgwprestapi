@@ -24,6 +24,13 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 		
 		WDGRESTAPI_Route::register_wdg(
 			'/adjustment/(?P<id>\d+)/files',
+			WP_REST_Server::READABLE,
+			array( $this, 'get_filelist_by_adjustment_id'),
+			array( 'id' => array( 'default' => 0 ) )
+		);
+		
+		WDGRESTAPI_Route::register_wdg(
+			'/adjustment/(?P<id>\d+)/files',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'link_file'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
@@ -34,6 +41,13 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 			WP_REST_Server::DELETABLE,
 			array( $this, 'unlink_file'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::DELETABLE )
+		);
+		
+		WDGRESTAPI_Route::register_wdg(
+			'/adjustment/(?P<id>\d+)/declarations',
+			WP_REST_Server::READABLE,
+			array( $this, 'get_declarationlist_by_adjustment_id'),
+			array( 'id' => array( 'default' => 0 ) )
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
@@ -149,6 +163,19 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 		}
 	}
 	
+	public function get_filelist_by_adjustment_id( WP_REST_Request $request ) {
+		$adjustment_id = $request->get_param( 'id' );
+		if ( !empty( $adjustment_id ) ) {
+			$file_list = WDGRESTAPI_Entity_AdjustmentFile::get_list_by_adjustment_id( $adjustment_id );
+			$this->log( "WDGRESTAPI_Route_Adjustment::get_filelist_by_adjustment_id::" . $adjustment_id, json_encode( $file_list ) );
+			return $file_list;
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Adjustment::get_filelist_by_adjustment_id", "404 : Invalid adjustment ID (empty)" );
+			return new WP_Error( '404', "Invalid adjustment ID (empty)" );
+		}
+	}
+	
 	public function link_file( WP_REST_Request $request ) {
 		$adjustment_id = $request->get_param( 'id' );
 		$adjustmentfile_item = new WDGRESTAPI_Entity_AdjustmentFile();
@@ -167,6 +194,19 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 		WDGRESTAPI_Entity_AdjustmentFile::remove( $adjustment_id, $file_id, $type );
 		$this->log( "WDGRESTAPI_Route_Adjustment::unlink_file::".$adjustment_id."::".$file_id."::".$type, 'TRUE' );
 		return TRUE;
+	}
+	
+	public function get_declarationlist_by_adjustment_id( WP_REST_Request $request ) {
+		$adjustment_id = $request->get_param( 'id' );
+		if ( !empty( $adjustment_id ) ) {
+			$declaration_list = WDGRESTAPI_Entity_AdjustmentDeclaration::get_list_by_adjustment_id( $adjustment_id );
+			$this->log( "WDGRESTAPI_Route_Adjustment::get_declarationlist_by_adjustment_id::" . $adjustment_id, json_encode( $declaration_list ) );
+			return $declaration_list;
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Adjustment::get_declarationlist_by_adjustment_id", "404 : Invalid adjustment ID (empty)" );
+			return new WP_Error( '404', "Invalid adjustment ID (empty)" );
+		}
 	}
 	
 	public function link_declaration( WP_REST_Request $request ) {
