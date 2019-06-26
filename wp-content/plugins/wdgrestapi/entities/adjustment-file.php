@@ -12,12 +12,22 @@ class WDGRESTAPI_Entity_AdjustmentFile extends WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	public static function get_list_by_adjustment_id( $id_adjustment ) {
+		$buffer = array();
+		
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT id_file, type FROM " . $table_name;
 		$query .= " WHERE id_adjustment=" . $id_adjustment;
-		$results = $wpdb->get_results( $query );
-		return $results;
+		$loaded_data = $wpdb->get_results( $query );
+		
+		if ( !empty( $loaded_data ) ) {
+			foreach ( $loaded_data as $file_data ) {
+				$file_temp = new WDGRESTAPI_Entity_File( $file_data->id_file );
+				array_push( $buffer, $file_temp->get_loaded_data() );
+			}
+		}
+		
+		return $buffer;
 	}
 	
 	/**

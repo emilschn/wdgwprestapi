@@ -37,7 +37,7 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
-			'/adjustment/(?P<adjustmentid>\d+)/file/(?P<fileid>\d+))',
+			'/adjustment/(?P<adjustmentid>\d+)/file/(?P<fileid>\d+)',
 			WP_REST_Server::DELETABLE,
 			array( $this, 'unlink_file'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::DELETABLE )
@@ -58,7 +58,7 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
-			'/adjustment/(?P<adjustmentid>\d+)/declaration/(?P<fileid>\d+))',
+			'/adjustment/(?P<adjustmentid>\d+)/declaration/(?P<fileid>\d+)',
 			WP_REST_Server::DELETABLE,
 			array( $this, 'unlink_declaration'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::DELETABLE )
