@@ -46,6 +46,15 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne la liste des ajustements de cette déclaration
+	 * @return array
+	 */
+	public function get_linked_adjustments() {
+		$buffer = WDGRESTAPI_Entity_Adjustment::list_get_by_declaration_id( $this->loaded_data->id );
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne la liste de toutes les déclarations
 	 * @return array
 	 */

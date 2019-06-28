@@ -31,6 +31,30 @@ class WDGRESTAPI_Entity_AdjustmentDeclaration extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne la liste des ajustements liés à une déclaration
+	 * @param int $id_declaration
+	 * @return array
+	 */
+	public static function get_list_by_declaration_id( $id_declaration ) {
+		$buffer = array();
+		
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = "SELECT id_adjustment, type FROM " . $table_name;
+		$query .= " WHERE id_declaration=" . $id_declaration;
+		$loaded_data = $wpdb->get_results( $query );
+		
+		if ( !empty( $loaded_data ) ) {
+			foreach ( $loaded_data as $adjustment_data ) {
+				$adjustment_temp = new WDGRESTAPI_Entity_Adjustment( $adjustment_data->id_adjustment );
+				array_push( $buffer, $adjustment_temp->get_loaded_data() );
+			}
+		}
+		
+		return $buffer;
+	}
+	
+	/**
 	 * Supprime la liaison entre ajustement, déclaration et un type spécifique
 	 * @param int $id_adjustment
 	 * @param int $id_declaration

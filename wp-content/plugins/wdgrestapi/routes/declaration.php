@@ -244,7 +244,12 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 			$loaded_data = $declaration_item->get_loaded_data();
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$rois_data = $declaration_item->get_adjustments();
+				$input_linked = filter_input( INPUT_GET, 'linked' );
+				if ( empty( $input_linked ) ) {
+					$rois_data = $declaration_item->get_adjustments();
+				} else {
+					$rois_data = $declaration_item->get_linked_adjustments();
+				}
 				$this->log( "WDGRESTAPI_Route_Declaration::single_get_adjustments::" . $declaration_id, json_encode( $rois_data ) );
 				return $rois_data;
 				
