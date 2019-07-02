@@ -94,12 +94,16 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les déclarations
 	 * @return array
 	 */
-	public static function list_get_by_project_id( $project_id ) {
+	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
 		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE id_project = " .$project_id;
 		$results = $wpdb->get_results( $query );
-		return self::complete_data( $results );
+		if ( $is_data_restricted_to_entity ) {
+			return $results;
+		} else {
+			return self::complete_data( $results );
+		}
 	}
 	
 	/**

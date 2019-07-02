@@ -255,7 +255,8 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			$loaded_data = $project_item->get_loaded_data();
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$royalties_data = $project_item->get_declarations();
+				$input_data_restricted_to_entity = filter_input( INPUT_GET, 'data_restricted_to_entity' );
+				$royalties_data = $project_item->get_declarations( ( $input_data_restricted_to_entity == '1' ) );
 				$this->log( "WDGRESTAPI_Route_Project::single_get_declarations::" . $project_id, json_encode( $royalties_data ) );
 				return $royalties_data;
 				
