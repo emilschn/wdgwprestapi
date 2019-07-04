@@ -60,16 +60,15 @@ class WDGRESTAPI_Entity_AdjustmentDeclaration extends WDGRESTAPI_Entity {
 	 * @param int $id_declaration
 	 * @param string $type
 	 */
-	public static function remove( $id_adjustment, $id_declaration, $type ) {
-		if ( !empty( $id_adjustment ) && !empty( $id_declaration ) && !empty( $type ) ) {
+	public static function remove( $id_adjustment, $id_declaration ) {
+		if ( !empty( $id_adjustment ) && !empty( $id_declaration ) ) {
 			global $wpdb;
 			$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 			$wpdb->delete(
 				$table_name,
 				array(
-					'id_project'	=> $id_adjustment,
-					'id_declaration'=> $id_declaration,
-					'type'			=> $type
+					'id_adjustment'	=> $id_adjustment,
+					'id_declaration'=> $id_declaration
 				)
 			);
 		}

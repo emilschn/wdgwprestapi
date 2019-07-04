@@ -58,7 +58,7 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
-			'/adjustment/(?P<adjustmentid>\d+)/declaration/(?P<fileid>\d+)',
+			'/adjustment/(?P<adjustmentid>\d+)/declaration/(?P<declarationid>\d+)',
 			WP_REST_Server::DELETABLE,
 			array( $this, 'unlink_declaration'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::DELETABLE )
@@ -83,7 +83,7 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 			
 			if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
 				$this->log( "WDGRESTAPI_Route_Adjustment::single_get::" . $adjustment_id, json_encode( $loaded_data_temp ) );
-				return $loaded_data;
+				return $loaded_data_temp;
 				
 			} else {
 				$this->log( "WDGRESTAPI_Route_Adjustment::single_get::" . $adjustment_id, "404 : Invalid adjustment id" );
@@ -190,9 +190,8 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 	public function unlink_file( WP_REST_Request $request ) {
 		$adjustment_id = $request->get_param( 'adjustmentid' );
 		$file_id = $request->get_param( 'fileid' );
-		$type = $request->get_param( 'type' );
-		WDGRESTAPI_Entity_AdjustmentFile::remove( $adjustment_id, $file_id, $type );
-		$this->log( "WDGRESTAPI_Route_Adjustment::unlink_file::".$adjustment_id."::".$file_id."::".$type, 'TRUE' );
+		WDGRESTAPI_Entity_AdjustmentFile::remove( $adjustment_id, $file_id );
+		$this->log( "WDGRESTAPI_Route_Adjustment::unlink_file::".$adjustment_id."::".$file_id, 'TRUE' );
 		return TRUE;
 	}
 	
@@ -223,9 +222,8 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 	public function unlink_declaration( WP_REST_Request $request ) {
 		$adjustment_id = $request->get_param( 'adjustmentid' );
 		$declaration_id = $request->get_param( 'declarationid' );
-		$type = $request->get_param( 'type' );
-		WDGRESTAPI_Entity_AdjustmentDeclaration::remove( $adjustment_id, $declaration_id, $type );
-		$this->log( "WDGRESTAPI_Route_Adjustment::unlink_declaration::".$adjustment_id."::".$declaration_id."::".$type, 'TRUE' );
+		WDGRESTAPI_Entity_AdjustmentDeclaration::remove( $adjustment_id, $declaration_id );
+		$this->log( "WDGRESTAPI_Route_Adjustment::unlink_declaration::".$adjustment_id."::".$declaration_id, 'TRUE' );
 		return TRUE;
 	}
 	

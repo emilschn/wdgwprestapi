@@ -36,16 +36,15 @@ class WDGRESTAPI_Entity_AdjustmentFile extends WDGRESTAPI_Entity {
 	 * @param int $id_file
 	 * @param string $type
 	 */
-	public static function remove( $id_adjustment, $id_file, $type ) {
-		if ( !empty( $id_adjustment ) && !empty( $id_file ) && !empty( $type ) ) {
+	public static function remove( $id_adjustment, $id_file ) {
+		if ( !empty( $id_adjustment ) && !empty( $id_file ) ) {
 			global $wpdb;
 			$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 			$wpdb->delete(
 				$table_name,
 				array(
-					'id_project'	=> $id_adjustment,
-					'id_file'		=> $id_file,
-					'type'			=> $type
+					'id_adjustment'	=> $id_adjustment,
+					'id_file'		=> $id_file
 				)
 			);
 		}
