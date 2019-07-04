@@ -55,6 +55,16 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne les fichiers liés à une déclaration
+	 * @return array
+	 */
+	public function get_files( $file_type = '' ) {
+		$item = WDGRESTAPI_Entity_File::get_single( self::$entity_type, $this->loaded_data->id, $file_type );
+		$item_loaded_data = $item->get_loaded_data();
+		return array( $item_loaded_data->url );
+	}
+	
+	/**
 	 * Retourne la liste de toutes les déclarations
 	 * @return array
 	 */
