@@ -18,7 +18,7 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 	public static function list_get() {
 		$quickbooks_service = WDGRESTAPI_Entity_Bill::get_quickbooks_service();
 		if ( is_wp_error( $quickbooks_service ) ) {
-			$this->properties_errors = $quickbooks_service->get_error_message();
+			//$this->properties_errors = $quickbooks_service->get_error_message();
 			
 		} elseif ( !empty( $quickbooks_service ) ) {
 			return $quickbooks_service->FindAll( 'Invoice', 1, 5 );
