@@ -277,6 +277,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number( $input ) {
+		$input = str_replace( ' ', '', $input );
 		return ( is_numeric( $input ) || ( $input == 0 ) );
 	}
 	
@@ -286,6 +287,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number_positive( $input ) {
+		$input = str_replace( ' ', '', $input );
 		return ( $input > 0 );
 	}
 	
@@ -295,6 +297,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number_integer( $input ) {
+		$input = str_replace( ' ', '', $input );
 		return ( ctype_digit( strval( $input ) ) );
 	}
 	
@@ -322,7 +325,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_name( $input ) {
-		return !empty( $input );
+		return !empty( $input ) && !self::is_number( $input ) && !self::is_email( $input );
 	}
 	
 	/**
@@ -340,7 +343,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_country_iso_code( $input ) {
-		return !empty( $input ) && isset( WDGRESTAPI_Lib_Validator::$country_list[ $input ] );
+		return !empty( $input ) && isset( WDGRESTAPI_Lib_Validator::$country_list[ strtoupper( $input ) ] );
 	}
 	
 	/**
@@ -349,7 +352,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_day( $input ) {
-		return ( is_numeric( $input ) && ( $input <= 31 ) );
+		return ( self::is_number_positive_integer( $input ) && ( $input <= 31 ) );
 	}
 	
 	/**
@@ -358,7 +361,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_month( $input ) {
-		return ( is_numeric( $input ) && ( $input <= 12 ) );
+		return ( self::is_number_positive_integer( $input ) && ( $input <= 12 ) );
 	}
 	
 	/**
@@ -367,7 +370,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_year( $input ) {
-		return is_numeric( $input ) && is_int( $input );
+		return self::is_number_integer( $input );
 	}
 	
 	/**
@@ -412,6 +415,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_postalcode( $input, $input_country ) {
+		$input = str_replace( ' ', '', $input );
 		return ( $input_country != 'FR' || preg_match( '#^[0-9]{5}$#', $input ) );
 	}
 	
