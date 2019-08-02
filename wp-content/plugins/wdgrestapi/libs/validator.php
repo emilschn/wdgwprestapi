@@ -277,6 +277,9 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number( $input ) {
+		if ( is_bool( $input ) ) {
+			return FALSE;
+		}
 		$input = str_replace( ' ', '', $input );
 		if ( $input == (string) (float) $input ) {
 			return is_numeric( $input );
@@ -302,7 +305,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number_integer( $input ) {
-		return ( self::is_number( $input ) && (int) $input === $input );
+		return ( self::is_number( $input ) && (int) $input === round( (int) $input ) );
 	}
 	
 	/**
@@ -338,7 +341,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_gender( $input ) {
-		return ( $input == "male" || $input == "female" );
+		return ( $input === "male" || $input === "female" );
 	}
 	
 	/**
@@ -385,7 +388,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date( $input_day, $input_month, $input_year ) {
-		if ( !self::is_number_integer( input_day ) || !self::is_number_integer( input_month ) || !self::is_number_integer( input_year ) ) {
+		if ( !self::is_number_integer( $input_day ) || !self::is_number_integer( $input_month ) || !self::is_number_integer( $input_year ) ) {
 			return FALSE;
 		}
 		return checkdate( $input_month, $input_day, $input_year );

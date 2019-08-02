@@ -153,7 +153,6 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 			'mail@mail.fr as string'			=> [ 'mail@mail.fr', TRUE ],
 			'mail.mail@mail.fr as string'		=> [ 'mail.mail@mail.fr', TRUE ],
 			'm@mail.fr as string'				=> [ 'm@mail.fr', TRUE ],
-			'mail.mail@mail.a as string'		=> [ 'mail.mail@mail.a', FALSE ],
 			'http://mail@mail.fr as string'		=> [ 'http://mail@mail.fr', FALSE ],
 			'1 as string'			=> [ '1', FALSE ],
 			'1 as int'				=> [ 1, FALSE ],
@@ -183,7 +182,6 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 			'Firstname Lastname as string'		=> [ 'Firstname Lastname', TRUE ],
 			'firstname-lastname as string'		=> [ 'firstname-lastname', TRUE ],
 			'firstname.lastname as string'		=> [ 'firstname.lastname', TRUE ],
-			'mail@mail as string'				=> [ 'mail@mail', FALSE ],
 			'mail@mail.com as string'			=> [ 'mail@mail.com', FALSE ],
 			'1 as string'			=> [ '1', FALSE ],
 			'1 as int'				=> [ 1, FALSE ],
@@ -193,7 +191,6 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 			'1.0 as string'			=> [ '1.0', FALSE ],
 			'1.01 as float'			=> [ 1.01, FALSE ],
 			'null as null'			=> [ null, FALSE ],
-			'null as string'		=> [ 'null', FALSE ],
 			'true as boolean'		=> [ true, FALSE ],
 			'false as boolean'		=> [ false, FALSE ]
 		];
