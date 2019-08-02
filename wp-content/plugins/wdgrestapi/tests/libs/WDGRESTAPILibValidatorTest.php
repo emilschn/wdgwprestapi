@@ -369,10 +369,10 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 			'1 1 2001 as int'			=> [ 1, 1, 2001, TRUE ],
 			'1.0 1 2001 as float'		=> [ 1.0, 1, 2001, TRUE ],
 			'1.0 1 2001 as string'		=> [ '1.0', 1, 2001, TRUE ],
-			'true 01 2001 as boolean'	=> [ true, 01, 2001, FALSE ],
-			'01 true 2001 as boolean'	=> [ 01, true, 2001, FALSE ],
-			'01 01 true as boolean'		=> [ 01, 01, true, FALSE ],
-			'01 01 name as string'		=> [ 01, 01, 'name', FALSE ]
+			'true 01 2001 as boolean'	=> [ true, 1, 2001, FALSE ],
+			'01 true 2001 as boolean'	=> [ 1, true, 2001, FALSE ],
+			'01 01 true as boolean'		=> [ 1, 1, true, FALSE ],
+			'01 01 name as string'		=> [ 1, 1, 'name', FALSE ]
 		];
 	}
 
@@ -388,10 +388,10 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 			'01 01 1998 as string'		=> [ '01', '01', '1998', TRUE ],
 			'01 01 2019 as string'		=> [ '01', '01', '2030', FALSE ],
 			'01 01 1998 as int'			=> [ 1, 1, 1998, TRUE ],
-			'true 01 2001 as boolean'	=> [ true, 01, 2001, FALSE ],
-			'01 true 2001 as boolean'	=> [ 01, true, 2001, FALSE ],
-			'01 01 true as boolean'		=> [ 01, 01, true, FALSE ],
-			'01 01 name as string'		=> [ 01, 01, 'name', FALSE ]
+			'true 1 2001 as boolean'	=> [ true, 1, 2001, FALSE ],
+			'01 true 2001 as boolean'	=> [ 1, true, 2001, FALSE ],
+			'1 1 true as boolean'		=> [ 1, 1, true, FALSE ],
+			'1 1 name as string'		=> [ 1, 1, 'name', FALSE ]
 		];
 	}
 
@@ -406,7 +406,10 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 		return [
 			'57000 FR as string'		=> [ '57000', 'FR', TRUE ],
 			'57 000 FR as string'		=> [ '57 000', 'FR', TRUE ],
+			'7000 FR as string'		=> [ '7000', 'FR', TRUE ],
+			'7 000 FR as string'		=> [ '7 000', 'FR', TRUE ],
 			'57000 FR as int'			=> [ 57000, 'FR', TRUE ],
+			'7000 FR as int'			=> [ 7000, 'FR', TRUE ],
 			'true FR as boolean'		=> [ true, 'FR', FALSE ],
 			'true FR as string'			=> [ 'true', 'FR', FALSE ],
 			'57000 true as string'		=> [ 57000, 'other', TRUE ]
