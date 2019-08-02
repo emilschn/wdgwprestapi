@@ -369,10 +369,10 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 			'1 1 2001 as int'			=> [ 1, 1, 2001, TRUE ],
 			'1.0 1 2001 as float'		=> [ 1.0, 1, 2001, TRUE ],
 			'1.0 1 2001 as string'		=> [ '1.0', 1, 2001, TRUE ],
-			'true 01 2001 as boolean'	=> [ true, 1, 2001, FALSE ],
-			'01 true 2001 as boolean'	=> [ 1, true, 2001, FALSE ],
-			'01 01 true as boolean'		=> [ 1, 1, true, FALSE ],
-			'01 01 name as string'		=> [ 1, 1, 'name', FALSE ]
+			'true 1 2001 as boolean'	=> [ true, 1, 2001, FALSE ],
+			'1 true 2001 as boolean'	=> [ 1, true, 2001, FALSE ],
+			'1 1 true as boolean'		=> [ 1, 1, true, FALSE ]/*,
+			'1 1 name as string'		=> [ 1, 1, 'name', FALSE ]*/
 		];
 	}
 
