@@ -268,7 +268,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_boolean( $input ) {
-		return ( $input === 1 || $input === 0 );
+		return ( $input === 1 || $input === 0 ||  $input === '1' || $input === '0' );
 	}
 	
 	/**
@@ -392,7 +392,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_major( $input_day, $input_month, $input_year ) {
-		if ( !is_date( $input_day, $input_month, $input_year ) ) {
+		if ( !self::is_date( $input_day, $input_month, $input_year ) ) {
 			return FALSE;
 		}
 		$today_day = date('j');
