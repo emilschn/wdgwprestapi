@@ -359,6 +359,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_day( $input ) {
+		$input = str_replace( ' ', '', $input );
 		return ( self::is_number_positive_integer( $input ) && ( $input <= 31 ) );
 	}
 	
@@ -368,6 +369,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_month( $input ) {
+		$input = str_replace( ' ', '', $input );
 		return ( self::is_number_positive_integer( $input ) && ( $input <= 12 ) );
 	}
 	
@@ -377,6 +379,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_year( $input ) {
+		$input = str_replace( ' ', '', $input );
 		return self::is_number_integer( $input );
 	}
 	
@@ -441,7 +444,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_minimum_amount( $input ) {
-		return ( self::is_number_positive_integer( $input ) && $input >= self::$minimum_amount );
+		return ( self::is_number_positive( $input ) && $input >= self::$minimum_amount );
 	}
 	
 	/**

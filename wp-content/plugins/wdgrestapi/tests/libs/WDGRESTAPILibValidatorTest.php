@@ -444,7 +444,7 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 	public function urlProvider() {
 		return [
 			'url as string'					=> [ 'url', FALSE ],
-			'http://url as string'			=> [ 'http://url', FALSE ],
+			'http://url as string'			=> [ 'http://url', TRUE ],
 			'http://url.fr as string'		=> [ 'http://url.fr', TRUE ],
 			'https://url.fr as string'		=> [ 'https://url.fr', TRUE ],
 			'http://www.url.fr as string'	=> [ 'http://www.url.fr', TRUE ],
