@@ -316,7 +316,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_email( $input ) {
-		return is_email( $input );
+		return filter_var( $input, FILTER_VALIDATE_EMAIL );
 	}
 	
 	/**
