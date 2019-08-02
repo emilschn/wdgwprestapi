@@ -16,7 +16,7 @@ class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
 			'1 as int'				=> [ 1, TRUE ],
 			'0 as string'			=> [ '0', TRUE ],
 			'0 as int'				=> [ 0, TRUE ],
-			'1.0 as float'			=> [ 1.0, TRUE ],
+			'1.0 as float'			=> [ 1.0, FALSE ],
 			'1.0 as string'			=> [ '1.0', FALSE ],
 			'one as string'			=> [ 'one', FALSE ],
 			'zero as string'		=> [ 'zero', FALSE ],
