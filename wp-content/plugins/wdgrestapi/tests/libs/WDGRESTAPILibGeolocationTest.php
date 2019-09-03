@@ -12,6 +12,7 @@ require_once dirname( __FILE__ ) . '/../../libs/geolocation.php';
 class WDGRESTAPILibGeolocationTest extends PHPUnit_Framework_TestCase {
 
 	public function testgetGeolocationData() {
+		wp_initial_constants();
 		wp_start_object_cache();
 
 		$this->assertEmpty( WDGRESTAPI_Lib_Geolocation::get_geolocation_data( '' ) );
