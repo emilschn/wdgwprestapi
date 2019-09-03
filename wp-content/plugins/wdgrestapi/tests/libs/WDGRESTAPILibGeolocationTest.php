@@ -1,7 +1,7 @@
 <?php
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/load.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/plugin.php';
-require_once dirname( __FILE__ ) . '/../../../../../wp-includes/options.php';
+require_once dirname( __FILE__ ) . '/../../../../../wp-includes/option.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/http.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/default-constants.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/class-wp-error.php';
