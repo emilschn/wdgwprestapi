@@ -3,7 +3,7 @@ require_once dirname( __FILE__ ) . '/../../libs/logs.php';
 
 class WDGRESTAPILibLogsTest extends PHPUnit_Framework_TestCase {
 
-	public function testlog( $value, $expected ) {
+	public function testlog() {
 		$this->assertFalse( WDGRESTAPI_Lib_Logs::log( 'coucou', WDGRESTAPI_Entity_Log::$entity_type ) );
 
 		WDGRESTAPI_Lib_Logs::log( 'coucou' );
