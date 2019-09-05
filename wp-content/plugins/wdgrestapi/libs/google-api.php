@@ -6,7 +6,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	public static function init_client() {
 		if ( is_null( self::$client ) ) {
 			if ( !defined( 'WDG_GOOGLEDOCS_KEY_FILE' ) ) {
-				return;
+				return FALSE;
 			}
 
 			$private_key = file_get_contents( __DIR__ . '/../../../../' . WDG_GOOGLEDOCS_KEY_FILE );
@@ -107,7 +107,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 
 	public static function set_values( $sheet_id, $row_index, $row_data ) {
 		if ( defined( 'WDG_DEV' ) ) {
-			return;
+			return FALSE;
 		}
 		self::init_client();
 		if ( empty( self::$client ) ) {
