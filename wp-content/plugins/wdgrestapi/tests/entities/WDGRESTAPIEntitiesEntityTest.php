@@ -56,7 +56,7 @@ class WDGRESTAPIEntitiesEntityTest extends PHPUnit_Framework_TestCase {
 
 	public function testmakeUID() {
 		$test_uid = WDGRESTAPI_Entity::make_uid();
-		$this->assertIsString( $test_uid );
+		$this->assertStringMatchesFormat( '%x', $test_uid );
 	}
 
 	public function testsave() {
