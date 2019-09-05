@@ -1,5 +1,6 @@
 <?php
 require_once dirname( __FILE__ ) . '/../../libs/logs.php';
+require_once dirname( __FILE__ ) . '/../../entities/log.php';
 
 class WDGRESTAPILibLogsTest extends PHPUnit_Framework_TestCase {
 
