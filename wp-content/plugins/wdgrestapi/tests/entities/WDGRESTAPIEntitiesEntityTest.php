@@ -9,14 +9,14 @@ class WDGRESTAPIEntitiesEntityTest extends PHPUnit_Framework_TestCase {
 		$loaded_data_empty = json_decode( '{}' );
 
 		$entityTest1 = new WDGRESTAPI_Entity( 1, 'test', array() );
-		$this->assertEquals( $entityTest1->get_loaded_data(), $loaded_data_empty );
+		$this->assertEquals( $loaded_data_empty, $entityTest1->get_loaded_data() );
 
 		$entityTest2 = new WDGRESTAPI_Entity( FALSE, FALSE, FALSE );
-		$this->assertEquals( $entityTest2->get_loaded_data(), $loaded_data_empty );
+		$this->assertEquals( $loaded_data_empty, $entityTest2->get_loaded_data() );
 
 		$entityTest3 = new WDGRESTAPI_Entity( FALSE, FALSE, $db_properties_test );
 		$loaded_data_3 = $entityTest3->get_loaded_data();
-		$this->assertEquals( $loaded_data_3->prop, 'val' );
+		$this->assertFalse( $loaded_data_3->prop );
 
 	}
 
@@ -27,16 +27,16 @@ class WDGRESTAPIEntitiesEntityTest extends PHPUnit_Framework_TestCase {
 		$entityTest3->set_property( 'prop', 'val2' );
 		$entityTest3->set_property( 'prop2', 'val' );
 		$loaded_data_3 = $entityTest3->get_loaded_data();
-		$this->assertEquals( $loaded_data_3->prop, 'val2' );
-		$this->assertEquals( $loaded_data_3->prop2, 'val' );
+		$this->assertEquals( 'val2', $loaded_data_3->prop );
+		$this->assertEquals( 'val', $loaded_data_3->prop2 );
 
 	}
 
 	public function testsetMetadata() {
-		$db_properties_test = array( 'prop' => 'val' );
+		$db_properties_test = array( 'metadata' => array() );
 		$entityTest = new WDGRESTAPI_Entity( FALSE, FALSE, $db_properties_test );
 		$entityTest->set_metadata( 'metaprop', 'metaval' );
-		$this->assertEquals( $entityTest->get_metadata( 'metaprop' ), 'metaval' );
+		$this->assertEquals( 'metaval', $entityTest->get_metadata( 'metaprop' ) );
 
 	}
 
@@ -44,13 +44,13 @@ class WDGRESTAPIEntitiesEntityTest extends PHPUnit_Framework_TestCase {
 		$db_properties_test = array( 'prop' => 'val' );
 
 		$entityTest1 = new WDGRESTAPI_Entity( 1, 'test', array() );
-		$this->assertEquals( $entityTest1->get_properties_errors(), array() );
+		$this->assertEquals( array(), $entityTest1->get_properties_errors() );
 
 		$entityTest2 = new WDGRESTAPI_Entity( FALSE, FALSE, FALSE );
-		$this->assertEquals( $entityTest2->get_properties_errors(), array() );
+		$this->assertEquals( array(), $entityTest2->get_properties_errors() );
 
 		$entityTest3 = new WDGRESTAPI_Entity( FALSE, FALSE, $db_properties_test );
-		$this->assertEquals( $loaded_data_3->get_properties_errors(), array() );
+		$this->assertEquals( array(), $entityTest3->get_properties_errors() );
 
 	}
 
@@ -81,7 +81,7 @@ class WDGRESTAPIEntitiesEntityTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider mysqlToWDGProvider
 	 */
 	public function testgetMySQLTypeFromWDGType( $value, $expected) {
-		$this->assertEquals( WDGRESTAPI_Entity::get_mysqltype_from_wdgtype( $value ), $expected );
+		$this->assertEquals( $expected, WDGRESTAPI_Entity::get_mysqltype_from_wdgtype( $value ) );
 	}
 	
 	public function mysqlToWDGProvider() {

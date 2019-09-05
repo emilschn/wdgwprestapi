@@ -113,7 +113,7 @@ class WDGRESTAPI_Entity {
 		if ( !empty( $current_client ) ) {
 			$current_client_id = $current_client->ID;
 		}
-		$test = $current_client->ID . '-' . time() . '-';
+		$test = $current_client_id . '-' . time() . '-';
 		$buffer = md5( $test );
 		//Test si effectivement unique
 		return $buffer;
