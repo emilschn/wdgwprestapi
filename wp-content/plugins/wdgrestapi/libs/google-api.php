@@ -5,6 +5,10 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	
 	public static function init_client() {
 		if ( is_null( self::$client ) ) {
+			if ( !defined( 'WDG_GOOGLEDOCS_KEY_FILE' ) ) {
+				return;
+			}
+
 			$private_key = file_get_contents( __DIR__ . '/../../../../' . WDG_GOOGLEDOCS_KEY_FILE );
 			if ( empty( $private_key ) ) {
 				return FALSE;
