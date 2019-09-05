@@ -5,8 +5,12 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	
 	public static function init_client() {
 		if ( is_null( self::$client ) ) {
-			require_once 'google-api-php-client/src/Google/autoload.php';
 			$private_key = file_get_contents( __DIR__ . '/../../../../' . WDG_GOOGLEDOCS_KEY_FILE );
+			if ( empty( $private_key ) ) {
+				return FALSE;
+			}
+
+			require_once 'google-api-php-client/src/Google/autoload.php';
 			$data = json_decode( $private_key );
 
 			$scopes = array( Google_Service_Sheets::SPREADSHEETS );
@@ -34,7 +38,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 				$row_data[ $index - 1 ] = strval( $data_value );
 			}
 		}
-		self::set_values( 'PROJECTS', $id + 1, $row_data );
+		return self::set_values( 'PROJECTS', $id + 1, $row_data );
 	}
 	
 	public static function set_user_values( $id, $data ) {
@@ -46,7 +50,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 				$row_data[ $index - 1 ] = strval( $data_value );
 			}
 		}
-		self::set_values( 'USERS', $id + 1, $row_data );
+		return self::set_values( 'USERS', $id + 1, $row_data );
 	}
 	
 	public static function set_organization_values( $id, $data ) {
@@ -58,7 +62,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 				$row_data[ $index - 1 ] = strval( $data_value );
 			}
 		}
-		self::set_values( 'ORGANIZATIONS', $id + 1, $row_data );
+		return self::set_values( 'ORGANIZATIONS', $id + 1, $row_data );
 	}
 	
 	public static function set_investment_contract_values( $id, $data ) {
@@ -70,7 +74,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 				$row_data[ $index - 1 ] = strval( $data_value );
 			}
 		}
-		self::set_values( 'CONTRACTS', $id + 1, $row_data );
+		return self::set_values( 'CONTRACTS', $id + 1, $row_data );
 	}
 	
 	public static function set_declaration_values( $id, $data ) {
@@ -82,7 +86,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 				$row_data[ $index - 1 ] = strval( $data_value );
 			}
 		}
-		self::set_values( 'DECLARATIONS', $id + 1, $row_data );
+		return self::set_values( 'DECLARATIONS', $id + 1, $row_data );
 	}
 	
 	public static function set_poll_values( $id, $data ) {
@@ -94,7 +98,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 				$row_data[ $index - 1 ] = strval( $data_value );
 			}
 		}
-		self::set_values( 'POLLS', $id + 1, $row_data );
+		return self::set_values( 'POLLS', $id + 1, $row_data );
 	}
 
 	public static function set_values( $sheet_id, $row_index, $row_data ) {
@@ -102,6 +106,9 @@ class WDGRESTAPI_Lib_GoogleAPI {
 			return;
 		}
 		self::init_client();
+		if ( empty( self::$client ) ) {
+			return FALSE;
+		}
 		$service = new Google_Service_Sheets( self::$client );
 		$spreadsheetid = WDG_SPREADSHEETS_STATS_ID;
 		$range = $sheet_id . "!A" .$row_index. ":BZ" .$row_index;
