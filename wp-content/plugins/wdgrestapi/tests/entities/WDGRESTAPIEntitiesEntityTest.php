@@ -23,12 +23,12 @@ class WDGRESTAPIEntitiesEntityTest extends PHPUnit_Framework_TestCase {
 	public function testsetProperty() {
 		$db_properties_test = array( 'prop' => 'val' );
 
-		$entityTest3 = new WDGRESTAPI_Entity( FALSE, FALSE, $db_properties_test );
-		$entityTest3->set_property( 'prop', 'val2' );
-		$entityTest3->set_property( 'prop2', 'val' );
-		$loaded_data_3 = $entityTest3->get_loaded_data();
-		$this->assertEquals( 'val2', $loaded_data_3->prop );
-		$this->assertEquals( 'val', $loaded_data_3->prop2 );
+		$entityTest = new WDGRESTAPI_Entity( FALSE, FALSE, $db_properties_test );
+		$entityTest->set_property( 'prop', 'val2' );
+		$entityTest->set_property( 'prop2', 'val' );
+		$loaded_data = $entityTest->get_loaded_data();
+		$this->assertEquals( 'val2', $loaded_data->prop );
+		$this->assertEquals( 'val', $loaded_data->prop2 );
 
 	}
 
