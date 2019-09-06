@@ -1,4 +1,5 @@
 <?php
+require_once dirname( __FILE__ ) . '/../../../../../wp-includes/plugin.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/rest-api.php';
 require_once dirname( __FILE__ ) . '/../../../restapi-user-basic-access/classes/authentication.php';
 require_once dirname( __FILE__ ) . '/../../entities/entity.php';
