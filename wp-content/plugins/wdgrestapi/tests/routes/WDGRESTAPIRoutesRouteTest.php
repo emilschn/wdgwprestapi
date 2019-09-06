@@ -42,7 +42,8 @@ class WDGRESTAPIRoutesRouteTest extends PHPUnit_Framework_TestCase {
 		$array_authorized_ids_test = array( '0' );
 		$routeTest = new WDGRESTAPI_Route();
 		$result_authorized_ids = $routeTest->get_current_client_authorized_ids();
-		$this->assertIsArray( $result_authorized_ids );
+		// assertIsArray non fonctionnel sur codeship ?
+		$this->assertCount( 1, $result_authorized_ids );
 		$this->assertSame( $array_authorized_ids_test, $result_authorized_ids );
 	}
 	
@@ -50,6 +51,7 @@ class WDGRESTAPIRoutesRouteTest extends PHPUnit_Framework_TestCase {
 		$array_authorized_ids_test = '(0)';
 		$routeTest = new WDGRESTAPI_Route();
 		$result_authorized_ids_string = $routeTest->get_current_client_autorized_ids_string();
+		// assertIsString non fonctionnel sur codeship ?
 		$this->assertStringMatchesFormat( '%s', $result_authorized_ids_string );
 		$this->assertSame( $array_authorized_ids_test, $result_authorized_ids_string );
 	}
