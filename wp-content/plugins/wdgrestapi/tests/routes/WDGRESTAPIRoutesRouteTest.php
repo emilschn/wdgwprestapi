@@ -1,10 +1,13 @@
 <?php
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/plugin.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/rest-api.php';
+require_once dirname( __FILE__ ) . '/../../../../../wp-includes/rest-api/class-wp-rest-server.php';
+require_once dirname( __FILE__ ) . '/../../../../../wp-includes/rest-api/endpoints/class-wp-rest-controller.php';
+
 require_once dirname( __FILE__ ) . '/../../../restapi-user-basic-access/classes/authentication.php';
+
 require_once dirname( __FILE__ ) . '/../../entities/entity.php';
 require_once dirname( __FILE__ ) . '/../../entities/log.php';
-require_once dirname( __FILE__ ) . '/../../../../../wp-includes/rest-api/endpoints/class-wp-rest-controller.php';
 require_once dirname( __FILE__ ) . '/../../routes/route.php';
 
 class WDGRESTAPIRoutesRouteTest extends PHPUnit_Framework_TestCase {
