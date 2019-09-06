@@ -1,6 +1,15 @@
 <?php
+require_once dirname( __FILE__ ) . '/../../../../../wp-includes/load.php';
+require_once dirname( __FILE__ ) . '/../../../../../wp-includes/default-constants.php';
+wp_initial_constants();
+
+require_once dirname( __FILE__ ) . '/../../../../../wp-load.php';
+
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/functions.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/plugin.php';
+require_once dirname( __FILE__ ) . '/../../../../../wp-includes/cache.php';
+wp_start_object_cache();
+
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/rest-api.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/rest-api/class-wp-rest-server.php';
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/rest-api/endpoints/class-wp-rest-controller.php';
