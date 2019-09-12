@@ -11,7 +11,9 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 */
 	public function save() {
 		$buffer = parent::save();
-		WDGRESTAPI_Lib_GoogleAPI::set_user_values( $this->loaded_data->id, $this->loaded_data );
+		if ( !empty( $this->loaded_data->id ) ) {
+			WDGRESTAPI_Lib_GoogleAPI::set_user_values( $this->loaded_data->id, $this->loaded_data );
+		}
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/users' );
 		return $buffer;
 	}
@@ -75,7 +77,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	public function get_investment_contracts() {
-		$buffer = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
+		$buffer = FALSE;
+		if ( !empty( $this->loaded_data->id ) ) {
+			$buffer = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
+		}
 		return $buffer;
 	}
 	
@@ -84,7 +89,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	public function get_rois() {
-		$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_user );
+		$buffer = FALSE;
+		if ( !empty( $this->loaded_data->id ) ) {
+			$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_user );
+		}
 		return $buffer;
 	}
 	
@@ -248,7 +256,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		if ( empty( $buffer ) ) {
 			return $buffer;
 		}
-		
+
 		$buffer->investors_count = 0;
 		$buffer->investors_multi_count = 0;
 		
