@@ -24,10 +24,10 @@ class WDGRESTAPILibGeolocationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEmpty( WDGRESTAPI_Lib_Geolocation::get_geolocation_data( '' ) );
 		
 		$geoloc_rubbish = WDGRESTAPI_Lib_Geolocation::get_geolocation_data( 'blabliblou blabliblou' );
-		$this->assertEquals( TRUE, is_wp_error( $geoloc_rubbish ) );
+		$this->assertTrue( is_wp_error( $geoloc_rubbish ) );
 
 		$geoloc_existing = WDGRESTAPI_Lib_Geolocation::get_geolocation_data( '1 place de la bourse 44000 Nantes' );
-		$this->assertEquals( TRUE, ( isset( $geoloc_existing[ 'lat' ] ) && isset( $geoloc_existing[ 'long' ] ) ) );
+		$this->assertTrue( ( isset( $geoloc_existing[ 'lat' ] ) && isset( $geoloc_existing[ 'long' ] ) ) );
 	}
 	
 }

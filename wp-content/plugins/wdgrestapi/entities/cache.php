@@ -7,10 +7,12 @@ class WDGRESTAPI_Entity_Cache extends WDGRESTAPI_Entity {
 		
 		if ( empty( $id ) && !empty( $name ) ) {
 			global $wpdb;
-			$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
-			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-			$query = "SELECT * FROM " .$table_name. " WHERE name='" .$name. "' AND caller=" .$current_client->ID;
-			$this->loaded_data = $wpdb->get_row( $query );
+			if ( isset( $wpdb ) ) {
+				$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
+				$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+				$query = "SELECT * FROM " .$table_name. " WHERE name='" .$name. "' AND caller=" .$current_client->ID;
+				$this->loaded_data = $wpdb->get_row( $query );
+			}
 		}
 	}
 	
@@ -26,7 +28,9 @@ class WDGRESTAPI_Entity_Cache extends WDGRESTAPI_Entity {
 		$current_date = new DateTime();
 		$this->set_property( 'date', $current_date->format( 'Y-m-d H:i:s' ) );
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		$this->set_property( 'caller', $current_client->ID );
+		if ( !empty( $current_client ) ) {
+			$this->set_property( 'caller', $current_client->ID );
+		}
 		parent::save();
 	}
 	
