@@ -7,6 +7,7 @@ require_once dirname( __FILE__ ) . '/../../entities/user.php';
 require_once dirname( __FILE__ ) . '/../../entities/investment-contract.php';
 require_once dirname( __FILE__ ) . '/../../entities/roi.php';
 require_once dirname( __FILE__ ) . '/../../entities/cache.php';
+require_once dirname( __FILE__ ) . '/../../entities/log.php';
 
 class WDGRESTAPIEntitiesUserTest extends PHPUnit_Framework_TestCase {
 
