@@ -206,6 +206,10 @@ class WDGRESTAPI_Entity {
 		$buffer = '';
 		
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		if ( empty( $current_client ) ) {
+			return FALSE;
+		}
+
 		$ref_client_url = $current_client->user_url;
 		$route = '/connexion';
 		$params = '?action=' .$action. '&param=' .urlencode( $param );
@@ -245,6 +249,9 @@ class WDGRESTAPI_Entity {
 	 */
 	protected static function post_data_on_client_site( $action, $param, $posted_params ) {
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		if ( empty( $current_client ) ) {
+			return FALSE;
+		}
 		$ref_client_url = $current_client->user_url;
 		$route = '/connexion';
 		$params = '?action=' .$action. '&param=' .urlencode( $param );

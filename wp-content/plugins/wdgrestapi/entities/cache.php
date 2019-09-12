@@ -64,6 +64,9 @@ class WDGRESTAPI_Entity_Cache extends WDGRESTAPI_Entity {
 	
 	public static function delete_by_name_like( $like_pattern ) {
 		global $wpdb;
+		if ( !isset( $wpdb ) ) {
+			return FALSE;
+		}
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Cache::$entity_type );
 		$wpdb->query( 
 			$wpdb->prepare( 

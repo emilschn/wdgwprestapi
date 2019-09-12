@@ -41,6 +41,9 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 	
 	public static function list_get_by_investor( $user_id, $user_type ) {
 		global $wpdb;
+		if ( !isset( $wpdb ) ) {
+			return array();
+		}
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT * FROM " .$table_name. " WHERE investor_id = " .$user_id. " AND investor_type='" .$user_type. "'";
 		$results = $wpdb->get_results( $query );
