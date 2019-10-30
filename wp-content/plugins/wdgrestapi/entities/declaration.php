@@ -71,7 +71,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	public static function list_get( $authorized_client_id_string, $start_date = FALSE, $end_date = FALSE, $type = FALSE  ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
-		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, percent_commission_without_tax, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		$result_list = $wpdb->get_results( $query );
 		
 		if ( !empty( $start_date ) ) {
@@ -107,7 +107,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
-		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE id_project = " .$project_id;
+		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, percent_commission_without_tax, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE id_project = " .$project_id;
 		$results = $wpdb->get_results( $query );
 		if ( $is_data_restricted_to_entity ) {
 			return $results;
@@ -149,6 +149,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 			'amount'					=> $result->amount,
 			'remaining_amount'			=> $result->remaining_amount,
 			'transfered_previous_remaining_amount'			=> $result->transfered_previous_remaining_amount,
+			'percent_commission_without_tax'				=> $result->percent_commission_without_tax,
 			'percent_commission'		=> $result->percent_commission,
 			'status'					=> $result->status,
 			'mean_payment'				=> $result->mean_payment,
@@ -258,6 +259,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		'remaining_amount'		=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 7 ),
 		'transfered_previous_remaining_amount'	=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 8 ),
 		'percent_commission'	=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 9 ),
+		'percent_commission_without_tax'		=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 9 ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 10 ),
 		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 11 ),
 		'payment_token'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
