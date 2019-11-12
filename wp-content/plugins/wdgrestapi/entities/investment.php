@@ -28,6 +28,11 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		}
 	}
 	
+	public function save() {
+		parent::save();
+		WDGRESTAPI_Lib_GoogleAPI::set_investment_values( $this->loaded_data->id, $this->loaded_data );
+	}
+	
 	/**
 	 * Renvoie true si les données qui ont été transmises sont correctes
 	 * @return boolean
@@ -356,32 +361,32 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
  ******************************************************************************/
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
-		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
+		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
 		'wpref'					=> array( 'type' => 'id', 'other' => '' ),
 		'token'					=> array( 'type' => 'uid', 'other' => 'NOT NULL' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		
-		'user_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'user_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 3 ),
 		'user_wpref'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gender'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'firstname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'lastname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
-		'nationality'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'nationality'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 10 ),
 		'birthday_day'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_month'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_year'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_city'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'age'					=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'age'					=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 7 ),
 		
 		'address'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 8 ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 9 ),
 		'phone_number'			=> array( 'type' => 'varchar', 'other' => '' ),
 		
-		'is_legal_entity'			=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
+		'is_legal_entity'			=> array( 'type' => 'bool', 'other' => 'NOT NULL', 'gs_col_index' => 4 ),
 		'legal_entity_form'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'legal_entity_id'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'legal_entity_rcs'			=> array( 'type' => 'varchar', 'other' => '' ),
@@ -391,15 +396,15 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'legal_entity_city'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'legal_entity_nationality'	=> array( 'type' => 'varchar', 'other' => '' ),
 		
-		'project'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
-		'amount'				=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'project'				=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
+		'amount'				=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 6 ),
 		'cents_with_royalties'	=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'redirect_url_ok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'redirect_url_nok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'notification_url'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'contract_url'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
-		'invest_datetime'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
+		'invest_datetime'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL', 'gs_col_index' => 5 ),
 		'is_preinvestment'		=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		
 		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),

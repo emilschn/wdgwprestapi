@@ -96,6 +96,18 @@ class WDGRESTAPI_Lib_GoogleAPI {
 		}
 		self::set_values( 'POLLS', $id + 1, $row_data );
 	}
+	
+	public static function set_investment_values( $id, $data ) {
+		$row_data = array();
+		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
+		foreach ( $data as $data_name => $data_value ) {
+			if ( isset( WDGRESTAPI_Entity_Investment::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Investment::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
+				$index = WDGRESTAPI_Entity_Investment::$db_properties[ $data_name ][ 'gs_col_index' ];
+				$row_data[ $index - 1 ] = strval( $data_value );
+			}
+		}
+		self::set_values( 'INVESTMENTS', $id + 1, $row_data );
+	}
 
 	public static function set_values( $sheet_id, $row_index, $row_data ) {
 		if ( defined( 'WDG_DEV' ) ) {
