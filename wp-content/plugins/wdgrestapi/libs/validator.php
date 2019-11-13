@@ -268,7 +268,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_boolean( $input ) {
-		return ( $input === 1 || $input === 0 );
+		return ( $input === 1 || $input === 0 ||  $input === '1' || $input === '0' );
 	}
 	
 	/**
@@ -277,7 +277,17 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number( $input ) {
-		return ( is_numeric( $input ) || ( $input == 0 ) );
+		if ( is_bool( $input ) ) {
+			return FALSE;
+		}
+		$input = str_replace( ' ', '', $input );
+		if ( $input == (string) (float) $input ) {
+			return is_numeric( $input );
+		}
+		if ( $input >= 0 && is_string( $input ) && !is_float( $input ) ) {
+			return ctype_digit( $input );
+		}
+		return is_numeric( $input );
 	}
 	
 	/**
@@ -286,7 +296,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number_positive( $input ) {
-		return ( $input > 0 );
+		return ( self::is_number( $input ) && $input > 0 );
 	}
 	
 	/**
@@ -295,7 +305,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number_integer( $input ) {
-		return ( ctype_digit( strval( $input ) ) );
+		return ( self::is_number( $input ) && $input == round( $input ) );
 	}
 	
 	/**
@@ -304,7 +314,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_number_positive_integer( $input ) {
-		return ( WDGRESTAPI_Lib_Validator::is_number_positive( $input ) && WDGRESTAPI_Lib_Validator::is_number_integer( $input ) );
+		return ( self::is_number_positive( $input ) && self::is_number_integer( $input ) );
 	}
 
 	/**
@@ -313,7 +323,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_email( $input ) {
-		return is_email( $input );
+		return ( filter_var( $input, FILTER_VALIDATE_EMAIL ) !== FALSE );
 	}
 	
 	/**
@@ -322,7 +332,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_name( $input ) {
-		return !empty( $input );
+		return !empty( $input ) && !is_bool( $input ) && !self::is_number( $input ) && !self::is_email( $input );
 	}
 	
 	/**
@@ -331,7 +341,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_gender( $input ) {
-		return ( $input == "male" || $input == "female" );
+		return ( $input === "male" || $input === "female" );
 	}
 	
 	/**
@@ -340,7 +350,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_country_iso_code( $input ) {
-		return !empty( $input ) && isset( WDGRESTAPI_Lib_Validator::$country_list[ $input ] );
+		return !empty( $input ) && isset( WDGRESTAPI_Lib_Validator::$country_list[ strtoupper( $input ) ] );
 	}
 	
 	/**
@@ -349,7 +359,11 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_day( $input ) {
-		return ( is_numeric( $input ) && ( $input <= 31 ) );
+		if ( !self::is_number_positive_integer( $input ) ) {
+			return FALSE;
+		}
+		$input = str_replace( ' ', '', $input );
+		return ( $input <= 31 );
 	}
 	
 	/**
@@ -358,7 +372,11 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_month( $input ) {
-		return ( is_numeric( $input ) && ( $input <= 12 ) );
+		if ( !self::is_number_positive_integer( $input ) ) {
+			return FALSE;
+		}
+		$input = str_replace( ' ', '', $input );
+		return ( $input <= 12 );
 	}
 	
 	/**
@@ -367,7 +385,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date_year( $input ) {
-		return is_numeric( $input ) && is_int( $input );
+		return self::is_number_integer( $input );
 	}
 	
 	/**
@@ -378,6 +396,9 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_date( $input_day, $input_month, $input_year ) {
+		if ( !self::is_number_integer( $input_day ) || !self::is_number_integer( $input_month ) || !self::is_number_integer( $input_year ) ) {
+			return FALSE;
+		}
 		return checkdate( $input_month, $input_day, $input_year );
 	}
 	
@@ -389,6 +410,9 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_major( $input_day, $input_month, $input_year ) {
+		if ( !self::is_date( $input_day, $input_month, $input_year ) ) {
+			return FALSE;
+		}
 		$today_day = date('j');
 		$today_month = date('n');
 		$today_year = date('Y');
@@ -412,6 +436,10 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_postalcode( $input, $input_country ) {
+		$input = str_replace( ' ', '', $input );
+		if ( $input_country == 'FR' && strlen( $input ) == 4 ) {
+			$input = '0' . $input;
+		}
 		return ( $input_country != 'FR' || preg_match( '#^[0-9]{5}$#', $input ) );
 	}
 	
@@ -421,7 +449,7 @@ class WDGRESTAPI_Lib_Validator {
 	 * @return boolean
 	 */
 	public static function is_minimum_amount( $input ) {
-		return ( $input >= WDGRESTAPI_Lib_Validator::$minimum_amount );
+		return ( self::is_number_positive( $input ) && $input >= self::$minimum_amount );
 	}
 	
 	/**
@@ -443,7 +471,15 @@ class WDGRESTAPI_Lib_Validator {
 		$countries = array('al'=>28,'ad'=>24,'at'=>20,'az'=>28,'bh'=>22,'be'=>16,'ba'=>20,'br'=>29,'bg'=>22,'cr'=>21,'hr'=>21,'cy'=>28,'cz'=>24,'dk'=>18,'do'=>28,'ee'=>20,'fo'=>18,'fi'=>18,'fr'=>27,'ge'=>22,'de'=>22,'gi'=>23,'gr'=>27,'gl'=>18,'gt'=>28,'hu'=>28,'is'=>26,'ie'=>22,'il'=>23,'it'=>27,'jo'=>30,'kz'=>20,'kw'=>30,'lv'=>21,'lb'=>28,'li'=>21,'lt'=>20,'lu'=>20,'mk'=>19,'mt'=>31,'mr'=>27,'mu'=>30,'mc'=>27,'md'=>24,'me'=>22,'nl'=>18,'no'=>15,'pk'=>24,'ps'=>29,'pl'=>28,'pt'=>25,'qa'=>29,'ro'=>24,'sm'=>27,'sa'=>24,'rs'=>22,'sk'=>24,'si'=>19,'es'=>24,'se'=>24,'ch'=>21,'tn'=>24,'tr'=>26,'ae'=>23,'gb'=>22,'vg'=>24);
 		$chars = array('a'=>10,'b'=>11,'c'=>12,'d'=>13,'e'=>14,'f'=>15,'g'=>16,'h'=>17,'i'=>18,'j'=>19,'k'=>20,'l'=>21,'m'=>22,'n'=>23,'o'=>24,'p'=>25,'q'=>26,'r'=>27,'s'=>28,'t'=>29,'u'=>30,'v'=>31,'w'=>32,'x'=>33,'y'=>34,'z'=>35);
 
-		if ( strlen($iban) == $countries[ substr( $iban, 0, 2 ) ] ) {
+		if ( strlen( $iban ) < 2 ) {
+			return FALSE;
+		}
+		$country_key = substr( $iban, 0, 2 );
+		if ( !array_key_exists( $country_key, $countries ) ) {
+			return FALSE;
+		}
+
+		if ( strlen($iban) == $countries[ $country_key ] ) {
 			$moved_char = substr( $iban, 4 ).substr( $iban, 0, 4 );
 			$moved_char_array = str_split( $moved_char );
 			$new_string = "";

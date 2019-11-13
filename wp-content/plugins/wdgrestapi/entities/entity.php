@@ -13,22 +13,34 @@ class WDGRESTAPI_Entity {
 		$this->loaded_data = json_decode('{}');
 		
 		// Si un id est passé, on construit à partir de la base de données
-		if ( $id != FALSE ) {
-			global $wpdb;
-			$table_name = WDGRESTAPI_Entity::get_table_name( $entity_type );
-			$query = 'SELECT * FROM ' .$table_name. ' WHERE id='.$id;
-			$this->loaded_data = $wpdb->get_row( $query );
+		if ( !empty( $id ) && !empty( $entity_type ) ) {
+			$this->init_loaded_data( $id, $entity_type );
 		
 		// Sinon, on initialise avec les différents champs
 		} else {
 			
-			foreach ($db_properties as $db_key => $db_property) {
-				if ( $db_key != 'unique_key' && $db_key != 'id' ) {
-					$this->loaded_data->$db_key = FALSE;
+			if ( !empty( $db_properties ) ) {
+				foreach ( $db_properties as $db_key => $db_property ) {
+					if ( $db_key != 'unique_key' && $db_key != 'id' ) {
+						$this->loaded_data->$db_key = FALSE;
+					}
 				}
 			}
 			
 		}
+	}
+
+	/**
+	 * Initialise les données de l'entité à partir des données en base de données
+	 */
+	private function init_loaded_data( $id, $entity_type ) {
+		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
+		$table_name = WDGRESTAPI_Entity::get_table_name( $entity_type );
+		$query = 'SELECT * FROM ' .$table_name. ' WHERE id='.$id;
+		$this->loaded_data = $wpdb->get_row( $query );
 	}
 	
 	/**
@@ -69,14 +81,6 @@ class WDGRESTAPI_Entity {
 		}
 		return $buffer;
 	}
-	
-	/**
-	 * Retourne le tableau des erreurs constatées sur les propriétés
-	 * @return array
-	 */
-	public function get_properties_errors() {
-		return $this->properties_errors;
-	}
 
 	/**
 	 * Pour les entités qui ont un champ metadata, met à jour la valeur d'une des metadata
@@ -95,9 +99,21 @@ class WDGRESTAPI_Entity {
 		}
 	}
 	
-	public function make_uid() {
+	/**
+	 * Retourne le tableau des erreurs constatées sur les propriétés
+	 * @return array
+	 */
+	public function get_properties_errors() {
+		return $this->properties_errors;
+	}
+	
+	public static function make_uid() {
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		$test = $current_client->ID . '-' . time() . '-';
+		$current_client_id = '0';
+		if ( !empty( $current_client ) ) {
+			$current_client_id = $current_client->ID;
+		}
+		$test = $current_client_id . '-' . time() . '-';
 		$buffer = md5( $test );
 		//Test si effectivement unique
 		return $buffer;
@@ -108,6 +124,9 @@ class WDGRESTAPI_Entity {
 	 */
 	public function save() {
 		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
 		$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
 		
 		// Préparation de toutes les propriétés
@@ -163,6 +182,9 @@ class WDGRESTAPI_Entity {
 	 */
 	public function delete() {
 		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
 		$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
 		$where_properties = array(
 			'id'	=> $this->loaded_data->id
@@ -184,6 +206,10 @@ class WDGRESTAPI_Entity {
 		$buffer = '';
 		
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		if ( empty( $current_client ) ) {
+			return FALSE;
+		}
+
 		$ref_client_url = $current_client->user_url;
 		$route = '/connexion';
 		$params = '?action=' .$action. '&param=' .urlencode( $param );
@@ -223,6 +249,9 @@ class WDGRESTAPI_Entity {
 	 */
 	protected static function post_data_on_client_site( $action, $param, $posted_params ) {
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		if ( empty( $current_client ) ) {
+			return FALSE;
+		}
 		$ref_client_url = $current_client->user_url;
 		$route = '/connexion';
 		$params = '?action=' .$action. '&param=' .urlencode( $param );
@@ -256,6 +285,9 @@ class WDGRESTAPI_Entity {
 	 */
 	public static function upgrade_entity_db( $entity_type, $db_properties ) {
 		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
 		$charset_collate = $wpdb->get_charset_collate();
 		$table_name = WDGRESTAPI_Entity::get_table_name( $entity_type );
 		
@@ -296,6 +328,9 @@ class WDGRESTAPI_Entity {
 	 */
 	public static function get_table_name( $entity_type ) {
 		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
 		return $wpdb->prefix . 'entity_' . $entity_type;
 	}
 	

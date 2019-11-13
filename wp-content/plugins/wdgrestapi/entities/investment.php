@@ -122,7 +122,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 				array_push( $this->properties_errors, __( "Le champ Forme légale (legal_entity_form) n'est pas correct.", 'wdgrestapi' ) );
 				$buffer = false;
 			}
-			if ( !WDGRESTAPI_Lib_Validator::is_name( $this->loaded_data->legal_entity_id ) ) {
+			if ( !empty( $this->loaded_data->legal_entity_id ) ) {
 				array_push( $this->properties_errors, __( "Le champ Numéro SIREN (legal_entity_id) n'est pas correct.", 'wdgrestapi' ) );
 				$buffer = false;
 			}

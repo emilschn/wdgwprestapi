@@ -42,6 +42,9 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 	 */
 	public static function list_get_by_recipient_id( $recipient_id, $recipient_type = 'user' ) {
 		global $wpdb;
+		if ( !isset( $wpdb ) ) {
+			return array();
+		}
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ROI::$entity_type );
 		$query = "SELECT id, id_investment, id_investment_contract, id_project, id_orga, id_user, recipient_type, id_declaration, date_transfer, amount, id_transfer, status FROM " .$table_name. " WHERE id_user = " .$recipient_id. " AND recipient_type = '" .$recipient_type. "' ORDER BY date_transfer ASC";
 		$results = $wpdb->get_results( $query );

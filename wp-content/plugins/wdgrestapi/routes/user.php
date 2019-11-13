@@ -125,7 +125,10 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$input_with_links = filter_input( INPUT_GET, 'with_links' );
 		
-		$user_id = $request->get_param( 'id' );
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
 			$loaded_data = $user_item->get_loaded_data( ( $input_with_links == '1' ) );
@@ -152,7 +155,10 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return object
 	 */
 	public function single_get_royalties( WP_REST_Request $request ) {
-		$user_email = $request->get_param( 'email' );
+		$user_email = FALSE;
+		if ( !empty( $request ) ) {
+			$user_email = $request->get_param( 'email' );
+		}
 		if ( !empty( $user_email ) ) {
 			$royalties_data = WDGRESTAPI_Entity_User::get_royalties_data( $user_email );
 			$this->log( "WDGRESTAPI_Route_User::single_get_royalties::" . $user_email, json_encode( $royalties_data ) );
@@ -172,9 +178,15 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	public function single_create( WP_REST_Request $request ) {
 		$user_item = new WDGRESTAPI_Entity_User();
 		$this->set_posted_properties( $user_item, WDGRESTAPI_Entity_User::$db_properties );
+
+		$current_client_id = 0;
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		$user_item->set_property( 'client_user_id', $current_client->ID );
+		if ( !empty( $current_client ) ) {
+			$current_client_id = $current_client->ID;
+		}
+		$user_item->set_property( 'client_user_id', $current_client_id );
 		$user_item->save();
+
 		$reloaded_data = $user_item->get_loaded_data();
 		$this->log( "WDGRESTAPI_Route_User::single_create", json_encode( $reloaded_data ) );
 		return $reloaded_data;
@@ -186,7 +198,10 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return \WP_Error
 	 */
 	public function single_edit( WP_REST_Request $request ) {
-		$user_id = $request->get_param( 'id' );
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
 			$loaded_data = $user_item->get_loaded_data();
@@ -216,7 +231,10 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return \WP_Error
 	 */
 	public function single_edit_email( WP_REST_Request $request ) {
-		$user_email = $request->get_param( 'email' );
+		$user_email = FALSE;
+		if ( !empty( $request ) ) {
+			$user_email = $request->get_param( 'email' );
+		}
 		if ( !empty( $user_email ) ) {
 			$email_data = WDGRESTAPI_Entity_User::update_email( $user_email, $_POST );
 			$this->log( "WDGRESTAPI_Route_User::single_edit_email::" . $user_email, json_encode( $email_data ) );
@@ -234,7 +252,10 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return object
 	 */
 	public function single_get_investment_contracts( WP_REST_Request $request ) {
-		$user_id = $request->get_param( 'id' );
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
 			$loaded_data = $user_item->get_loaded_data();
@@ -262,7 +283,10 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return object
 	 */
 	public function single_get_rois( WP_REST_Request $request ) {
-		$user_id = $request->get_param( 'id' );
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
 			$loaded_data = $user_item->get_loaded_data();
@@ -291,7 +315,10 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return object
 	 */
 	public function single_get_activities( WP_REST_Request $request ) {
-		$user_id = $request->get_param( 'id' );
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
 			$loaded_data = $user_item->get_loaded_data();

@@ -10,9 +10,12 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * Override de la fonction de sauvegarde pour supprimer le cache des listes d'utilisateur
 	 */
 	public function save() {
-		parent::save();
-		WDGRESTAPI_Lib_GoogleAPI::set_user_values( $this->loaded_data->id, $this->loaded_data );
+		$buffer = parent::save();
+		if ( !empty( $this->loaded_data->id ) ) {
+			WDGRESTAPI_Lib_GoogleAPI::set_user_values( $this->loaded_data->id, $this->loaded_data );
+		}
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/users' );
+		return $buffer;
 	}
 	
 	public function get_loaded_data( $with_links = FALSE ) {
@@ -74,7 +77,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	public function get_investment_contracts() {
-		$buffer = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
+		$buffer = FALSE;
+		if ( !empty( $this->loaded_data->id ) ) {
+			$buffer = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
+		}
 		return $buffer;
 	}
 	
@@ -83,7 +89,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	public function get_rois() {
-		$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_user );
+		$buffer = FALSE;
+		if ( !empty( $this->loaded_data->id ) ) {
+			$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_user );
+		}
 		return $buffer;
 	}
 	
@@ -172,6 +181,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 */
 	public static function list_get( $authorized_client_id_string, $offset = 0, $limit = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
 		global $wpdb;
+		if ( !isset( $wpdb ) ) {
+			return FALSE;
+		}
+
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
 		
 		if ( !empty( $input_link_to_project ) ) {
@@ -240,16 +253,24 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 */
 	public static function get_stats() {
 		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_users_stats' );
+		if ( empty( $buffer ) ) {
+			return $buffer;
+		}
+
+		$buffer->investors_count = 0;
+		$buffer->investors_multi_count = 0;
 		
 		global $wpdb;
-		$table_investments = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
-		$count_query = "SELECT COUNT( DISTINCT user_id ) AS nb FROM " .$table_investments;
-		$count_results = $wpdb->get_results( $count_query );
-		$buffer->investors_count = $count_results[ 0 ]->nb;
-		
-		$count_multi_query = "SELECT COUNT( DISTINCT user_id ) AS nb FROM " .$table_investments. " GROUP BY user_id HAVING COUNT( user_id ) > 1";
-		$count_multi_results = $wpdb->get_results( $count_multi_query );
-		$buffer->investors_multi_count = $count_multi_results[ 0 ]->nb;
+		if ( isset( $wpdb ) ) {
+			$table_investments = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
+			$count_query = "SELECT COUNT( DISTINCT user_id ) AS nb FROM " .$table_investments;
+			$count_results = $wpdb->get_results( $count_query );
+			$buffer->investors_count = $count_results[ 0 ]->nb;
+			
+			$count_multi_query = "SELECT COUNT( DISTINCT user_id ) AS nb FROM " .$table_investments. " GROUP BY user_id HAVING COUNT( user_id ) > 1";
+			$count_multi_results = $wpdb->get_results( $count_multi_query );
+			$buffer->investors_multi_count = $count_multi_results[ 0 ]->nb;
+		}
 
 		return $buffer;
 	}

@@ -143,7 +143,7 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 		if ( $investment_item->has_checked_properties() ) {
 			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			$investment_item->set_property( 'client_user_id', $current_client->ID );
-			$investment_item->set_property( 'token', $investment_item->make_uid() );
+			$investment_item->set_property( 'token', WDGRESTAPI_Entity::make_uid() );
 			$investment_item->set_property( 'status', WDGRESTAPI_Entity_Investment::$status_init );
 			$date_expiration = new DateTime();
 			$date_expiration->add( new DateInterval( 'PT1H' ) );

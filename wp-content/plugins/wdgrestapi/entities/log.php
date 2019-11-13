@@ -12,8 +12,12 @@ class WDGRESTAPI_Entity_Log extends WDGRESTAPI_Entity {
 		$current_date = new DateTime();
 		$this->set_property( 'date', $current_date->format( 'Y-m-d H:i:s' ) );
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-		$this->set_property( 'caller', $current_client->ID );
-		parent::save();
+		$current_client_id = '0';
+		if ( !empty( $current_client ) ) {
+			$current_client_id = $current_client->ID;
+		}
+		$this->set_property( 'caller', $current_client_id );
+		return parent::save();
 	}
 	
 	
