@@ -373,17 +373,17 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'firstname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'lastname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
-		'nationality'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 10 ),
+		'nationality'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 11 ),
 		'birthday_day'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_month'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_year'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_city'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'age'					=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 7 ),
+		'age'					=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 8 ),
 		
 		'address'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 8 ),
+		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 9 ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 9 ),
+		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 10 ),
 		'phone_number'			=> array( 'type' => 'varchar', 'other' => '' ),
 		
 		'is_legal_entity'			=> array( 'type' => 'bool', 'other' => 'NOT NULL', 'gs_col_index' => 4 ),
@@ -415,7 +415,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'signature_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'signature_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
-		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 7 ),
 		'token_expiration'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' )
 	);
 	
