@@ -205,7 +205,9 @@ class WDGRESTAPI_Entity {
 			
 			if ( is_array( $remote_result ) && isset( $remote_result[ 'body' ] ) ) {
 				$buffer = $remote_result["body"];
-				$cached_version_entity->save( $params, $buffer );
+				$cached_version_entity->set_name($params);
+				$cached_version_entity->set_value($buffer);
+				$cached_version_entity->save();
 				
 			} else {
 //				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::get_data_on_client_site > error : ' . print_r( $remote_result, TRUE ) );
