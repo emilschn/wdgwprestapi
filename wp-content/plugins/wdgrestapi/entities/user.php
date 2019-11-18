@@ -324,7 +324,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'viadeo_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'activation_key'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'password'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'signup_date'			=> array( 'type' => 'date', 'other' => '' )
+		'signup_date'			=> array( 'type' => 'date', 'other' => '' ),
+		'unsubscribe_royalties_notifications'=> array( 'type' => 'varchar', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd
