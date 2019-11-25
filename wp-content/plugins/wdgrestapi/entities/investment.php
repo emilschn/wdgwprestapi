@@ -12,17 +12,27 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 	public static $status_canceled = 'canceled';
 	public static $status_validated = 'validated';
 	
-	public function __construct( $id = FALSE, $token = FALSE ) {
-		parent::__construct( $id, WDGRESTAPI_Entity_Investment::$entity_type, WDGRESTAPI_Entity_Investment::$db_properties );
+	public function __construct( $id = FALSE, $token = FALSE, $wpref = FALSE ) {
+		parent::__construct( $id, self::$entity_type, self::$db_properties );
 		
-		if ( empty( $id ) && !empty( $token ) ) {
-			global $wpdb;
-			$table_name = WDGRESTAPI_Entity::get_table_name( $this->current_entity_type );
-			$query = "SELECT * FROM " .$table_name. " WHERE token='" .$token. "'";
-			$this->loaded_data = $wpdb->get_row( $query );
+		if ( empty( $id ) ) {
+			
+			if ( !empty( $wpref ) ) {
+				global $wpdb;
+				$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+				$query = "SELECT * FROM " .$table_name. " WHERE wpref=" .$wpref;
+				$this->loaded_data = $wpdb->get_row( $query );
+
+			} else if ( !empty( $token ) ) {
+			   global $wpdb;
+			   $table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+			   $query = "SELECT * FROM " .$table_name. " WHERE token='" .$token. "'";
+			   $this->loaded_data = $wpdb->get_row( $query );
+		   }
+
 		}
 		
-		if ( isset( $this->loaded_data ) && $this->loaded_data->status == WDGRESTAPI_Entity_Investment::$status_init && $this->has_token_expired() ) {
+		if ( !empty( $this->loaded_data ) && $this->loaded_data->status == WDGRESTAPI_Entity_Investment::$status_init && $this->has_token_expired() ) {
 			$this->loaded_data->status = WDGRESTAPI_Entity_Investment::$status_expired;
 			$this->save();
 		}
