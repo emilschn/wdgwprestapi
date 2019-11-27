@@ -151,6 +151,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 4 ),
 		'description'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 5 ),
 		'representative_function'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 6 ),
+		'employees_count'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 26 ),
 		'creation_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'strong_authentication'	=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),

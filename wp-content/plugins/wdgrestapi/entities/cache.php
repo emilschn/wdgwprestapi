@@ -18,12 +18,8 @@ class WDGRESTAPI_Entity_Cache extends WDGRESTAPI_Entity {
 	
 	/**
 	 * Ajoute ou met à jour une ligne dans la bdd
-	 * @param string $name
-	 * @param string $value
 	 */
-	public function save( $name, $value ) {
-		$this->set_property( 'name', $name );
-		$this->set_property( 'value', $value );
+	public function save() {
 		date_default_timezone_set( 'Europe/Paris' );
 		$current_date = new DateTime();
 		$this->set_property( 'date', $current_date->format( 'Y-m-d H:i:s' ) );
@@ -33,7 +29,22 @@ class WDGRESTAPI_Entity_Cache extends WDGRESTAPI_Entity {
 		}
 		parent::save();
 	}
+
+	/**
+	 * Définit le nom
+	 * @param string $name
+	 */
+	public function set_name( $name ) {
+		$this->set_property( 'name', $name );
+	} 
 	
+	/**
+	 * Définit la valeur
+	 * @param string $value
+	 */
+	public function set_value( $value ) {
+		$this->set_property( 'value', $value );
+	} 
 	/**
 	 * Retourne TRUE si la valeur a expiré dans le cache
 	 * @param int $expiration en minutes

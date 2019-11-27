@@ -2,6 +2,8 @@
 class WDGRESTAPI_Lib_GoogleAPI {
 	
 	private static $client;
+
+	private static $nb_columns_in_spreadsheets = 50;
 	
 	public static function init_client() {
 		if ( is_null( self::$client ) ) {
@@ -35,7 +37,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	
 	public static function set_project_values( $id, $data ) {
 		$row_data = array();
-		for ( $i = 0; $i < 50; $i++ ) { array_push( $row_data, '' ); }
+		for ( $i = 0; $i < self::$nb_columns_in_spreadsheets; $i++ ) { array_push( $row_data, '' ); }
 		foreach ( $data as $data_name => $data_value ) {
 			if ( isset( WDGRESTAPI_Entity_Project::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Project::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
 				$index = WDGRESTAPI_Entity_Project::$db_properties[ $data_name ][ 'gs_col_index' ];
@@ -47,7 +49,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	
 	public static function set_user_values( $id, $data ) {
 		$row_data = array();
-		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
+		for ( $i = 0; $i < self::$nb_columns_in_spreadsheets; $i++ ) { array_push( $row_data, '' ); }
 		foreach ( $data as $data_name => $data_value ) {
 			if ( isset( WDGRESTAPI_Entity_User::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_User::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
 				$index = WDGRESTAPI_Entity_User::$db_properties[ $data_name ][ 'gs_col_index' ];
@@ -59,7 +61,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	
 	public static function set_organization_values( $id, $data ) {
 		$row_data = array();
-		for ( $i = 0; $i < 26; $i++ ) { array_push( $row_data, '' ); }
+		for ( $i = 0; $i < self::$nb_columns_in_spreadsheets; $i++ ) { array_push( $row_data, '' ); }
 		foreach ( $data as $data_name => $data_value ) {
 			if ( isset( WDGRESTAPI_Entity_Organization::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Organization::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
 				$index = WDGRESTAPI_Entity_Organization::$db_properties[ $data_name ][ 'gs_col_index' ];
@@ -71,7 +73,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	
 	public static function set_investment_contract_values( $id, $data ) {
 		$row_data = array();
-		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
+		for ( $i = 0; $i < self::$nb_columns_in_spreadsheets; $i++ ) { array_push( $row_data, '' ); }
 		foreach ( $data as $data_name => $data_value ) {
 			if ( isset( WDGRESTAPI_Entity_InvestmentContract::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_InvestmentContract::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
 				$index = WDGRESTAPI_Entity_InvestmentContract::$db_properties[ $data_name ][ 'gs_col_index' ];
@@ -83,7 +85,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	
 	public static function set_declaration_values( $id, $data ) {
 		$row_data = array();
-		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
+		for ( $i = 0; $i < self::$nb_columns_in_spreadsheets; $i++ ) { array_push( $row_data, '' ); }
 		foreach ( $data as $data_name => $data_value ) {
 			if ( isset( WDGRESTAPI_Entity_Declaration::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Declaration::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
 				$index = WDGRESTAPI_Entity_Declaration::$db_properties[ $data_name ][ 'gs_col_index' ];
@@ -95,7 +97,7 @@ class WDGRESTAPI_Lib_GoogleAPI {
 	
 	public static function set_poll_values( $id, $data ) {
 		$row_data = array();
-		for ( $i = 0; $i < 40; $i++ ) { array_push( $row_data, '' ); }
+		for ( $i = 0; $i < self::$nb_columns_in_spreadsheets; $i++ ) { array_push( $row_data, '' ); }
 		foreach ( $data as $data_name => $data_value ) {
 			if ( isset( WDGRESTAPI_Entity_PollAnswer::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_PollAnswer::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
 				$index = WDGRESTAPI_Entity_PollAnswer::$db_properties[ $data_name ][ 'gs_col_index' ];
@@ -103,6 +105,18 @@ class WDGRESTAPI_Lib_GoogleAPI {
 			}
 		}
 		return self::set_values( 'POLLS', $id + 1, $row_data );
+	}
+	
+	public static function set_investment_values( $id, $data ) {
+		$row_data = array();
+		for ( $i = 0; $i < self::$nb_columns_in_spreadsheets; $i++ ) { array_push( $row_data, '' ); }
+		foreach ( $data as $data_name => $data_value ) {
+			if ( isset( WDGRESTAPI_Entity_Investment::$db_properties[ $data_name ] ) && isset( WDGRESTAPI_Entity_Investment::$db_properties[ $data_name ][ 'gs_col_index' ] ) ) {
+				$index = WDGRESTAPI_Entity_Investment::$db_properties[ $data_name ][ 'gs_col_index' ];
+				$row_data[ $index - 1 ] = strval( $data_value );
+			}
+		}
+		self::set_values( 'INVESTMENTS', $id + 1, $row_data );
 	}
 
 	public static function set_values( $sheet_id, $row_index, $row_data ) {

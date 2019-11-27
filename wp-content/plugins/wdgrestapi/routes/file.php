@@ -81,7 +81,8 @@ class WDGRESTAPI_Route_File extends WDGRESTAPI_Route {
 			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			$file_item->set_property( 'client_user_id', $current_client->ID );
 			$file_data = filter_input( INPUT_POST, 'data' );
-			$save_result = $file_item->save( $file_data );
+			$file_item->set_file_data( $file_data );
+			$save_result = $file_item->save();
 			$reloaded_data = $file_item->get_loaded_data();
 			$this->log( "WDGRESTAPI_Route_File::single_create", json_encode( $reloaded_data ) );
 			if ( $save_result === false ) {

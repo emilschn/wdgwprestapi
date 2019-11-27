@@ -24,7 +24,7 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 		WDGRESTAPI_Route::register_wdg(
 			'/investment',
 			WP_REST_Server::CREATABLE,
-			array( $this, 'single_create'),
+			array( $this, 'single_create_or_update'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
 		
@@ -100,22 +100,23 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	 * @param WP_REST_Request $request
 	 * @return \WP_Error
 	 */
-	public function single_create( WP_REST_Request $request ) {
-		$this->log( "WDGRESTAPI_Route_Investment::single_create", json_encode( $_POST ) );
-		$investment_item = new WDGRESTAPI_Entity_Investment();
+	public function single_create_or_update( WP_REST_Request $request ) {
+		$this->log( "WDGRESTAPI_Route_Investment::single_create_or_update", json_encode( $_POST ) );
+		$investment_wpref = filter_input( INPUT_POST, 'wpref' );
+		$investment_item = new WDGRESTAPI_Entity_Investment( FALSE, FALSE, $investment_wpref );
 		$this->set_posted_properties( $investment_item, WDGRESTAPI_Entity_Investment::$db_properties );
 		if ( $investment_item->has_checked_properties() ) {
 			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 			$investment_item->set_property( 'client_user_id', $current_client->ID );
 			$save_result = $investment_item->save();
 			$reloaded_data = $investment_item->get_loaded_data();
-			$this->log( "WDGRESTAPI_Route_Investment::single_create", json_encode( $reloaded_data ) );
+			$this->log( "WDGRESTAPI_Route_Investment::single_create_or_update", json_encode( $reloaded_data ) );
 			if ( $save_result === false ) {
 				global $wpdb;
-				$this->log( "WDGRESTAPI_Route_Investment::single_create", print_r( $wpdb, true ) );
+				$this->log( "WDGRESTAPI_Route_Investment::single_create_or_update", print_r( $wpdb, true ) );
 				return new WP_Error( 'cant-create', 'db-insert-error' );
 			} else {
-				$this->log( "WDGRESTAPI_Route_Investment::single_create", "success" );
+				$this->log( "WDGRESTAPI_Route_Investment::single_create_or_update", "success" );
 				return $reloaded_data;
 			}
 			
@@ -125,8 +126,8 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 			foreach ( $error_list as $error ) {
 				$error_buffer .= $error . " ";
 			}
-			$this->log( "WDGRESTAPI_Route_Investment::single_create", "failed" );
-			$this->log( "WDGRESTAPI_Route_Investment::single_create", $error_buffer );
+			$this->log( "WDGRESTAPI_Route_Investment::single_create_or_update", "failed" );
+			$this->log( "WDGRESTAPI_Route_Investment::single_create_or_update", $error_buffer );
 			return new WP_Error( 'cant-create', $error_buffer );
 		}
 	}
