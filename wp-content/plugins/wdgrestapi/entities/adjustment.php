@@ -18,12 +18,26 @@ class WDGRESTAPI_Entity_Adjustment extends WDGRESTAPI_Entity {
 	 * @param int $declaration_id
 	 * @return array
 	 */
-	public static function list_get_by_declaration_id( $declaration_id ) {
+	public static function list_get_by_declaration_id( $declaration_id, $with_links = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT * FROM " .$table_name. " WHERE id_declaration = " .$declaration_id. " ORDER BY date_created ASC";
 		$results = $wpdb->get_results( $query );
-		return $results;
+
+		if ( $with_links ) {
+			$buffer = array();
+			if ( !empty( $results ) ) {
+				foreach ( $results as $single_result ) {
+					$single_result->files = WDGRESTAPI_Entity_AdjustmentFile::get_list_by_adjustment_id( $single_result->id );
+					$single_result->declarations = WDGRESTAPI_Entity_AdjustmentDeclaration::get_list_by_adjustment_id( $single_result->id );
+					array_push( $buffer, $single_result );
+				}
+			}
+			return $buffer;
+
+		} else {
+			return $results;
+		}
 	}
 	
 	/**

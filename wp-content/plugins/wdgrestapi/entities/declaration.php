@@ -40,8 +40,8 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * Retourne la liste des ajustements de cette déclaration
 	 * @return array
 	 */
-	public function get_adjustments() {
-		$buffer = WDGRESTAPI_Entity_Adjustment::list_get_by_declaration_id( $this->loaded_data->id );
+	public function get_adjustments( $with_links = FALSE ) {
+		$buffer = WDGRESTAPI_Entity_Adjustment::list_get_by_declaration_id( $this->loaded_data->id, $with_links );
 		return $buffer;
 	}
 	
@@ -60,8 +60,12 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 */
 	public function get_files( $file_type = '' ) {
 		$item = WDGRESTAPI_Entity_File::get_single( self::$entity_type, $this->loaded_data->id, $file_type );
-		$item_loaded_data = $item->get_loaded_data();
-		return array( $item_loaded_data->url );
+		if ( !empty( $item ) ) {
+			$item_loaded_data = $item->get_loaded_data();
+			return array( $item_loaded_data->url );
+		} else {
+			return array();
+		}
 	}
 	
 	/**
@@ -104,13 +108,30 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les déclarations
 	 * @return array
 	 */
-	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE ) {
+	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE, $with_links = FALSE ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
 		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, percent_commission_without_tax, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE id_project = " .$project_id;
 		$results = $wpdb->get_results( $query );
+
 		if ( $is_data_restricted_to_entity ) {
-			return $results;
+			if ( $with_links ) {
+				$buffer = array();
+				if ( !empty( $results ) ) {
+					foreach ( $results as $single_result ) {
+						$item_declaration = new WDGRESTAPI_Entity_Declaration( $single_result->id );
+						$single_result->adjustments = $item_declaration->get_adjustments( $with_links );
+						$single_result->rois = $item_declaration->get_rois();
+						$single_result->files = $item_declaration->get_files( 'bill' );
+						array_push( $buffer, $single_result );
+					}
+				}
+				return $buffer;
+	
+			} else {
+				return $results;
+			}
+
 		} else {
 			return self::complete_data( $results );
 		}

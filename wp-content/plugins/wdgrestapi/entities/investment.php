@@ -17,18 +17,24 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		
 		if ( empty( $id ) ) {
 			
+			$query = '';
 			if ( !empty( $wpref ) ) {
 				global $wpdb;
 				$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 				$query = "SELECT * FROM " .$table_name. " WHERE wpref=" .$wpref;
-				$this->loaded_data = $wpdb->get_row( $query );
 
 			} else if ( !empty( $token ) ) {
 			   global $wpdb;
 			   $table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 			   $query = "SELECT * FROM " .$table_name. " WHERE token='" .$token. "'";
-			   $this->loaded_data = $wpdb->get_row( $query );
-		   }
+			}
+
+			if ( !empty( $query ) ) {
+				$row_data = $wpdb->get_row( $query );
+				if ( !empty( $row_data ) ) {
+					$this->loaded_data = $row_data;
+				}
+			}
 
 		}
 		

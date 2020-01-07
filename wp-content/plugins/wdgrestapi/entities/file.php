@@ -43,7 +43,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
-	public function get_list( $entity_type = '', $entity_id = '', $file_type = '', $exclude_linked_to_adjustment = FALSE ) {
+	public static function get_list( $entity_type = '', $entity_id = '', $file_type = '', $exclude_linked_to_adjustment = FALSE ) {
 		$buffer = array();
 		
 		global $wpdb;
