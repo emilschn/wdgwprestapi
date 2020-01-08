@@ -1,7 +1,8 @@
 <?php
 require_once dirname( __FILE__ ) . '/../../libs/validator.php';
 
-class WDGRESTAPILibValidatorTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+class WDGRESTAPILibValidatorTest extends TestCase {
 
 	/**
 	 * @dataProvider booleanProvider

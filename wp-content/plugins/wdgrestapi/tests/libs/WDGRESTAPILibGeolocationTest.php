@@ -17,8 +17,9 @@ require_once dirname( __FILE__ ) . '/../../../../../wp-includes/class-wp-error.p
 require_once dirname( __FILE__ ) . '/../../../../../wp-includes/class-wp-hook.php';
 require_once dirname( __FILE__ ) . '/../../libs/geolocation.php';
 
+use PHPUnit\Framework\TestCase;
 
-class WDGRESTAPILibGeolocationTest extends PHPUnit_Framework_TestCase {
+class WDGRESTAPILibGeolocationTest extends TestCase {
 
 	public function testgetGeolocationData() {
 		$this->assertEmpty( WDGRESTAPI_Lib_Geolocation::get_geolocation_data( '' ) );
