@@ -1,7 +1,8 @@
 <?php
 require_once dirname( __FILE__ ) . '/../../libs/google-api.php';
 
-class WDGRESTAPILibGoogleAPITest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+class WDGRESTAPILibGoogleAPITest extends TestCase {
 
 	public function testinitClient() {
 		$this->assertFalse( WDGRESTAPI_Lib_GoogleAPI::init_client() );

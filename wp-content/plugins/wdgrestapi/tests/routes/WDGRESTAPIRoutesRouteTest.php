@@ -20,7 +20,8 @@ require_once dirname( __FILE__ ) . '/../../entities/entity.php';
 require_once dirname( __FILE__ ) . '/../../entities/log.php';
 require_once dirname( __FILE__ ) . '/../../routes/route.php';
 
-class WDGRESTAPIRoutesRouteTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+class WDGRESTAPIRoutesRouteTest extends TestCase {
 
 	public function testsetPostedProperties() {
 		$db_properties_test = array( 'prop' => 'val' );
