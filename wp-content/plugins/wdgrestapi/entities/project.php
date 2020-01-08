@@ -113,8 +113,8 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 	
-	public function get_adjustments() {
-		$buffer = WDGRESTAPI_Entity_Adjustment::list_get_by_project_id( $this->loaded_data->id );
+	public function get_adjustments( $with_links = FALSE ) {
+		$buffer = WDGRESTAPI_Entity_Adjustment::list_get_by_project_id( $this->loaded_data->id, $with_links );
 		return $buffer;
 	}
 	

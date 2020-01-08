@@ -285,8 +285,9 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			$loaded_data = $project_item->get_loaded_data();
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$royalties_data = $project_item->get_adjustments();
-				$this->log( "WDGRESTAPI_Route_Project::single_get_adjustments::" . $project_id, json_encode( $royalties_data ) );
+				$input_data_with_links = filter_input( INPUT_GET, 'with_links' );
+				$adjustments_data = $project_item->get_adjustments( $input_data_with_links );
+				$this->log( "WDGRESTAPI_Route_Project::single_get_adjustments::" . $project_id, json_encode( $adjustments_data ) );
 				return $royalties_data;
 				
 			} else {
