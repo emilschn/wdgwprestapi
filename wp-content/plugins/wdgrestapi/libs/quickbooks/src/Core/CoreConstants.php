@@ -6,15 +6,15 @@ namespace QuickBooksOnline\API\Core;
  */
 class CoreConstants
 {
-    //Set the default minor version to 8
-    const DEFAULT_SDK_MINOR_VERSION = "8";
+    //Set the default minor version
+    const DEFAULT_SDK_MINOR_VERSION = "45";
     const DEFAULT_LOGGINGLOCATION = "/tmp/IdsLogs";
 
     const PHP_CLASS_PREFIX = 'IPP';
     /*
      * All content writer strategy we support. Append this lists with new strategies
      */
-    public static $CONTENTWRITER_STRATEGIES = array('file','handler','export');
+    const CONTENTWRITER_STRATEGIES = array('file','handler','export');
 
     /*
      * Specific file strategy that we used for Content Writter
@@ -163,6 +163,12 @@ class CoreConstants
     const CONTENTTYPE_APPLICATIONXML = "application/xml";
 
     /**
+     * Content type: application/xml;charset=UTF-8.
+     * @var string CONTENTTYPE_APPLICATIONXML_WITH_CHARSET
+     */
+    const CONTENTTYPE_APPLICATIONXML_WITH_CHARSET = "application/xml;charset=UTF-8";
+
+    /**
      * Content type: application/xml.
      * @var string CONTENTTYPE_APPLICATIONJSON
      */
@@ -204,6 +210,11 @@ class CoreConstants
      * @var string Id
      */
     const Id = "Id";
+
+    const PAYMENTCLASSNAME = "IPPPayment";
+
+    const VOID_QUERYPARAMETER_GENERAL = '?operation=void';
+    const VOID_QUERYPARAMETER_PAYMENT = '?operation=update&include=void';
 
     /**
      * Intuit tid
@@ -287,7 +298,7 @@ class CoreConstants
      * The Request source header value.
      * @var string REQUESTSOURCEHEADER
      */
-    const USERAGENT = "V3PHPSDK4.0.0";
+    const USERAGENT = "V3PHPSDK5.3.3";
 
     public static function getType($string, $return=1)
     {
@@ -310,9 +321,13 @@ class CoreConstants
                                     "IPPTaxService"   => array( '*' => false,
                                                                 'Add' => true,
                                                                 'jsonOnly' => true),
-                                    "IPPSalesReceipt" => array( "DownloadPDF" => true, "SendEmail" => true ),
-                                    "IPPInvoice"      => array( "DownloadPDF" => true, "SendEmail" => true  ),
-                                    "IPPEstimate"     => array( "DownloadPDF" => true, "SendEmail" => true  ),
+                                    "IPPSalesReceipt"  => array( "DownloadPDF" => true, "SendEmail" => true ),
+                                    "IPPInvoice"       => array( "DownloadPDF" => true, "SendEmail" => true  ),
+                                    "IPPEstimate"      => array( "DownloadPDF" => true, "SendEmail" => true  ),
+                                    "IPPCreditMemo"    => array( "DownloadPDF" => true, "SendEmail" => true  ),
+                                    "IPPRefundReceipt" => array( "DownloadPDF" => true, "SendEmail" => true  ),
+                                    "IPPPurchaseOrder" => array( "DownloadPDF" => true, "SendEmail" => true  ),
+                                    "IPPPayment"       => array( "DownloadPDF" => true, "SendEmail" => true  ),
                             );
     }
 
@@ -396,4 +411,7 @@ class CoreConstants
     public static function getCertPath(){
         return dirname(__FILE__) . "/OAuth/OAuth2/certs/cacert.pem"; //Pem certification Key Path
     }
+
+    //AutoLoader Settings
+    const USE_AUTOLOADER = true;
 }

@@ -1,19 +1,5 @@
 <?php
-/*******************************************************************************
- * Copyright (c) 2017 Intuit
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
+
 namespace QuickBooksOnline\API\Core;
 
 use QuickBooksOnline\API\Core\Configuration\IppConfiguration;
@@ -95,7 +81,7 @@ class ServiceContext
      *   Initializes a new instance of the ServiceContext class.
      *
      * @param string $realmId The realm id.
-     * @param IntuitServicesType $serviceType Service Type - QBO/QB.
+     * @param string $serviceType Service Type - QBO/QB.
      * @param RequestValidator $requestValidator The request validate.
      * @throws IdsException If arguments are null or empty.
      * @throws InvalidRealmException If realm id is invalid.
@@ -354,6 +340,10 @@ class ServiceContext
         }
     }
 
+    /**
+     * Update OAuth 2 Access Token with the new Token Value
+     * @param OAuth2AccessToken  The OAuth 2 token that contains access token, refresh token
+     */
     public function updateOAuth2Token($OAuth2AccessToken){
       if($OAuth2AccessToken instanceof OAuth2AccessToken && $this->requestValidator instanceof OAuth2AccessToken){
         $this->IppConfiguration->Security = $OAuth2AccessToken;

@@ -11,6 +11,8 @@ use QuickBooksOnline\API\Core\Http\Response;
 use QuickBooksOnline\API\Diagnostics\Logger;
 use QuickBooksOnline\API\Core\Configuration\OperationControlList;
 use QuickBooksOnline\API\Core\OAuth\OAuth2\OAuth2AccessToken;
+use SimpleXMLElement;
+use QuickBooksOnline\API\Exception\SdkException;
 
 /**
  * Specifies the Default Configuration Reader implmentation used by the SDK. The ConfigReader can either read a file or from passed arrays
@@ -87,12 +89,12 @@ class LocalConfigReader
 
             LocalConfigReader::initializeOAuthSettings($xmlObj, $ippConfig, $OAuthOption);
             LocalConfigReader::initializeRequestAndResponseSerializationAndCompressionFormat($xmlObj, $ippConfig);
-            LocalConfigReader::intializaeServiceBaseURLAndLogger($xmlObj, $ippConfig);
+            LocalConfigReader::initializeServiceBaseURLAndLogger($xmlObj, $ippConfig);
             LocalConfigReader::initializeAPIEntityRules($xmlObj, $ippConfig);
             LocalConfigReader::setupMinorVersion($ippConfig, $xmlObj);
 
             return $ippConfig;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new SdkException("Error Reading the ");
         }
     }
@@ -113,7 +115,7 @@ class LocalConfigReader
                   $ippConfig->OAuthMode = CoreConstants::OAUTH2;
                 }
                 //Set Logger and Searlization format. The default one is XML
-                LocalConfigReader::intializeMessage($ippConfig);
+                LocalConfigReader::initializeMessage($ippConfig);
                 LocalConfigReader::setRequestAndResponseSerializationFormat($ippConfig, CompressionFormat::None, CompressionFormat::None, SerializationFormat::Xml, SerializationFormat::Xml);
                 //Set base Urls
                 $ippConfig->BaseUrl = new BaseUrl();
@@ -137,7 +139,7 @@ class LocalConfigReader
     * Initializes API Entity Rules
     *
     * @param IppConfiguration $ippConfig
-    * @param XMLObject $xmlObj
+    * @param \SimpleXMLElement $xmlObj
   */
     public static function initializeAPIEntityRules($xmlObj, $ippConfig)
     {
@@ -163,7 +165,7 @@ class LocalConfigReader
    /**
     * Initializes operation contrtol list
     * @param IppConfiguration $ippConfig
-    * @param XMLObject $xmlObj
+    * @param \SimpleXMLElement $xmlObj
    */
    public static function setupMinorVersion($ippConfig, $xmlObj)
    {
@@ -177,7 +179,7 @@ class LocalConfigReader
 
    /**
     * Returns array in a OperationControlList rules format from XML
-    * @param type $xmlObj
+    * @param \SimpleXMLElement $xmlObj
     * @return boolean
    */
    public static function populateJsonOnlyEntities($xmlObj)
@@ -265,7 +267,7 @@ class LocalConfigReader
      */
      public static function initializeRequestAndResponseSerializationAndCompressionFormat($xmlObj, $ippConfig)
      {
-         LocalConfigReader::intializeMessage($ippConfig);
+         LocalConfigReader::initializeMessage($ippConfig);
 
          $requestSerializationFormat = null;
          $requestCompressionFormat = null;
@@ -289,7 +291,7 @@ class LocalConfigReader
          LocalConfigReader::setRequestAndResponseSerializationFormat($ippConfig, $requestCompressionFormat, $responseCompressionFormat, $requestSerializationFormat, $responseSerializationFormat);
      }
 
-    public static function intializeMessage($ippConfig)
+    public static function initializeMessage($ippConfig)
     {
         // Initialize Request Configuration Object
          $ippConfig->Message = new Message();
@@ -370,7 +372,7 @@ class LocalConfigReader
        * Initialize BaseURL and log Settings from Simple XML Reading from SDK.config
      * @Hao
      */
-     public static function intializaeServiceBaseURLAndLogger($xmlObj, $ippConfig)
+     public static function initializeServiceBaseURLAndLogger($xmlObj, $ippConfig)
      {
          // Initialize BaseUrl Configuration Object
         $ippConfig->BaseUrl = new BaseUrl();
@@ -429,8 +431,8 @@ class LocalConfigReader
 
    /**
    * Creates PHP class entity from intuit name
-   * @param type $name
-   * @return type
+   * @param string $name
+   * @return string
    */
    private static function decorateEntity($name)
    {

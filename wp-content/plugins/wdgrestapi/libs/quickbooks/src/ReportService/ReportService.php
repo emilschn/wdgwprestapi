@@ -3,15 +3,15 @@
 namespace QuickBooksOnline\API\ReportService;
 
 use QuickBooksOnline\API\Core\CoreHelper;
-use QuickBooksOnline\API\Diagnostics\ContentWriter;
-use QuickBooksOnline\API\Core\Configuration\OperationControlList;
-use QuickBooksOnline\API\DataService\Batch;
-use QuickBooksOnline\API\DataService\IntuitCDCResponse;
 use QuickBooksOnline\API\Core\Http\Serialization\SerializationFormat;
 use QuickBooksOnline\API\Core\HttpClients\SyncRestHandler;
 use QuickBooksOnline\API\Core\ServiceContext;
-use QuickbooksOnline\API\Core\CoreConstants;
+use QuickBooksOnline\API\Core\CoreConstants;
 use QuickBooksOnline\API\Core\HttpClients\RequestParameters;
+use QuickBooksOnline\API\Core\HttpClients\RestHandler;
+use QuickBooksOnline\API\Core\Http\Serialization\IEntitySerializer;
+use QuickBooksOnline\API\Core\HttpClients\FaultHandler;
+use QuickBooksOnline\API\Exception\SdkExceptions\InvalidParameterException;
 
 class ReportService
 {
@@ -23,15 +23,27 @@ class ReportService
 
     /**
      * Rest Request Handler.
-     * @var IRestHandler
+     * @var RestHandler
      */
     private $restHandler;
 
     /**
-     * Serializer needs to be used fore responce object
+     * Serializer needs to be used fore response object
      * @var IEntitySerializer
      */
     private $responseSerializer;
+
+    /**
+     * Throw exception on Error. Default is false;
+     * @var Boolean
+     */
+    private $throwExceptionOnError = false;
+
+    /**
+     * If not false, the request from last dataService did not return 2xx
+     * @var FaultHandler
+     */
+    private $lastError = false;
 
     /**
      * Serializer needs to be used for request object
@@ -83,7 +95,26 @@ class ReportService
     private $both_amount = null;
     private $memo = null;
     private $doc_num = null;
+    private $subcol_pct_inc = null;
+    private $subcol_pct_exp = null;
 
+    public function getPercentIncome(){
+       return $this->subcol_pct_inc;
+    }
+
+    public function getPercentExpense(){
+       return $this->subcol_pct_exp;
+    }
+
+    public function setPercentIncome($percentIncome){
+       $this->subcol_pct_inc = $percentIncome;
+       return $this;
+    }
+
+    public function setPercentExpense($percentExpense){
+       $this->subcol_pct_exp = $percentExpense;
+       return $this;
+    }
     /**
      * @return null
      */
@@ -94,10 +125,13 @@ class ReportService
 
     /**
      * @param null $report_date
+     *
+     * @return $this
      */
     public function setReportDate($report_date)
     {
         $this->report_date = $report_date;
+        return $this;
     }
 
     /**
@@ -110,10 +144,13 @@ class ReportService
 
     /**
      * @param null $start_date
+     *
+     * @return $this
      */
     public function setStartDate($start_date)
     {
         $this->start_date = $start_date;
+        return $this;
     }
 
     /**
@@ -126,10 +163,13 @@ class ReportService
 
     /**
      * @param null $end_date
+     *
+     * @return $this
      */
     public function setEndDate($end_date)
     {
         $this->end_date = $end_date;
+        return $this;
     }
 
     /**
@@ -142,10 +182,13 @@ class ReportService
 
     /**
      * @param null $date_macro
+     *
+     * @return $this
      */
     public function setDateMacro($date_macro)
     {
         $this->date_macro = $date_macro;
+        return $this;
     }
 
     /**
@@ -158,10 +201,13 @@ class ReportService
 
     /**
      * @param null $past_due
+     *
+     * @return $this
      */
     public function setPastDue($past_due)
     {
         $this->past_due = $past_due;
+        return $this;
     }
 
     /**
@@ -174,10 +220,13 @@ class ReportService
 
     /**
      * @param null $end_duedate
+     *
+     * @return $this
      */
     public function setEndDuedate($end_duedate)
     {
         $this->end_duedate = $end_duedate;
+        return $this;
     }
 
     /**
@@ -190,10 +239,13 @@ class ReportService
 
     /**
      * @param null $start_duedate
+     *
+     * @return $this
      */
     public function setStartDuedate($start_duedate)
     {
         $this->start_duedate = $start_duedate;
+        return $this;
     }
 
     /**
@@ -206,10 +258,13 @@ class ReportService
 
     /**
      * @param null $duedate_macro
+     *
+     * @return $this
      */
     public function setDuedateMacro($duedate_macro)
     {
         $this->duedate_macro = $duedate_macro;
+        return $this;
     }
 
     /**
@@ -222,10 +277,13 @@ class ReportService
 
     /**
      * @param null $accounting_method
+     *
+     * @return $this
      */
     public function setAccountingMethod($accounting_method)
     {
         $this->accounting_method = $accounting_method;
+        return $this;
     }
 
     /**
@@ -238,10 +296,13 @@ class ReportService
 
     /**
      * @param null $account
+     *
+     * @return $this
      */
     public function setAccount($account)
     {
         $this->account = $account;
+        return $this;
     }
 
     /**
@@ -254,10 +315,13 @@ class ReportService
 
     /**
      * @param null $source_account
+     *
+     * @return $this
      */
     public function setSourceAccount($source_account)
     {
         $this->source_account = $source_account;
+        return $this;
     }
 
     /**
@@ -270,10 +334,13 @@ class ReportService
 
     /**
      * @param null $account_type
+     *
+     * @return $this
      */
     public function setAccountType($account_type)
     {
         $this->account_type = $account_type;
+        return $this;
     }
 
     /**
@@ -286,10 +353,13 @@ class ReportService
 
     /**
      * @param null $source_account_type
+     *
+     * @return $this
      */
     public function setSourceAccountType($source_account_type)
     {
         $this->source_account_type = $source_account_type;
+        return $this;
     }
 
     /**
@@ -302,10 +372,13 @@ class ReportService
 
     /**
      * @param null $summarize_column_by
+     *
+     * @return $this
      */
     public function setSummarizeColumnBy($summarize_column_by)
     {
         $this->summarize_column_by = $summarize_column_by;
+        return $this;
     }
 
     /**
@@ -318,10 +391,13 @@ class ReportService
 
     /**
      * @param null $customer
+     *
+     * @return $this
      */
     public function setCustomer($customer)
     {
         $this->customer = $customer;
+        return $this;
     }
 
     /**
@@ -334,10 +410,13 @@ class ReportService
 
     /**
      * @param null $vendor
+     *
+     * @return $this
      */
     public function setVendor($vendor)
     {
         $this->vendor = $vendor;
+        return $this;
     }
 
     /**
@@ -350,10 +429,13 @@ class ReportService
 
     /**
      * @param null $item
+     *
+     * @return $this
      */
     public function setItem($item)
     {
         $this->item = $item;
+        return $this;
     }
 
     /**
@@ -366,10 +448,13 @@ class ReportService
 
     /**
      * @param null $classid
+     *
+     * @return $this
      */
     public function setClassid($classid)
     {
         $this->classid = $classid;
+        return $this;
     }
 
     /**
@@ -382,10 +467,13 @@ class ReportService
 
     /**
      * @param null $appaid
+     *
+     * @return $this
      */
     public function setAppaid($appaid)
     {
         $this->appaid = $appaid;
+        return $this;
     }
 
     /**
@@ -398,10 +486,13 @@ class ReportService
 
     /**
      * @param null $department
+     *
+     * @return $this
      */
     public function setDepartment($department)
     {
         $this->department = $department;
+        return $this;
     }
 
     /**
@@ -414,10 +505,13 @@ class ReportService
 
     /**
      * @param null $qzurl
+     *
+     * @return $this
      */
     public function setQzurl($qzurl)
     {
         $this->qzurl = $qzurl;
+        return $this;
     }
 
     /**
@@ -430,10 +524,13 @@ class ReportService
 
     /**
      * @param null $aging_period
+     *
+     * @return $this
      */
     public function setAgingPeriod($aging_period)
     {
         $this->aging_period = $aging_period;
+        return $this;
     }
 
     /**
@@ -446,10 +543,13 @@ class ReportService
 
     /**
      * @param null $aging_method
+     *
+     * @return $this
      */
     public function setAgingMethod($aging_method)
     {
         $this->aging_method = $aging_method;
+        return $this;
     }
 
     /**
@@ -462,10 +562,13 @@ class ReportService
 
     /**
      * @param null $num_periods
+     *
+     * @return $this
      */
     public function setNumPeriods($num_periods)
     {
         $this->num_periods = $num_periods;
+        return $this;
     }
 
     /**
@@ -478,10 +581,13 @@ class ReportService
 
     /**
      * @param null $term
+     *
+     * @return $this
      */
     public function setTerm($term)
     {
         $this->term = $term;
+        return $this;
     }
 
     /**
@@ -494,10 +600,13 @@ class ReportService
 
     /**
      * @param null $columns
+     *
+     * @return $this
      */
     public function setColumns($columns)
     {
         $this->columns = $columns;
+        return $this;
     }
 
     /**
@@ -510,10 +619,13 @@ class ReportService
 
     /**
      * @param null $sort_by
+     *
+     * @return $this
      */
     public function setSortBy($sort_by)
     {
         $this->sort_by = $sort_by;
+        return $this;
     }
 
     /**
@@ -526,10 +638,13 @@ class ReportService
 
     /**
      * @param null $sort_order
+     *
+     * @return $this
      */
     public function setSortOrder($sort_order)
     {
         $this->sort_order = $sort_order;
+        return $this;
     }
 
     /**
@@ -542,10 +657,13 @@ class ReportService
 
     /**
      * @param null $group_by
+     *
+     * @return $this
      */
     public function setGroupBy($group_by)
     {
         $this->group_by = $group_by;
+        return $this;
     }
 
     /**
@@ -558,10 +676,13 @@ class ReportService
 
     /**
      * @param null $createdate_macro
+     *
+     * @return $this
      */
     public function setCreatedateMacro($createdate_macro)
     {
         $this->createdate_macro = $createdate_macro;
+        return $this;
     }
 
     /**
@@ -574,10 +695,13 @@ class ReportService
 
     /**
      * @param null $end_createdate
+     *
+     * @return $this
      */
     public function setEndCreatedate($end_createdate)
     {
         $this->end_createdate = $end_createdate;
+        return $this;
     }
 
     /**
@@ -590,10 +714,13 @@ class ReportService
 
     /**
      * @param null $start_createdate
+     *
+     * @return $this
      */
     public function setStartCreatedate($start_createdate)
     {
         $this->start_createdate = $start_createdate;
+        return $this;
     }
 
     /**
@@ -606,10 +733,13 @@ class ReportService
 
     /**
      * @param null $moddate_macro
+     *
+     * @return $this
      */
     public function setModdateMacro($moddate_macro)
     {
         $this->moddate_macro = $moddate_macro;
+        return $this;
     }
 
     /**
@@ -622,10 +752,13 @@ class ReportService
 
     /**
      * @param null $end_moddate
+     *
+     * @return $this
      */
     public function setEndModdate($end_moddate)
     {
         $this->end_moddate = $end_moddate;
+        return $this;
     }
 
     /**
@@ -638,10 +771,13 @@ class ReportService
 
     /**
      * @param null $start_moddate
+     *
+     * @return $this
      */
     public function setStartModdate($start_moddate)
     {
         $this->start_moddate = $start_moddate;
+        return $this;
     }
 
     /**
@@ -654,10 +790,13 @@ class ReportService
 
     /**
      * @param null $payment_method
+     *
+     * @return $this
      */
     public function setPaymentMethod($payment_method)
     {
         $this->payment_method = $payment_method;
+        return $this;
     }
 
     /**
@@ -670,10 +809,13 @@ class ReportService
 
     /**
      * @param null $name
+     *
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -686,10 +828,13 @@ class ReportService
 
     /**
      * @param null $transaction_type
+     *
+     * @return $this
      */
     public function setTransactionType($transaction_type)
     {
         $this->transaction_type = $transaction_type;
+        return $this;
     }
 
     /**
@@ -702,10 +847,13 @@ class ReportService
 
     /**
      * @param null $cleared
+     *
+     * @return $this
      */
     public function setCleared($cleared)
     {
         $this->cleared = $cleared;
+        return $this;
     }
 
     /**
@@ -718,10 +866,13 @@ class ReportService
 
     /**
      * @param null $arpaid
+     *
+     * @return $this
      */
     public function setArpaid($arpaid)
     {
         $this->arpaid = $arpaid;
+        return $this;
     }
 
     /**
@@ -734,10 +885,13 @@ class ReportService
 
     /**
      * @param null $printed
+     *
+     * @return $this
      */
     public function setPrinted($printed)
     {
         $this->printed = $printed;
+        return $this;
     }
 
     /**
@@ -750,10 +904,13 @@ class ReportService
 
     /**
      * @param null $both_amount
+     *
+     * @return $this
      */
     public function setBothAmount($both_amount)
     {
         $this->both_amount = $both_amount;
+        return $this;
     }
 
     /**
@@ -766,10 +923,13 @@ class ReportService
 
     /**
      * @param null $memo
+     *
+     * @return $this
      */
     public function setMemo($memo)
     {
         $this->memo = $memo;
+        return $this;
     }
 
     /**
@@ -782,14 +942,17 @@ class ReportService
 
     /**
      * @param null $doc_num
+     *
+     * @return $this
      */
     public function setDocNum($doc_num)
     {
         $this->doc_num = $doc_num;
+        return $this;
     }
 
     /**
-     * Returns serializer for responce objects
+     * Returns serializer for response objects
      * @return IEntitySerializer
      */
     public function getResponseSerializer()
@@ -808,6 +971,20 @@ class ReportService
     }
 
     /**
+     * If any non 200 status code is return, throw an exception.
+     */
+    public function turnOnThrowExceptionOnError(){
+        $this->throwExceptionOnError = true;
+    }
+
+    /**
+     * If any non 200 status code is return, do not throw an exception. Default is OFF.
+     */
+    public function turnOffThrowExceptionOnError(){
+        $this->throwExceptionOnError = false;
+    }
+
+    /**
      * Initializes a new instance of the DataService class.
      *
      * @param ServiceContext $serviceContext IPP Service Context
@@ -816,7 +993,7 @@ class ReportService
     public function __construct($serviceContext)
     {
         if (null == $serviceContext) {
-            throw new InvalidArgumentException('Resources.ServiceContextCannotBeNull');
+            throw new \InvalidArgumentException('Resources.ServiceContextCannotBeNull');
         }
 
         if (!is_object($serviceContext)) {
@@ -857,7 +1034,7 @@ class ReportService
     private function getReportQueryParameters()
     {
         $uriParameterList = array();
-        $uriParameterString = null;
+        $uriParameterString = '';
 
         if (!is_null($this->report_date)) {
             array_push($uriParameterList, array("report_date", $this->getReportDate()));
@@ -912,7 +1089,7 @@ class ReportService
             array_push($uriParameterList, array("item", $this->getItem()));
         }
         if (!is_null($this->classid)) {
-            array_push($uriParameterList, array("classid", $this->getClassid()));
+            array_push($uriParameterList, array("class", $this->getClassid()));
         }
         if (!is_null($this->appaid)) {
             array_push($uriParameterList, array("appaid", $this->getAppaid()));
@@ -995,10 +1172,17 @@ class ReportService
         if (!is_null($this->doc_num)) {
             array_push($uriParameterList, array("doc_num", $this->getDocNum()));
         }
+        if (!is_null($this->subcol_pct_inc)) {
+            array_push($uriParameterList, array("subcol_pct_inc", $this->getPercentIncome()));
+        }
+
+        if (!is_null($this->subcol_pct_exp)) {
+            array_push($uriParameterList, array("subcol_pct_exp", $this->getPercentExpense()));
+        }
 
 
         foreach ($uriParameterList as $uriParameter) {
-            if (sizeof($uriParameterString) > 0) {
+            if (strlen($uriParameterString) > 0) {
                 $uriParameterString .= "&";
             }
             $uriParameterString .= $uriParameter[0];
@@ -1020,7 +1204,7 @@ class ReportService
         $querySeparator = "?";
         $reportQueryParameters = $this->getReportQueryParameters();
 
-        if ($reportQueryParameters) {
+        if (strlen($reportQueryParameters) > 0) {
             $httpRequestUri = implode(CoreConstants::SLASH_CHAR, array('company', $this->serviceContext->realmId, $urlResource, $reportName, $querySeparator));
             $httpRequestUri .=  $reportQueryParameters;
         } else {
@@ -1035,24 +1219,16 @@ class ReportService
             $requestParameters = new RequestParameters($httpRequestUri, 'GET', CoreConstants::CONTENTTYPE_APPLICATIONXML, null);
         }
 
-        $restRequestHandler = new SyncRestHandler($this->serviceContext);
-
-        try {
-            list($responseCode, $responseBody) = $restRequestHandler->sendRequest($requestParameters, null, null);
-        } catch (Exception $e) {
+        $restRequestHandler = $this->getRestHandler();
+        list($responseCode, $responseBody) = $restRequestHandler->sendRequest($requestParameters, null, null, $this->throwExceptionOnError);
+        $faultHandler = $restRequestHandler->getFaultHandler();
+        if ($faultHandler) {
+            $this->lastError = $faultHandler;
             return null;
-        }
-
-        CoreHelper::CheckNullResponseAndThrowException($responseBody);
-
-        try {
-            //The modification is no longer necessary
-            //$responseBody = $this->modifyReportResponse($responseBody);
+        } else {
+            $this->lastError = false;
             $parsedResponseBody = $this->getResponseSerializer()->Deserialize($responseBody, true);
-        } catch (Exception $e) {
-            return null;
+            return ($parsedResponseBody);
         }
-
-        return ($parsedResponseBody);
     }
 }

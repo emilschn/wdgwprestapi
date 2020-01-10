@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>QuickBooks, PHP HTTP client &mdash; PHPDocs 4.0.1 documentation</title>
+  <title>QuickBooks, PHP HTTP client &mdash; QuickBooks V3 PHP SDK 4.0.5 documentation</title>
   
 
   
@@ -26,7 +26,7 @@
 
   
   
-    <link rel="stylesheet" href="https://github.com/intuit/QuickBooks-V3-PHP-SDK/blob/master/docs/_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="PHPDocs 4.0.1 documentation" href="#"/>
+    <link rel="top" title="QuickBooks V3 PHP SDK 4.0.5 documentation" href="#"/>
         <link rel="next" title="Overview" href="overview.html"/> 
 
   
@@ -55,7 +55,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> PHPDocs
+            <a href="#" class="icon icon-home"> QuickBooks V3 PHP SDK
           
 
           
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                4.0.1
+                4.0.5
               </div>
             
           
@@ -91,7 +91,10 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authorization.html">Authorization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="handle-error.html">Error Handling</a></li>
 </ul>
 
             
@@ -106,7 +109,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">PHPDocs</a>
+          <a href="#">QuickBooks V3 PHP SDK</a>
         
       </nav>
 
@@ -180,13 +183,77 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="authorization.html">Authorization</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="authorization.html#oauth-1-0a">OAuth 1.0a</a></li>
-<li class="toctree-l2"><a class="reference internal" href="authorization.html#oauth-2-0">OAuth 2.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="authorization.html#generate-oauth-2-0-tokens">Generate OAuth 2.0 Tokens</a></li>
-<li class="toctree-l3"><a class="reference internal" href="authorization.html#use-oauth-2-0-tokens">Use OAuth 2.0 Tokens</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#creating-dataservice">Creating DataService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#setting-dataservice">Setting DataService</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#minor-version">Minor version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#logging">Logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#errors-and-timeouts">Errors and Timeouts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#servicecontext">ServiceContext</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authorization.html">Authorization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authorization.html#oauth-1-0a">OAuth 1.0a</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authorization.html#directly-use-oauth-1-0a-tokens">Directly Use OAuth 1.0a Tokens</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authorization.html#disconnect-or-reconnect-oauth-1-0a-tokens">Disconnect or Reconnect OAuth 1.0a Tokens</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="authorization.html#oauth-2-0">OAuth 2.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authorization.html#generate-oauth-2-0-tokens">Generate OAuth 2.0 Tokens</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authorization.html#directly-use-oauth-2-0-tokens">Directly Use OAuth 2.0 Tokens</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authorization.html#refresh-your-oauth-2-0-token">Refresh your OAuth 2.0 token</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authorization.html#revoke-your-oauth-2-0-token">Revoke your OAuth 2.0 token</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authorization.html#oauth-2-0-ssl-certificate-settings">OAuth 2.0 SSL certificate settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authorization.html#oauth-2-0-vs-1-0a-in-quickbooks-online">OAuth 2.0 vs 1.0a in QuickBooks Online</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#create-new-resources-post">Create new resources (POST)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#constructing-entities">Constructing Entities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#sending-requests">Sending Requests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#handling-response">Handling Response</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#example-and-result">Example and Result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#constructing-entities-with-tax">Constructing Entities with Tax</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#query-and-access-resources-get">Query and access resources (GET)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#get-by-entity-id">Get by Entity Id</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#get-company-info-or-preference">Get Company Info or Preference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#query-resources">Query resources</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="quickstart.html#maximum-number-of-entities-in-a-response">Maximum number of entities in a response</a></li>
+<li class="toctree-l4"><a class="reference internal" href="quickstart.html#pagination">Pagination</a></li>
+<li class="toctree-l4"><a class="reference internal" href="quickstart.html#count">Count</a></li>
+<li class="toctree-l4"><a class="reference internal" href="quickstart.html#filters">Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="quickstart.html#sorting">Sorting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#update-resources-put">Update resources (PUT)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#update-resources">Update resources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#update-resources-with-tax">Update resources with Tax</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#sparse-update-full-update">Sparse Update &amp; Full Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#delete-resources-delete">Delete resources(DELETE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#accessing-entity-fields-directly">Accessing Entity Fields Directly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#other-supported-operations">Other Supported Operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#sending-e-mail">Sending E-mail</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#batch-request">Batch Request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#change-data-capture-cdc">Change Data Capture(CDC)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#generating-reports">Generating Reports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#download-as-pdf">Download As PDF</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="handle-error.html">Error Handling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="handle-error.html#check-error-code-and-message">Check Error Code and Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="handle-error.html#report-an-error-to-intuit">Report an Error to Intuit</a></li>
 </ul>
 </li>
 </ul>
@@ -214,7 +281,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Hao Lu.
+        &copy; Copyright 2018, Intuit, Inc.
 
     </p>
   </div>
@@ -236,7 +303,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'4.0.1',
+            VERSION:'4.0.5',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
