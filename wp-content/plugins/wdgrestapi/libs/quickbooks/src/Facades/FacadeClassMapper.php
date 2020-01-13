@@ -44,7 +44,9 @@ class FacadeClassMapper
                //IPPTransfer
                'FromAccountRef','ToAccountRef',
                //IPPItem
-               'UOMSetRef','IncomeAccountRef','ExpenseAccountRef','COGSAccountRef','AssetAccountRef','PrefVendorRef','SalesTaxCodeRef','PurchaseTaxCodeRef'
+               'UOMSetRef','IncomeAccountRef','ExpenseAccountRef','COGSAccountRef','AssetAccountRef','PrefVendorRef','SalesTaxCodeRef','PurchaseTaxCodeRef',
+               //IPPCreditMemeo
+               'InvoiceRef'
 
         ];
     }
@@ -138,7 +140,9 @@ class FacadeClassMapper
         'Gender' => 'gender',
         'UseTimeEntry' => 'TimeEntryUsedForPaychecksEnum',
         'SpecialItemType' => 'SpecialItemTypeEnum',
-        'TaxTypeApplicable' => 'TaxTypeApplicablityEnum'
+        'TaxTypeApplicable' => 'TaxTypeApplicablityEnum',
+        'PostingType' => 'PostingTypeEnum',
+        'JournalEntryType' => 'EntityTypeEnum'
        ];
     }
 
@@ -153,11 +157,13 @@ class FacadeClassMapper
          'PayeeAddr' => 'PhysicalAddress',
          'VendorAddr' => 'PhysicalAddress',
          'PrimaryAddr' => 'PhysicalAddress',
+         'ShipFromAddr' => 'PhysicalAddress',
          'BillEmail' => 'EmailAddress',
          'BillEmailCc' => 'EmailAddress',
          'BillEmailBcc' => 'EmailAddress',
          'ReplyEmail' => 'EmailAddress',
          'POEmail' => 'EmailAddress',
+         'SalesEmailCc' => 'EmailAddress',
          //CCDetail was mapped to different entity on BillPaymentCreditCard
          'CCDetail' => 'CreditChargeInfo',
          'PrimaryPhone' => 'TelephoneNumber',
@@ -179,7 +185,9 @@ class FacadeClassMapper
          'ItemAssemblyLine' => 'ItemComponentLine',
          'SalesTaxRateList' => 'TaxRateList',
          'PurchaseTaxRateList' => 'TaxRateList',
-         'AdjustmentTaxRateList' => 'TaxRateList'
+         'AdjustmentTaxRateList' => 'TaxRateList',
+         //Use JournalEntryEntity to replace Entity
+         'JournalEntryEntity' => 'EntityTypeRef'
        ];
     }
 

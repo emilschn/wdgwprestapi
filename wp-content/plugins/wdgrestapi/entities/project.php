@@ -108,13 +108,13 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	 * Retourne la liste des déclarations liées à un projet
 	 * @return array
 	 */
-	public function get_declarations( $is_data_restricted_to_entity ) {
-		$buffer = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $this->loaded_data->id, $is_data_restricted_to_entity );
+	public function get_declarations( $is_data_restricted_to_entity, $with_links = FALSE ) {
+		$buffer = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $this->loaded_data->id, $is_data_restricted_to_entity, $with_links );
 		return $buffer;
 	}
 	
-	public function get_adjustments() {
-		$buffer = WDGRESTAPI_Entity_Adjustment::list_get_by_project_id( $this->loaded_data->id );
+	public function get_adjustments( $with_links = FALSE ) {
+		$buffer = WDGRESTAPI_Entity_Adjustment::list_get_by_project_id( $this->loaded_data->id, $with_links );
 		return $buffer;
 	}
 	

@@ -2,7 +2,8 @@
 require_once dirname( __FILE__ ) . '/../../../restapi-user-basic-access/classes/authentication.php';
 require_once dirname( __FILE__ ) . '/../../entities/entity.php';
 
-class WDGRESTAPIEntitiesEntityTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+class WDGRESTAPIEntitiesEntityTest extends TestCase {
 
 	public function testgetLoadedData() {
 		$db_properties_test = array( 'prop' => 'val' );

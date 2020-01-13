@@ -256,9 +256,10 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$input_data_restricted_to_entity = filter_input( INPUT_GET, 'data_restricted_to_entity' );
-				$royalties_data = $project_item->get_declarations( ( $input_data_restricted_to_entity == '1' ) );
-				$this->log( "WDGRESTAPI_Route_Project::single_get_declarations::" . $project_id, json_encode( $royalties_data ) );
-				return $royalties_data;
+				$input_data_with_links = filter_input( INPUT_GET, 'with_links' );
+				$declarations_data = $project_item->get_declarations( ( $input_data_restricted_to_entity == '1' ), ( $input_data_with_links == '1' ) );
+				$this->log( "WDGRESTAPI_Route_Project::single_get_declarations::" . $project_id, json_encode( $declarations_data ) );
+				return $declarations_data;
 				
 			} else {
 				$this->log( "WDGRESTAPI_Route_Project::single_get_declarations::" . $project_id, "404 : Invalid project ID" );
@@ -284,9 +285,10 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			$loaded_data = $project_item->get_loaded_data();
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$royalties_data = $project_item->get_adjustments();
-				$this->log( "WDGRESTAPI_Route_Project::single_get_adjustments::" . $project_id, json_encode( $royalties_data ) );
-				return $royalties_data;
+				$input_data_with_links = filter_input( INPUT_GET, 'with_links' );
+				$adjustments_data = $project_item->get_adjustments( $input_data_with_links );
+				$this->log( "WDGRESTAPI_Route_Project::single_get_adjustments::" . $project_id, json_encode( $adjustments_data ) );
+				return $adjustments_data;
 				
 			} else {
 				$this->log( "WDGRESTAPI_Route_Project::single_get_adjustments::" . $project_id, "404 : Invalid project ID" );

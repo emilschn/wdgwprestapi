@@ -26,7 +26,8 @@ require_once dirname( __FILE__ ) . '/../../routes/route.php';
 require_once dirname( __FILE__ ) . '/../../routes/user.php';
 require_once dirname( __FILE__ ) . '/../../libs/logs.php';
 
-class WDGRESTAPIRoutesUserTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+class WDGRESTAPIRoutesUserTest extends TestCase {
 
 	public function testregister() {
 		$test_register = WDGRESTAPI_Route_User::register();
