@@ -5,6 +5,7 @@ use QuickBooksOnline\API\DataService\DataService;
 use QuickBooksOnline\API\PlatformService\PlatformService;
 use QuickBooksOnline\API\Core\Http\Serialization\XmlObjectSerializer;
 use QuickBooksOnline\API\Facades\Invoice;
+use QuickBooksOnline\API\Core\OAuth\OAuth2\OAuth2LoginHelper;
 
 class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 	public static $entity_type = 'bill';
@@ -100,12 +101,17 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 	 */
 	private static function get_quickbooks_service() {
 		try {
+			$token_keys = self::get_token_keys();
+			if ( is_wp_error( $token_keys ) ) {
+				return $token_keys;
+			}
+
 			$quickbooks_service = DataService::Configure(array(
 				'auth_mode'			=> 'oauth2',
 				'ClientID'			=> WDG_QUICKBOOKS_CLIENT_ID,
 				'ClientSecret'		=> WDG_QUICKBOOKS_CLIENT_SECRET,
-				'accessTokenKey'	=> WDG_QUICKBOOKS_ACCESS_TOKEN_KEY,
-				'refreshTokenKey'	=> WDG_QUICKBOOKS_REFRESH_TOKEN_KEY,
+				'accessTokenKey'	=> $token_keys->getAccessToken(),
+				'refreshTokenKey'	=> $token_keys->getRefreshToken(),
 				'QBORealmID'		=> WDG_QUICKBOOKS_REALM_ID,
 				'baseUrl'			=> WDG_QUICKBOOKS_BASE_URL
 			));
@@ -114,10 +120,7 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 			$accessToken = $OAuth2LoginHelper->refreshToken();
 			$error = $OAuth2LoginHelper->getLastError();
 			if ($error != null) {
-				echo "The Status code is: " . $error->getHttpStatusCode() . "\n";
-				echo "The Helper message is: " . $error->getOAuthHelperError() . "\n";
-				echo "The Response message is: " . $error->getResponseBody() . "\n";
-				return;
+				return new WP_Error( 'error', $error->getHttpStatusCode() . ' - ' . $error->getOAuthHelperError() . ' - ' .$error->getResponseBody() );
 			}
 			$quickbooks_service->updateOAuth2Token( $accessToken );
 			
@@ -126,6 +129,26 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 		}
 		
 		return $quickbooks_service;
+	}
+
+	private static function get_token_keys() {
+		try {
+			$previous_refresh_token = get_option( 'quickbooks_refresh_token' );
+			if ( empty( $previous_refresh_token ) ) {
+				$previous_refresh_token = WDG_QUICKBOOKS_REFRESH_TOKEN_KEY;
+			}
+			$oauth2LoginHelper = new OAuth2LoginHelper( WDG_QUICKBOOKS_CLIENT_ID, WDG_QUICKBOOKS_CLIENT_SECRET );
+			$accessTokenObj = $oauth2LoginHelper->refreshAccessTokenWithRefreshToken( $previous_refresh_token );
+			$refreshTokenValue = $accessTokenObj->getRefreshToken();
+			if ( !empty( $refreshTokenValue ) ) {
+				update_option( 'quickbooks_refresh_token', $refreshTokenValue );
+			}
+			
+		} catch ( Exception $e ) {
+			return new WP_Error( 'error', $e->getMessage() );
+		}
+		
+		return $accessTokenObj;
 	}
 
 
