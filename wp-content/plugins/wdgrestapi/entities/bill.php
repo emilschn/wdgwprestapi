@@ -91,6 +91,10 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 			] );
 			$resultingObj = $quickbooks_service->Add( $bill_object );
 
+			if ( isset( $options->sendemail ) && $options->sendemail == 1 ) {
+				$quickbooks_service->SendEmail( $resultingObj, $options->customeremail );
+			}
+
 			$error = $quickbooks_service->getLastError();
 			if ($error != null) {
 				$this->properties_errors = $error->getResponseBody();
