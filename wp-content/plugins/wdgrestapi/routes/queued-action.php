@@ -32,11 +32,17 @@ class WDGRESTAPI_Route_QueuedAction extends WDGRESTAPI_Route {
 	 * Retourne la liste des e-mails
 	 */
 	public function list_get() {
-		$input_limit = filter_input( INPUT_GET, 'limit' );
-		$input_next_to_execute = filter_input( INPUT_GET, 'next_to_execute' );
-		$input_entity_id = filter_input( INPUT_GET, 'entity_id' );
-		$input_action = filter_input( INPUT_GET, 'action' );
-		return WDGRESTAPI_Entity_QueuedAction::list_get( $this->get_current_client_autorized_ids_string(), $input_limit, $input_next_to_execute, $input_entity_id, $input_action );
+		try {
+			$input_limit = filter_input( INPUT_GET, 'limit' );
+			$input_next_to_execute = filter_input( INPUT_GET, 'next_to_execute' );
+			$input_entity_id = filter_input( INPUT_GET, 'entity_id' );
+			$input_action = filter_input( INPUT_GET, 'action' );
+			return WDGRESTAPI_Entity_QueuedAction::list_get( $this->get_current_client_autorized_ids_string(), $input_limit, $input_next_to_execute, $input_entity_id, $input_action );
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_QueuedAction::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**

@@ -37,22 +37,27 @@ class WDGRESTAPI_Route_InvestmentContractHistory extends WDGRESTAPI_Route {
 	/**
 	 * Retourne une ligne d'historique d'un contrat d'investissement grâce à son id
 	 * @param WP_REST_Request $request
-	 * @return \WDGRESTAPI_Entity_Project
+	 * @return \WDGRESTAPI_Entity_InvestmentContractHistory
 	 */
 	public function single_get( WP_REST_Request $request ) {
 		$investment_contract_history_id = $request->get_param( 'id' );
 		if ( !empty( $investment_contract_history_id ) ) {
-			$investment_contract_history_item = new WDGRESTAPI_Entity_InvestmentContractHistory( $investment_contract_history_id );
-			$loaded_data = $investment_contract_history_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_InvestmentContractHistory::single_get::" . $investment_contract_history_id, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$investment_contract_history_item = new WDGRESTAPI_Entity_InvestmentContractHistory( $investment_contract_history_id );
+				$loaded_data = $investment_contract_history_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_InvestmentContractHistory::single_get::" . $investment_contract_history_id, "404 : Invalid investment contract history id" );
-				return new WP_Error( '404', "Invalid investment contract history id" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_InvestmentContractHistory::single_get::" . $investment_contract_history_id, "404 : Invalid investment contract history id" );
+					return new WP_Error( '404', "Invalid investment contract history id" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_InvestmentContractHistory::single_get::" . $investment_contract_history_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

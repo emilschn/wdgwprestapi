@@ -53,11 +53,17 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		$input_start_date = filter_input( INPUT_GET, 'start_date' );
-		$input_end_date = filter_input( INPUT_GET, 'end_date' );
-		$start_date = ( !empty( $input_start_date ) ) ? new DateTime( $input_start_date ) : FALSE;
-		$end_date = ( !empty( $input_end_date ) ) ? new DateTime( $input_end_date ) : FALSE;
-		return WDGRESTAPI_Entity_Investment::list_get( $start_date, $end_date );
+		try {
+			$input_start_date = filter_input( INPUT_GET, 'start_date' );
+			$input_end_date = filter_input( INPUT_GET, 'end_date' );
+			$start_date = ( !empty( $input_start_date ) ) ? new DateTime( $input_start_date ) : FALSE;
+			$end_date = ( !empty( $input_end_date ) ) ? new DateTime( $input_end_date ) : FALSE;
+			return WDGRESTAPI_Entity_Investment::list_get( $start_date, $end_date );
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_Investment::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -65,7 +71,13 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get_stats() {
-		return WDGRESTAPI_Entity_Investment::get_stats();
+		try {
+			return WDGRESTAPI_Entity_Investment::get_stats();
+
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_Investment::list_get_stats", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -76,17 +88,22 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$investment_token = $request->get_param( 'token' );
 		if ( !empty( $investment_token ) ) {
-			$investment_item = new WDGRESTAPI_Entity_Investment( '', $investment_token );
-			$loaded_data = $investment_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_Investment::single_get::" . $investment_token, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$investment_item = new WDGRESTAPI_Entity_Investment( '', $investment_token );
+				$loaded_data = $investment_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Investment::single_get::" . $investment_token, "404 : Invalid investment token" );
-				return new WP_Error( '404', "Invalid investment token" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Investment::single_get::" . $investment_token, "404 : Invalid investment token" );
+					return new WP_Error( '404', "Invalid investment token" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Investment::single_get::" . $investment_token, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
