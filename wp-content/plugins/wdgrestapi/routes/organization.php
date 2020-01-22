@@ -128,18 +128,18 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 					return $rois_data;
 					
 				} else {
-					$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $organization_id, "404 : Invalid organization ID" );
+					$this->log( "WDGRESTAPI_Route_Organization::single_get_investment_contracts::" . $organization_id, "404 : Invalid organization ID" );
 					return new WP_Error( '404', "Invalid organization ID" );
 					
 				}
 				
 			} catch ( Exception $e ) {
-				$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $organization_id, $e->getMessage() );
+				$this->log( "WDGRESTAPI_Route_Organization::single_get_investment_contracts::" . $organization_id, $e->getMessage() );
 				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
-			$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts", "404 : Invalid organization ID (empty)" );
+			$this->log( "WDGRESTAPI_Route_Organization::single_get_investment_contracts", "404 : Invalid organization ID (empty)" );
 			return new WP_Error( '404', "Invalid organization ID (empty)" );
 		}
 	}
