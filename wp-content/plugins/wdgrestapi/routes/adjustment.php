@@ -78,17 +78,22 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$adjustment_id = $request->get_param( 'id' );
 		if ( !empty( $adjustment_id ) ) {
-			$adjustment_item = new WDGRESTAPI_Entity_Adjustment( $adjustment_id );
-			$loaded_data_temp = $adjustment_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
-				$this->log( "WDGRESTAPI_Route_Adjustment::single_get::" . $adjustment_id, json_encode( $loaded_data_temp ) );
-				return $loaded_data_temp;
+			try {
+				$adjustment_item = new WDGRESTAPI_Entity_Adjustment( $adjustment_id );
+				$loaded_data_temp = $adjustment_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Adjustment::single_get::" . $adjustment_id, "404 : Invalid adjustment id" );
-				return new WP_Error( '404', "Invalid adjustment id" );
-				
+				if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
+					return $loaded_data_temp;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Adjustment::single_get::" . $adjustment_id, "404 : Invalid adjustment id" );
+					return new WP_Error( '404', "Invalid adjustment id" );
+					
+				}
+
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Adjustment::single_get::" . $adjustment_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -166,9 +171,14 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 	public function get_filelist_by_adjustment_id( WP_REST_Request $request ) {
 		$adjustment_id = $request->get_param( 'id' );
 		if ( !empty( $adjustment_id ) ) {
-			$file_list = WDGRESTAPI_Entity_AdjustmentFile::get_list_by_adjustment_id( $adjustment_id );
-			$this->log( "WDGRESTAPI_Route_Adjustment::get_filelist_by_adjustment_id::" . $adjustment_id, json_encode( $file_list ) );
-			return $file_list;
+			try {
+				$file_list = WDGRESTAPI_Entity_AdjustmentFile::get_list_by_adjustment_id( $adjustment_id );
+				return $file_list;
+
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Adjustment::get_filelist_by_adjustment_id::" . $adjustment_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Adjustment::get_filelist_by_adjustment_id", "404 : Invalid adjustment ID (empty)" );
@@ -198,9 +208,14 @@ class WDGRESTAPI_Route_Adjustment extends WDGRESTAPI_Route {
 	public function get_declarationlist_by_adjustment_id( WP_REST_Request $request ) {
 		$adjustment_id = $request->get_param( 'id' );
 		if ( !empty( $adjustment_id ) ) {
-			$declaration_list = WDGRESTAPI_Entity_AdjustmentDeclaration::get_list_by_adjustment_id( $adjustment_id );
-			$this->log( "WDGRESTAPI_Route_Adjustment::get_declarationlist_by_adjustment_id::" . $adjustment_id, json_encode( $declaration_list ) );
-			return $declaration_list;
+			try {
+				$declaration_list = WDGRESTAPI_Entity_AdjustmentDeclaration::get_list_by_adjustment_id( $adjustment_id );
+				return $declaration_list;
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Adjustment::get_declarationlist_by_adjustment_id::" . $adjustment_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_Adjustment::get_declarationlist_by_adjustment_id", "404 : Invalid adjustment ID (empty)" );

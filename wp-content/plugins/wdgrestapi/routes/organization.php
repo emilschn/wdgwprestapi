@@ -60,7 +60,13 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		return WDGRESTAPI_Entity_Organization::list_get( $this->get_current_client_autorized_ids_string() );
+		try {
+			return WDGRESTAPI_Entity_Organization::list_get( $this->get_current_client_autorized_ids_string() );
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_Organization::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -78,20 +84,25 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$organization_id = $request->get_param( 'id' );
 		if ( !empty( $organization_id ) ) {
-			$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
-			$loaded_data = $organization_item->get_loaded_data();
-			if ( isset( $loaded_data->metadata ) ) {
-				unset( $loaded_data->metadata );
-			}
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_Organization::single_get::" . $organization_id, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
+				$loaded_data = $organization_item->get_loaded_data();
+				if ( isset( $loaded_data->metadata ) ) {
+					unset( $loaded_data->metadata );
+				}
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Organization::single_get::" . $organization_id, "404 : Invalid organization ID" );
-				return new WP_Error( '404', "Invalid organization ID" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Organization::single_get::" . $organization_id, "404 : Invalid organization ID" );
+					return new WP_Error( '404', "Invalid organization ID" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Organization::single_get::" . $organization_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -108,22 +119,27 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	public function single_get_investment_contracts( WP_REST_Request $request ) {
 		$organization_id = $request->get_param( 'id' );
 		if ( !empty( $organization_id ) ) {
-			$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
-			$loaded_data = $organization_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$rois_data = $organization_item->get_investment_contracts();
-				$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $organization_id, json_encode( $rois_data ) );
-				return $rois_data;
+			try {
+				$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
+				$loaded_data = $organization_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $organization_id, "404 : Invalid organization ID" );
-				return new WP_Error( '404', "Invalid organization ID" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$rois_data = $organization_item->get_investment_contracts();
+					return $rois_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Organization::single_get_investment_contracts::" . $organization_id, "404 : Invalid organization ID" );
+					return new WP_Error( '404', "Invalid organization ID" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Organization::single_get_investment_contracts::" . $organization_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
-			$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts", "404 : Invalid organization ID (empty)" );
+			$this->log( "WDGRESTAPI_Route_Organization::single_get_investment_contracts", "404 : Invalid organization ID (empty)" );
 			return new WP_Error( '404', "Invalid organization ID (empty)" );
 		}
 	}
@@ -136,18 +152,23 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	public function single_get_rois( WP_REST_Request $request ) {
 		$organization_id = $request->get_param( 'id' );
 		if ( !empty( $organization_id ) ) {
-			$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
-			$loaded_data = $organization_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$rois_data = $organization_item->get_rois();
-				$this->log( "WDGRESTAPI_Route_Organization::single_get_rois::" . $organization_id, json_encode( $rois_data ) );
-				return $rois_data;
+			try {
+				$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
+				$loaded_data = $organization_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Organization::single_get_rois::" . $organization_id, "404 : Invalid organization ID" );
-				return new WP_Error( '404', "Invalid organization ID" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$rois_data = $organization_item->get_rois();
+					return $rois_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Organization::single_get_rois::" . $organization_id, "404 : Invalid organization ID" );
+					return new WP_Error( '404', "Invalid organization ID" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Organization::single_get_rois::" . $organization_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

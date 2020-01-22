@@ -50,17 +50,23 @@ class WDGRESTAPI_Route_Contract extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$contract_id = $request->get_param( 'id' );
 		if ( !empty( $contract_id ) ) {
-			$contract_item = new WDGRESTAPI_Entity_Contract( $contract_id );
-			$loaded_data_temp = $contract_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
-				$this->log( "WDGRESTAPI_Route_Contract::single_get::" . $contract_id, json_encode( $loaded_data_temp ) );
-				return $loaded_data_temp;
+			try {
+				$contract_item = new WDGRESTAPI_Entity_Contract( $contract_id );
+				$loaded_data_temp = $contract_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Contract::single_get::" . $contract_id, "404 : Invalid contract id" );
-				return new WP_Error( '404', "Invalid contract id" );
-				
+				if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
+					$this->log( "WDGRESTAPI_Route_Contract::single_get::" . $contract_id, json_encode( $loaded_data_temp ) );
+					return $loaded_data_temp;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Contract::single_get::" . $contract_id, "404 : Invalid contract id" );
+					return new WP_Error( '404', "Invalid contract id" );
+					
+				}
+
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Contract::single_get::" . $contract_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

@@ -39,8 +39,14 @@ class WDGRESTAPI_Route_InvestmentContract extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		$input_subscription = filter_input( INPUT_GET, 'id_subscription' );
-		return WDGRESTAPI_Entity_InvestmentContract::list_get( $this->get_current_client_autorized_ids_string(), $input_subscription );
+		try {
+			$input_subscription = filter_input( INPUT_GET, 'id_subscription' );
+			return WDGRESTAPI_Entity_InvestmentContract::list_get( $this->get_current_client_autorized_ids_string(), $input_subscription );
+				
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_InvestmentContract::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -51,17 +57,22 @@ class WDGRESTAPI_Route_InvestmentContract extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$investment_contract_id = $request->get_param( 'id' );
 		if ( !empty( $investment_contract_id ) ) {
-			$investment_contract_item = new WDGRESTAPI_Entity_InvestmentContract( $investment_contract_id );
-			$loaded_data = $investment_contract_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_InvestmentContract::single_get::" . $investment_contract_id, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$investment_contract_item = new WDGRESTAPI_Entity_InvestmentContract( $investment_contract_id );
+				$loaded_data = $investment_contract_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_InvestmentContract::single_get::" . $investment_contract_id, "404 : Invalid investment contract id" );
-				return new WP_Error( '404', "Invalid investment contract id" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_InvestmentContract::single_get::" . $investment_contract_id, "404 : Invalid investment contract id" );
+					return new WP_Error( '404', "Invalid investment contract id" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_InvestmentContract::single_get::" . $investment_contract_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

@@ -40,8 +40,14 @@ class WDGRESTAPI_Route_InvestmentDraft extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		$input_project_id = filter_input( INPUT_GET, 'project_id' );
-		return WDGRESTAPI_Entity_InvestmentDraft::list_get( $this->get_current_client_autorized_ids_string(), $input_project_id );
+		try {
+			$input_project_id = filter_input( INPUT_GET, 'project_id' );
+			return WDGRESTAPI_Entity_InvestmentDraft::list_get( $this->get_current_client_autorized_ids_string(), $input_project_id );
+
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_InvestmentDraft::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -52,17 +58,22 @@ class WDGRESTAPI_Route_InvestmentDraft extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$investment_draft_id = $request->get_param( 'id' );
 		if ( !empty( $investment_draft_id ) ) {
-			$investment_draft_item = new WDGRESTAPI_Entity_InvestmentDraft( $investment_draft_id );
-			$loaded_data = $investment_draft_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_InvestmentDraft::single_get::" . $investment_draft_id, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$investment_draft_item = new WDGRESTAPI_Entity_InvestmentDraft( $investment_draft_id );
+				$loaded_data = $investment_draft_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_InvestmentDraft::single_get::" . $investment_draft_id, "404 : Invalid investment draft id" );
-				return new WP_Error( '404', "Invalid investment draft id" );
-				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_InvestmentDraft::single_get::" . $investment_draft_id, "404 : Invalid investment draft id" );
+					return new WP_Error( '404', "Invalid investment draft id" );
+					
+				}
+
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_InvestmentDraft::single_get::" . $investment_draft_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

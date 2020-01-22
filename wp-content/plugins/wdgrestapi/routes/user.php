@@ -81,32 +81,38 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		$input_offset = filter_input( INPUT_GET, 'offset' );
-		$input_limit = filter_input( INPUT_GET, 'limit' );
-		$input_full = filter_input( INPUT_GET, 'full' );
-		$input_link_to_project = filter_input( INPUT_GET, 'link_to_project' );
-		
-		$offset = ( !empty( $input_offset ) ) ? $input_offset : 0;
-		$full = ( $input_full == '1' ) ? TRUE : FALSE;
-		
-		// Gestion cache
-		$cache_name = '/users?offset=' .$input_offset;
-		if ( !empty( $input_limit ) ) { $cache_name .= '&limit=' .$input_limit; }
-		if ( !empty( $input_full ) ) { $cache_name .= '&full=' .$input_full; }
-		if ( !empty( $input_link_to_project ) ) { $cache_name .= '&link_to_project=' .$input_link_to_project; }
-		$cached_version_entity = new WDGRESTAPI_Entity_Cache( FALSE, $cache_name );
-		$cached_value = $cached_version_entity->get_value( 60 );
-		
-		if ( !empty( $cached_value ) ) {
-			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_User::use cache');
-			$buffer = json_decode( $cached_value );
-		} else {
-			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_User::use request');
-			$buffer = WDGRESTAPI_Entity_User::list_get( $this->get_current_client_autorized_ids_string(), $offset, $input_limit, $full, $input_link_to_project );
-			$cached_version_entity->save( $cache_name, json_encode( $buffer ) );
+		try {
+			$input_offset = filter_input( INPUT_GET, 'offset' );
+			$input_limit = filter_input( INPUT_GET, 'limit' );
+			$input_full = filter_input( INPUT_GET, 'full' );
+			$input_link_to_project = filter_input( INPUT_GET, 'link_to_project' );
+			
+			$offset = ( !empty( $input_offset ) ) ? $input_offset : 0;
+			$full = ( $input_full == '1' ) ? TRUE : FALSE;
+			
+			// Gestion cache
+			$cache_name = '/users?offset=' .$input_offset;
+			if ( !empty( $input_limit ) ) { $cache_name .= '&limit=' .$input_limit; }
+			if ( !empty( $input_full ) ) { $cache_name .= '&full=' .$input_full; }
+			if ( !empty( $input_link_to_project ) ) { $cache_name .= '&link_to_project=' .$input_link_to_project; }
+			$cached_version_entity = new WDGRESTAPI_Entity_Cache( FALSE, $cache_name );
+			$cached_value = $cached_version_entity->get_value( 60 );
+			
+			if ( !empty( $cached_value ) ) {
+				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_User::use cache');
+				$buffer = json_decode( $cached_value );
+			} else {
+				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_User::use request');
+				$buffer = WDGRESTAPI_Entity_User::list_get( $this->get_current_client_autorized_ids_string(), $offset, $input_limit, $full, $input_link_to_project );
+				$cached_version_entity->save( $cache_name, json_encode( $buffer ) );
+			}
+			
+			return $buffer;
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_User::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
 		}
-		
-		return $buffer;
 	}
 	
 	/**
@@ -114,7 +120,13 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get_stats() {
-		return WDGRESTAPI_Entity_User::get_stats();
+		try {
+			return WDGRESTAPI_Entity_User::get_stats();
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_User::list_get_stats", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -130,17 +142,22 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			$user_id = $request->get_param( 'id' );
 		}
 		if ( !empty( $user_id ) ) {
-			$user_item = new WDGRESTAPI_Entity_User( $user_id );
-			$loaded_data = $user_item->get_loaded_data( ( $input_with_links == '1' ) );
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_User::single_get::" . $user_id, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$user_item = new WDGRESTAPI_Entity_User( $user_id );
+				$loaded_data = $user_item->get_loaded_data( ( $input_with_links == '1' ) );
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_User::single_get::" . $user_id, "404 : Invalid user ID" );
-				return new WP_Error( '404', "Invalid user ID" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_User::single_get::" . $user_id, "404 : Invalid user ID" );
+					return new WP_Error( '404', "Invalid user ID" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -160,9 +177,14 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			$user_email = $request->get_param( 'email' );
 		}
 		if ( !empty( $user_email ) ) {
-			$royalties_data = WDGRESTAPI_Entity_User::get_royalties_data( $user_email );
-			$this->log( "WDGRESTAPI_Route_User::single_get_royalties::" . $user_email, json_encode( $royalties_data ) );
-			return $royalties_data;
+			try {
+				$royalties_data = WDGRESTAPI_Entity_User::get_royalties_data( $user_email );
+				return $royalties_data;
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get_royalties::" . $user_email, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_User::single_get_royalties", "404 : Invalid user email (empty)" );
@@ -257,18 +279,23 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			$user_id = $request->get_param( 'id' );
 		}
 		if ( !empty( $user_id ) ) {
-			$user_item = new WDGRESTAPI_Entity_User( $user_id );
-			$loaded_data = $user_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$rois_data = $user_item->get_investment_contracts();
-				$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $user_id, json_encode( $rois_data ) );
-				return $rois_data;
+			try {
+				$user_item = new WDGRESTAPI_Entity_User( $user_id );
+				$loaded_data = $user_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $user_id, "404 : Invalid user ID" );
-				return new WP_Error( '404', "Invalid user ID" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$rois_data = $user_item->get_investment_contracts();
+					return $rois_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $user_id, "404 : Invalid user ID" );
+					return new WP_Error( '404', "Invalid user ID" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get_investment_contracts::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -288,18 +315,23 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			$user_id = $request->get_param( 'id' );
 		}
 		if ( !empty( $user_id ) ) {
-			$user_item = new WDGRESTAPI_Entity_User( $user_id );
-			$loaded_data = $user_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$rois_data = $user_item->get_rois();
-				$this->log( "WDGRESTAPI_Route_User::single_get_rois::" . $user_id, json_encode( $rois_data ) );
-				return $rois_data;
+			try {
+				$user_item = new WDGRESTAPI_Entity_User( $user_id );
+				$loaded_data = $user_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_User::single_get_rois::" . $user_id, "404 : Invalid user ID" );
-				return new WP_Error( '404', "Invalid user ID" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$rois_data = $user_item->get_rois();
+					return $rois_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_User::single_get_rois::" . $user_id, "404 : Invalid user ID" );
+					return new WP_Error( '404', "Invalid user ID" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get_rois::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -320,18 +352,23 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			$user_id = $request->get_param( 'id' );
 		}
 		if ( !empty( $user_id ) ) {
-			$user_item = new WDGRESTAPI_Entity_User( $user_id );
-			$loaded_data = $user_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$rois_data = $user_item->get_activities();
-				$this->log( "WDGRESTAPI_Route_User::single_get_activities::" . $user_id, json_encode( $rois_data ) );
-				return $rois_data;
+			try {
+				$user_item = new WDGRESTAPI_Entity_User( $user_id );
+				$loaded_data = $user_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_User::single_get_activities::" . $user_id, "404 : Invalid user ID" );
-				return new WP_Error( '404', "Invalid user ID" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$rois_data = $user_item->get_activities();
+					return $rois_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_User::single_get_activities::" . $user_id, "404 : Invalid user ID" );
+					return new WP_Error( '404', "Invalid user ID" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get_activities::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

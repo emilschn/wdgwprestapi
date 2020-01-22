@@ -50,17 +50,22 @@ class WDGRESTAPI_Route_File extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$file_id = $request->get_param( 'id' );
 		if ( !empty( $file_id ) ) {
-			$file_item = new WDGRESTAPI_Entity_File( $file_id );
-			$loaded_data_temp = $file_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
-				$this->log( "WDGRESTAPI_Route_File::single_get::" . $file_id, json_encode( $loaded_data_temp ) );
-				return $loaded_data_temp;
+			try {
+				$file_item = new WDGRESTAPI_Entity_File( $file_id );
+				$loaded_data_temp = $file_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_File::single_get::" . $file_id, "404 : Invalid file id" );
-				return new WP_Error( '404', "Invalid file id" );
+				if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
+					return $loaded_data_temp;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_File::single_get::" . $file_id, "404 : Invalid file id" );
+					return new WP_Error( '404', "Invalid file id" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_File::single_get::" . $file_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

@@ -46,7 +46,13 @@ class WDGRESTAPI_Route_ROI extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		return WDGRESTAPI_Entity_ROI::list_get( $this->get_current_client_autorized_ids_string() );
+		try {
+			return WDGRESTAPI_Entity_ROI::list_get( $this->get_current_client_autorized_ids_string() );
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_ROI::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -64,17 +70,22 @@ class WDGRESTAPI_Route_ROI extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$roi_id = $request->get_param( 'id' );
 		if ( !empty( $roi_id ) ) {
-			$declaration_item = new WDGRESTAPI_Entity_ROI( $roi_id );
-			$loaded_data = $declaration_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_ROI::single_get::" . $roi_id, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$declaration_item = new WDGRESTAPI_Entity_ROI( $roi_id );
+				$loaded_data = $declaration_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_ROI::single_get::" . $roi_id, "404 : Invalid ROI id" );
-				return new WP_Error( '404', "Invalid ROI id" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_ROI::single_get::" . $roi_id, "404 : Invalid ROI id" );
+					return new WP_Error( '404', "Invalid ROI id" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_ROI::single_get::" . $roi_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

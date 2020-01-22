@@ -25,7 +25,13 @@ class WDGRESTAPI_Route_Email extends WDGRESTAPI_Route {
 	 * Retourne la liste des e-mails
 	 */
 	public function list_get() {
-		return WDGRESTAPI_Entity_Email::list_get( $this->get_current_client_autorized_ids_string() );
+		try {
+			return WDGRESTAPI_Entity_Email::list_get( $this->get_current_client_autorized_ids_string() );
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_Email::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
