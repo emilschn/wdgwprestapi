@@ -86,7 +86,7 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 					"Address"	=> $options->customeremail
 				],
 				"BillEmailBcc"	=> [
-					"Address"	=> "admin@wedogood.co"
+					"Address"	=> "administratif@wedogood.co"
 				]
 			] );
 			$resultingObj = $quickbooks_service->Add( $bill_object );
