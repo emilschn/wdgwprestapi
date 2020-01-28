@@ -135,6 +135,33 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		return true;
 	}
 
+	public static function clean_sms_list() {
+		include_once( plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php');
+		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 5000 );
+		$data_list = array(
+			'list_parent'	=> 1
+		);
+		$array_mailin_list = $mailin->get_lists( $data_list );
+		$date_today = new DateTime();
+
+		foreach ( $array_mailin_list[ 'data' ] as $mailin_list_item ) {
+			if ( isset( $mailin_list_item[ 'name' ] ) ) {
+				// Si c'est une liste à supprimer
+				$list_name = $mailin_list_item[ 'name' ];
+				if ( strpos( $list_name, 'Supprimer API' ) !== FALSE ) {
+					// Si la liste a été créée il y a plus de 2 jours
+					$date_entered = new DateTime( $mailin_list_item[ 'entered' ] );
+					$date_interval = $date_today->diff( $date_entered );
+					if ( $date_interval->days > 2 ) {
+						$data = array(
+							'id' => $mailin_list_item[ 'id' ]
+						);
+						$mailin->delete_list( $data );
+					}
+				}
+			}
+		}
+	}
 
 
 
