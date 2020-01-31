@@ -11,11 +11,46 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 	public static $status_closed = 'closed';
 	public static $status_archive = 'archive';
 	
-	public function __construct( $id = FALSE ) {
+	public function __construct( $id = FALSE, $guid = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Project_Draft::$entity_type, WDGRESTAPI_Entity_Project_Draft::$db_properties );
+		if ( $guid != FALSE ) {
+			global $wpdb;
+			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
+			$query = 'SELECT * FROM ' .$table_name. ' WHERE guid='.$guid;
+			$this->loaded_data = $wpdb->get_row( $query );
+		}
 	}
 		
+	/**
+	 * Retourne la liste de tous les brouillons de projets d'un email
+	 * @return array
+	 */
+	public static function list_get( $email ) {
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
+		$query = "SELECT * FROM " .$table_name. " WHERE email=" .$email;
+		$results = $wpdb->get_results( $query );
+		
+		foreach ( $results as $result ) {
+			// $result = WDGRESTAPI_Entity_Project_Draft::expand_single_data( $result );
+			// $result = WDGRESTAPI_Entity_Project_Draft::standardize_data( $result );
+		}
+		
+		return $results;
+	}
 
+	/**
+	 * Retourne les données du statut du projet
+	 */
+	public function get_status() {
+		// $buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_status_by_project', $this->loaded_data->wpref );
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
+		$query = "SELECT status FROM " .$table_name. " WHERE guid=" .$this->loaded_data->guid;
+		$buffer = $wpdb->get_result( $query );
+		
+		return $buffer;
+	}
 
 /*******************************************************************************
  * GESTION BDD
@@ -25,7 +60,7 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
-		'guid'					=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
+		'guid'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
 		'id_user'				=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 3 ),
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 4 ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 5 ),
