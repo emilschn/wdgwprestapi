@@ -16,7 +16,7 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 		if ( $guid != FALSE ) {
 			global $wpdb;
 			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
-			$query = 'SELECT * FROM ' .$table_name. ' WHERE guid='.$guid;
+			$query = 'SELECT * FROM ' .$table_name. ' WHERE guid=\''.$guid.'\'';
 			$this->loaded_data = $wpdb->get_row( $query );
 		}
 	}

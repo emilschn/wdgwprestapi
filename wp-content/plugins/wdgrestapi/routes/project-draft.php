@@ -3,16 +3,16 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 	
 	public function __construct() {
 		WDGRESTAPI_Route::register_wdg(
-			'/project-drafts/(?P<email>\d+)',
+			'/project-drafts/(?P<email>[a-zA-Z0-9\-\@\.]+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get')
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
-			'/project-draft/(?P<guid>\d+)',
+			'/project-draft/(?P<guid>[a-zA-Z0-9\-]+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
-			array( 'id' => array( 'default' => 0 ) )
+			array( 'guid' => array( 'default' => 0 ) )
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
@@ -23,17 +23,17 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
-			'/project-draft/(?P<guid>\d+)',
+			'/project-draft/(?P<guid>[a-zA-Z0-9\-]+)',
 			WP_REST_Server::EDITABLE,
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
 		);
 		
 		WDGRESTAPI_Route::register_external(
-			'/project-draft/(?P<guid>\d+)/status',
+			'/project-draft/(?P<guid>[a-zA-Z0-9\-]+)/status',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_status'),
-			array( 'id' => array( 'default' => 0 ) )
+			array( 'guid' => array( 'default' => 0 ) )
 		);
 	}
 	
@@ -81,7 +81,6 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		
 		$project_draft_guid = $request->get_param( 'guid' );
-		$this->log( "WDGRESTAPI_Route_Project_Draft::single_get::" . $project_draft_guid, "404 : Invalid project GUID" );
 		if ( !empty( $project_draft_guid ) ) {
 			try {
 				$project_item = new WDGRESTAPI_Entity_Project_Draft( FALSE, $project_draft_guid );
