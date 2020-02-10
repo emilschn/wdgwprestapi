@@ -45,7 +45,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	
 	private function send_sendinblue_mail() {
 		include_once( plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php');
-		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 5000 );
+		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
 		
 		$recipients = str_replace( ',', '|', $this->loaded_data->recipient );
 		$options = json_decode( $this->loaded_data->options );
@@ -77,13 +77,18 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 			$data[ 'attachment_url' ] = $options->url_attachment;
 		}
 		
-		$sendinblue_result = $mailin->send_transactional_template( $data );
-		
 		$buffer = 'error';
-		if ( $sendinblue_result[ 'code' ] == 'success' ) {
-			$buffer = 'success';
+		try {
+			$sendinblue_result = $mailin->send_transactional_template( $data );
+			if ( $sendinblue_result[ 'code' ] == 'success' ) {
+				$buffer = 'success';
+			}
+			$this->loaded_data->result = json_encode( $sendinblue_result );
+
+		} catch ( Exception $e ) {
+			$this->loaded_data->result = 'Error : ' . $e->getMessage();
 		}
-		$this->loaded_data->result = json_encode( $sendinblue_result );
+		
 		$this->save();
 		return $buffer;
 	}
@@ -94,73 +99,86 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	 */
 	private function send_sendinblue_sms() {
 		include_once( plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php');
-		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 5000 );
+		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
 		
-		// Création d'une nouvelle liste
-		$current_date = new DateTime();
-		$data_new_list = array(
-			'list_name'		=> "(Supprimer API) Liste temporaire - date : " . $current_date->format( 'Y-m-d H:i:s' ),
-			'list_parent'	=> 1
-		);
-		$create_list_result = $mailin->create_list( $data_new_list );
-		
-		if ( !isset( $create_list_result[ 'data' ] ) || !isset( $create_list_result[ 'data' ][ 'id' ] ) ) {
-			$sendinblue_result = $create_list_result;
+		try {
+			// Création d'une nouvelle liste
+			$current_date = new DateTime();
+			$data_new_list = array(
+				'list_name'		=> "(Supprimer API) Liste temporaire - date : " . $current_date->format( 'Y-m-d H:i:s' ),
+				'list_parent'	=> 1
+			);
+			$create_list_result = $mailin->create_list( $data_new_list );
 			
-		} else {
-			$new_list_id = $create_list_result[ 'data' ][ 'id' ];
-
-			// Ajout des utilisateurs à la liste
-			$recipient_list = explode( ',', $this->loaded_data->recipient );
-			$data_add_users = array(
-				'id'		=> $new_list_id,
-				'users'		=> $recipient_list
-			);
-			$mailin->add_users_list( $data_add_users );
-
-			// Création de la campagne avec envoi direct
-			$data = array(
-				'name'			=> "(Supprimer API) Campagne temporaire - date : " . $current_date->format( 'Y-m-d H:i:s' ),
-				'sender'		=> "WE DO GOOD",
-				'content'		=> $this->loaded_data->template,
-				'listid'		=> array( $new_list_id ),
-				'send_now'		=> 1
-			);
-			$sendinblue_result = $mailin->create_sms_campaign( $data );
+			if ( !isset( $create_list_result[ 'data' ] ) || !isset( $create_list_result[ 'data' ][ 'id' ] ) ) {
+				$sendinblue_result = $create_list_result;
+				
+			} else {
+				$new_list_id = $create_list_result[ 'data' ][ 'id' ];
+	
+				// Ajout des utilisateurs à la liste
+				$recipient_list = explode( ',', $this->loaded_data->recipient );
+				$data_add_users = array(
+					'id'		=> $new_list_id,
+					'users'		=> $recipient_list
+				);
+				$mailin->add_users_list( $data_add_users );
+	
+				// Création de la campagne avec envoi direct
+				$data = array(
+					'name'			=> "(Supprimer API) Campagne temporaire - date : " . $current_date->format( 'Y-m-d H:i:s' ),
+					'sender'		=> "WE DO GOOD",
+					'content'		=> $this->loaded_data->template,
+					'listid'		=> array( $new_list_id ),
+					'send_now'		=> 1
+				);
+				$sendinblue_result = $mailin->create_sms_campaign( $data );
+			}
+			
+			
+			$this->loaded_data->result = json_encode( $sendinblue_result );
+			
+		} catch ( Exception $e ) {
+			$this->loaded_data->result = 'Error : ' . $e->getMessage();
 		}
-		
-		
-		$this->loaded_data->result = json_encode( $sendinblue_result );
+
 		$this->save();
 		return true;
 	}
 
 	public static function clean_sms_list() {
 		include_once( plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php');
-		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 5000 );
-		$data_list = array(
-			'list_parent'	=> 1
-		);
-		$array_mailin_list = $mailin->get_lists( $data_list );
-		$date_today = new DateTime();
+		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
 
-		foreach ( $array_mailin_list[ 'data' ] as $mailin_list_item ) {
-			if ( isset( $mailin_list_item[ 'name' ] ) ) {
-				// Si c'est une liste à supprimer
-				$list_name = $mailin_list_item[ 'name' ];
-				if ( strpos( $list_name, 'Supprimer API' ) !== FALSE ) {
-					// Si la liste a été créée il y a plus de 2 jours
-					$date_entered = new DateTime( $mailin_list_item[ 'entered' ] );
-					$date_interval = $date_today->diff( $date_entered );
-					if ( $date_interval->days > 2 ) {
-						$data = array(
-							'id' => $mailin_list_item[ 'id' ]
-						);
-						$mailin->delete_list( $data );
+		try {
+			$data_list = array(
+				'list_parent'	=> 1
+			);
+			$array_mailin_list = $mailin->get_lists( $data_list );
+			$date_today = new DateTime();
+	
+			foreach ( $array_mailin_list[ 'data' ] as $mailin_list_item ) {
+				if ( isset( $mailin_list_item[ 'name' ] ) ) {
+					// Si c'est une liste à supprimer
+					$list_name = $mailin_list_item[ 'name' ];
+					if ( strpos( $list_name, 'Supprimer API' ) !== FALSE ) {
+						// Si la liste a été créée il y a plus de 2 jours
+						$date_entered = new DateTime( $mailin_list_item[ 'entered' ] );
+						$date_interval = $date_today->diff( $date_entered );
+						if ( $date_interval->days > 2 ) {
+							$data = array(
+								'id' => $mailin_list_item[ 'id' ]
+							);
+							$mailin->delete_list( $data );
+						}
 					}
 				}
 			}
+			
+		} catch ( Exception $e ) {
+			
 		}
+		
 	}
 
 
