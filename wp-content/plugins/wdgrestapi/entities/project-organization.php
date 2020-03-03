@@ -15,11 +15,15 @@ class WDGRESTAPI_Entity_ProjectOrganization extends WDGRESTAPI_Entity {
 	 */
 	public static function get_list_by_project_id( $id_project ) {
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ProjectOrganization::$entity_type );
-		$query = "SELECT id_organization, type FROM " . $table_name;
-		$query .= " WHERE id_project=" . $id_project;
-		$results = $wpdb->get_results( $query );
-		return $results;
+		if (isset($id_project)) {
+			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ProjectOrganization::$entity_type );
+			$query = "SELECT id_organization, type FROM " . $table_name;
+			$query .= " WHERE id_project=" . $id_project;
+			$results = $wpdb->get_results( $query );
+			return $results;
+		} else {
+			return FALSE;
+		}
 	}
 	
 	/**
