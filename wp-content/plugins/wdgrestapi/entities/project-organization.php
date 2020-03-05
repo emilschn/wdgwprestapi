@@ -15,7 +15,7 @@ class WDGRESTAPI_Entity_ProjectOrganization extends WDGRESTAPI_Entity {
 	 */
 	public static function get_list_by_project_id( $id_project ) {
 		global $wpdb;
-		if (isset($id_project)) {
+		if (!empty($id_project)) {
 			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ProjectOrganization::$entity_type );
 			$query = "SELECT id_organization, type FROM " . $table_name;
 			$query .= " WHERE id_project=" . $id_project;
