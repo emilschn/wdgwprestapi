@@ -39,25 +39,30 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 	public function get_organizationlist_by_project_id( WP_REST_Request $request ) {
 		$project_id = $request->get_param( 'id' );
 		if ( !empty( $project_id ) ) {
-			$result = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $project_id );
-			$organization_list = array();
-			foreach ( $result as $link_item ) {
-				$project = new WDGRESTAPI_Entity_Organization( $link_item->id_organization );
-				$loaded_data = $project->get_loaded_data();
-				array_push( 
-					$organization_list,
-					array( 
-						"id"	=> $loaded_data->id,
-						"wpref"	=> $loaded_data->wpref,
-						"name"	=> $loaded_data->name,
-						"email"	=> $loaded_data->email,
-						"type"	=> $link_item->type
-					)
-				);
+			try {
+				$result = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $project_id );
+				$organization_list = array();
+				foreach ( $result as $link_item ) {
+					$project = new WDGRESTAPI_Entity_Organization( $link_item->id_organization );
+					$loaded_data = $project->get_loaded_data();
+					array_push( 
+						$organization_list,
+						array( 
+							"id"	=> $loaded_data->id,
+							"wpref"	=> $loaded_data->wpref,
+							"name"	=> $loaded_data->name,
+							"email"	=> $loaded_data->email,
+							"type"	=> $link_item->type
+						)
+					);
+				}
+				
+				return $organization_list;
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_organizationlist_by_project_id::" . $project_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
-			
-			$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_organizationlist_by_project_id::" . $project_id, json_encode( $organization_list ) );
-			return $organization_list;
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_organizationlist_by_project_id", "404 : Invalid project ID (empty)" );
@@ -68,24 +73,29 @@ class WDGRESTAPI_Route_ProjectOrganization extends WDGRESTAPI_Route {
 	public function get_projectlist_by_organization_id( WP_REST_Request $request ) {
 		$organization_id = $request->get_param( 'id' );
 		if ( !empty( $organization_id ) ) {
-			$result = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_organization_id( $organization_id );
-			$project_list = array();
-			foreach ( $result as $link_item ) {
-				$project = new WDGRESTAPI_Entity_Project( $link_item->id_project );
-				$loaded_data = $project->get_loaded_data();
-				array_push( 
-					$project_list,
-					array( 
-						"id"	=> $loaded_data->id,
-						"wpref"	=> $loaded_data->wpref,
-						"name"	=> $loaded_data->name,
-						"type"	=> $link_item->type
-					)
-				);
+			try {
+				$result = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_organization_id( $organization_id );
+				$project_list = array();
+				foreach ( $result as $link_item ) {
+					$project = new WDGRESTAPI_Entity_Project( $link_item->id_project );
+					$loaded_data = $project->get_loaded_data();
+					array_push( 
+						$project_list,
+						array( 
+							"id"	=> $loaded_data->id,
+							"wpref"	=> $loaded_data->wpref,
+							"name"	=> $loaded_data->name,
+							"type"	=> $link_item->type
+						)
+					);
+				}
+				
+				return $project_list;
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_projectlist_by_organization_id::" . $organization_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
-			
-			$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_projectlist_by_organization_id::" . $organization_id, json_encode( $project_list ) );
-			return $project_list;
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_ProjectOrganization::get_projectlist_by_organization_id", "404 : Invalid organization ID (empty)" );

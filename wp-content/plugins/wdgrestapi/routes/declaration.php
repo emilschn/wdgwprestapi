@@ -74,13 +74,19 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		$input_start_date = filter_input( INPUT_GET, 'start_date' );
-		$input_end_date = filter_input( INPUT_GET, 'end_date' );
-		$input_type = filter_input( INPUT_GET, 'type' );
-		$start_date = ( !empty( $input_start_date ) ) ? new DateTime( $input_start_date ) : FALSE;
-		$end_date = ( !empty( $input_end_date ) ) ? new DateTime( $input_end_date ) : FALSE;
-		$type = ( !empty( $input_type ) ) ? $input_type : FALSE;
-		return WDGRESTAPI_Entity_Declaration::list_get( $this->get_current_client_autorized_ids_string(), $start_date, $end_date, $type );
+		try {
+			$input_start_date = filter_input( INPUT_GET, 'start_date' );
+			$input_end_date = filter_input( INPUT_GET, 'end_date' );
+			$input_type = filter_input( INPUT_GET, 'type' );
+			$start_date = ( !empty( $input_start_date ) ) ? new DateTime( $input_start_date ) : FALSE;
+			$end_date = ( !empty( $input_end_date ) ) ? new DateTime( $input_end_date ) : FALSE;
+			$type = ( !empty( $input_type ) ) ? $input_type : FALSE;
+			return WDGRESTAPI_Entity_Declaration::list_get( $this->get_current_client_autorized_ids_string(), $start_date, $end_date, $type );
+
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_Declaration::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -93,23 +99,28 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	/**
 	 * Retourne une déclaration grâce à son id
 	 * @param WP_REST_Request $request
-	 * @return \WDGRESTAPI_Entity_Project
+	 * @return \WDGRESTAPI_Entity_Declaration
 	 */
 	public function single_get( WP_REST_Request $request ) {
 		$declaration_id = $request->get_param( 'id' );
 		if ( !empty( $declaration_id ) ) {
-			$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
-			$loaded_data_temp = $declaration_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
-				$loaded_data = WDGRESTAPI_Entity_Declaration::complete_single_data( $loaded_data_temp );
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get::" . $declaration_id, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
+				$loaded_data_temp = $declaration_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get::" . $declaration_id, "404 : Invalid declaration id" );
-				return new WP_Error( '404', "Invalid declaration id" );
-				
+				if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
+					$loaded_data = WDGRESTAPI_Entity_Declaration::complete_single_data( $loaded_data_temp );
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Declaration::single_get::" . $declaration_id, "404 : Invalid declaration id" );
+					return new WP_Error( '404', "Invalid declaration id" );
+					
+				}
+
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get::" . $declaration_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -126,17 +137,23 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	public function single_get_by_token( WP_REST_Request $request ) {
 		$payment_token = $request->get_param( 'token' );
 		if ( !empty( $payment_token ) ) {
-			$declaration_item = new WDGRESTAPI_Entity_Declaration( FALSE, $payment_token );
-			$loaded_data = $declaration_item->get_loaded_data();
+			try {
+				$declaration_item = new WDGRESTAPI_Entity_Declaration( FALSE, $payment_token );
+				$loaded_data = $declaration_item->get_loaded_data();
+				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$this->log( "WDGRESTAPI_Route_Declaration::single_get_by_token::" . $payment_token, json_encode( $loaded_data ) );
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Declaration::single_get_by_token::" . $payment_token, "404 : Invalid declaration payment token" );
+					return new WP_Error( '404', "Invalid declaration payment token" );
+					
+				}
 			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get_by_token::" . $payment_token, json_encode( $loaded_data ) );
-				return $loaded_data;
-				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get_by_token::" . $payment_token, "404 : Invalid declaration payment token" );
-				return new WP_Error( '404', "Invalid declaration payment token" );
-				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_by_token::" . $payment_token, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -219,18 +236,23 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	public function single_get_rois( WP_REST_Request $request ) {
 		$declaration_id = $request->get_param( 'id' );
 		if ( !empty( $declaration_id ) ) {
-			$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
-			$loaded_data = $declaration_item->get_loaded_data();
+			try {
+				$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
+				$loaded_data = $declaration_item->get_loaded_data();
+				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$rois_data = $declaration_item->get_rois();
+					return $rois_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Declaration::single_get_rois::" . $declaration_id, "404 : Invalid declaration ID" );
+					return new WP_Error( '404', "Invalid declaration ID" );
+					
+				}
 			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$rois_data = $declaration_item->get_rois();
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get_rois::" . $declaration_id, json_encode( $rois_data ) );
-				return $rois_data;
-				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get_rois::" . $declaration_id, "404 : Invalid declaration ID" );
-				return new WP_Error( '404', "Invalid declaration ID" );
-				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_rois::" . $declaration_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -247,23 +269,28 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	public function single_get_adjustments( WP_REST_Request $request ) {
 		$declaration_id = $request->get_param( 'id' );
 		if ( !empty( $declaration_id ) ) {
-			$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
-			$loaded_data = $declaration_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$input_linked = filter_input( INPUT_GET, 'linked' );
-				if ( empty( $input_linked ) ) {
-					$rois_data = $declaration_item->get_adjustments();
+			try {
+				$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
+				$loaded_data = $declaration_item->get_loaded_data();
+				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$input_linked = filter_input( INPUT_GET, 'linked' );
+					if ( empty( $input_linked ) ) {
+						$rois_data = $declaration_item->get_adjustments();
+					} else {
+						$rois_data = $declaration_item->get_linked_adjustments();
+					}
+					return $rois_data;
+					
 				} else {
-					$rois_data = $declaration_item->get_linked_adjustments();
+					$this->log( "WDGRESTAPI_Route_Declaration::single_get_adjustments::" . $declaration_id, "404 : Invalid declaration ID" );
+					return new WP_Error( '404', "Invalid declaration ID" );
+					
 				}
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get_adjustments::" . $declaration_id, json_encode( $rois_data ) );
-				return $rois_data;
-				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get_adjustments::" . $declaration_id, "404 : Invalid declaration ID" );
-				return new WP_Error( '404', "Invalid declaration ID" );
-				
+			
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_adjustments::" . $declaration_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
@@ -280,19 +307,24 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 	public function single_get_files( WP_REST_Request $request ) {
 		$declaration_id = $request->get_param( 'id' );
 		if ( !empty( $declaration_id ) ) {
-			$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
-			$loaded_data = $declaration_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$input_file_type = filter_input( INPUT_GET, 'file_type' );
-				$file_list = $declaration_item->get_files( $input_file_type );
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get_files::" . $declaration_id, json_encode( $file_list ) );
-				return $file_list;
+			try {
+				$declaration_item = new WDGRESTAPI_Entity_Declaration( $declaration_id );
+				$loaded_data = $declaration_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_Declaration::single_get_files::" . $declaration_id, "404 : Invalid declaration ID" );
-				return new WP_Error( '404', "Invalid declaration ID" );
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$input_file_type = filter_input( INPUT_GET, 'file_type' );
+					$file_list = $declaration_item->get_files( $input_file_type );
+					return $file_list;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Declaration::single_get_files::" . $declaration_id, "404 : Invalid declaration ID" );
+					return new WP_Error( '404', "Invalid declaration ID" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Declaration::single_get_files::" . $declaration_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

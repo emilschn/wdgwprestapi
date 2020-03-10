@@ -39,25 +39,30 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 	public function get_userlist_by_project_id( WP_REST_Request $request ) {
 		$project_id = $request->get_param( 'id' );
 		if ( !empty( $project_id ) ) {
-			$result = WDGRESTAPI_Entity_ProjectUser::get_list_by_project_id( $project_id );
-			$user_list = array();
-			foreach ( $result as $link_item ) {
-				$user = new WDGRESTAPI_Entity_User( $link_item->id_user );
-				$loaded_data = $user->get_loaded_data();
-				array_push( 
-					$user_list,
-					array( 
-						"id"		=> $loaded_data->id,
-						"wpref"		=> $loaded_data->wpref,
-						"name"		=> $loaded_data->name,
-						"surname"	=> $loaded_data->surname,
-						"type"		=> $link_item->type
-					)
-				);
+			try {
+				$result = WDGRESTAPI_Entity_ProjectUser::get_list_by_project_id( $project_id );
+				$user_list = array();
+				foreach ( $result as $link_item ) {
+					$user = new WDGRESTAPI_Entity_User( $link_item->id_user );
+					$loaded_data = $user->get_loaded_data();
+					array_push( 
+						$user_list,
+						array( 
+							"id"		=> $loaded_data->id,
+							"wpref"		=> $loaded_data->wpref,
+							"name"		=> $loaded_data->name,
+							"surname"	=> $loaded_data->surname,
+							"type"		=> $link_item->type
+						)
+					);
+				}
+				
+				return $user_list;
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_ProjectUser::get_userlist_by_project_id::" . $project_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
-			
-			$this->log( "WDGRESTAPI_Route_ProjectUser::get_userlist_by_project_id::" . $project_id, json_encode( $user_list ) );
-			return $user_list;
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_ProjectUser::get_userlist_by_project_id", "404 : Invalid project ID (empty)" );
@@ -68,24 +73,29 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 	public function get_projectlist_by_user_id( WP_REST_Request $request ) {
 		$user_id = $request->get_param( 'id' );
 		if ( !empty( $user_id ) ) {
-			$result = WDGRESTAPI_Entity_ProjectUser::get_list_by_user_id( $user_id );
-			$project_list = array();
-			foreach ( $result as $link_item ) {
-				$project = new WDGRESTAPI_Entity_Project( $link_item->id_project );
-				$loaded_data = $project->get_loaded_data();
-				array_push( 
-					$project_list,
-					array( 
-						"id"	=> $loaded_data->id,
-						"wpref"	=> $loaded_data->wpref,
-						"name"	=> $loaded_data->name,
-						"type"	=> $link_item->type
-					)
-				);
+			try {
+				$result = WDGRESTAPI_Entity_ProjectUser::get_list_by_user_id( $user_id );
+				$project_list = array();
+				foreach ( $result as $link_item ) {
+					$project = new WDGRESTAPI_Entity_Project( $link_item->id_project );
+					$loaded_data = $project->get_loaded_data();
+					array_push( 
+						$project_list,
+						array( 
+							"id"	=> $loaded_data->id,
+							"wpref"	=> $loaded_data->wpref,
+							"name"	=> $loaded_data->name,
+							"type"	=> $link_item->type
+						)
+					);
+				}
+				
+				return $project_list;
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_ProjectUser::get_projectlist_by_user_id::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
-			
-			$this->log( "WDGRESTAPI_Route_ProjectUser::get_projectlist_by_user_id::" . $user_id, json_encode( $project_list ) );
-			return $project_list;
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_ProjectUser::get_projectlist_by_user_id", "404 : Invalid user ID (empty)" );

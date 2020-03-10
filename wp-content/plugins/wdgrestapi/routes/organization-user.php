@@ -32,9 +32,14 @@ class WDGRESTAPI_Route_OrganizationUser extends WDGRESTAPI_Route {
 	public function get_userlist_by_organization_id( WP_REST_Request $request ) {
 		$organization_id = $request->get_param( 'id' );
 		if ( !empty( $organization_id ) ) {
-			$user_list = WDGRESTAPI_Entity_OrganizationUser::get_list_by_organization_id( $organization_id );
-			$this->log( "WDGRESTAPI_Route_OrganizationUser::get_userlist_by_organization_id::" . $organization_id, json_encode( $user_list ) );
-			return $user_list;
+			try {
+				$user_list = WDGRESTAPI_Entity_OrganizationUser::get_list_by_organization_id( $organization_id );
+				return $user_list;
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_OrganizationUser::get_userlist_by_organization_id::" . $organization_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_OrganizationUser::get_userlist_by_organization_id", "404 : Invalid organization ID (empty)" );
@@ -45,24 +50,29 @@ class WDGRESTAPI_Route_OrganizationUser extends WDGRESTAPI_Route {
 	public function get_organizationlist_by_user_id( WP_REST_Request $request ) {
 		$user_id = $request->get_param( 'id' );
 		if ( !empty( $user_id ) ) {
-			$result = WDGRESTAPI_Entity_OrganizationUser::get_list_by_user_id( $user_id );
-			$organization_list = array();
-			foreach ( $result as $link_item ) {
-				$organization = new WDGRESTAPI_Entity_Organization( $link_item->id_organization );
-				$loaded_data = $organization->get_loaded_data();
-				array_push( 
-					$organization_list,
-					array( 
-						"id"	=> $loaded_data->id,
-						"wpref"	=> $loaded_data->wpref,
-						"name"	=> $loaded_data->name,
-						"type"	=> $link_item->type
-					)
-				);
+			try {
+				$result = WDGRESTAPI_Entity_OrganizationUser::get_list_by_user_id( $user_id );
+				$organization_list = array();
+				foreach ( $result as $link_item ) {
+					$organization = new WDGRESTAPI_Entity_Organization( $link_item->id_organization );
+					$loaded_data = $organization->get_loaded_data();
+					array_push( 
+						$organization_list,
+						array( 
+							"id"	=> $loaded_data->id,
+							"wpref"	=> $loaded_data->wpref,
+							"name"	=> $loaded_data->name,
+							"type"	=> $link_item->type
+						)
+					);
+				}
+				
+				return $organization_list;
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_OrganizationUser::get_organizationlist_by_user_id::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
-			
-			$this->log( "WDGRESTAPI_Route_OrganizationUser::get_organizationlist_by_user_id::" . $user_id, json_encode( $organization_list ) );
-			return $organization_list;
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_OrganizationUser::get_organizationlist_by_user_id", "404 : Invalid user ID (empty)" );

@@ -39,17 +39,23 @@ class WDGRESTAPI_Route_PollAnswer extends WDGRESTAPI_Route {
 	 * @return array
 	 */
 	public function list_get() {
-		$input_user = filter_input( INPUT_GET, 'user_id' );
-		$input_project = filter_input( INPUT_GET, 'project_id' );
-		$input_poll_slug = filter_input( INPUT_GET, 'poll_slug' );
-		$limit = filter_input( INPUT_GET, 'limit' );
-		$offset = filter_input( INPUT_GET, 'offset' );
-		$apply_in_google = filter_input( INPUT_GET, 'apply_in_google' );
-		
-		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_PollAnswer::list_get');
-		$buffer = WDGRESTAPI_Entity_PollAnswer::list_get( $this->get_current_client_autorized_ids_string(), $input_user, $input_project, $input_poll_slug, $limit, $offset, $apply_in_google );
-		
-		return $buffer;
+		try {
+			$input_user = filter_input( INPUT_GET, 'user_id' );
+			$input_project = filter_input( INPUT_GET, 'project_id' );
+			$input_poll_slug = filter_input( INPUT_GET, 'poll_slug' );
+			$limit = filter_input( INPUT_GET, 'limit' );
+			$offset = filter_input( INPUT_GET, 'offset' );
+			$apply_in_google = filter_input( INPUT_GET, 'apply_in_google' );
+			
+			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_PollAnswer::list_get');
+			$buffer = WDGRESTAPI_Entity_PollAnswer::list_get( $this->get_current_client_autorized_ids_string(), $input_user, $input_project, $input_poll_slug, $limit, $offset, $apply_in_google );
+			
+			return $buffer;
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_PollAnswer::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -60,17 +66,22 @@ class WDGRESTAPI_Route_PollAnswer extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$poll_answer_id = $request->get_param( 'id' );
 		if ( !empty( $poll_answer_id ) ) {
-			$poll_answer_item = new WDGRESTAPI_Entity_PollAnswer( $poll_answer_id );
-			$loaded_data_temp = $poll_answer_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
-				$this->log( "WDGRESTAPI_Route_PollAnswer::single_get::" . $poll_answer_id, json_encode( $loaded_data_temp ) );
-				return $loaded_data_temp;
+			try {
+				$poll_answer_item = new WDGRESTAPI_Entity_PollAnswer( $poll_answer_id );
+				$loaded_data_temp = $poll_answer_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_PollAnswer::single_get::" . $poll_answer_id, "404 : Invalid poll answer id" );
-				return new WP_Error( '404', "Invalid poll answer id" );
+				if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
+					return $loaded_data_temp;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_PollAnswer::single_get::" . $poll_answer_id, "404 : Invalid poll answer id" );
+					return new WP_Error( '404', "Invalid poll answer id" );
+					
+				}
 				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_PollAnswer::single_get::" . $poll_answer_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

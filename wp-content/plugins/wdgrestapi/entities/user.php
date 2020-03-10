@@ -300,7 +300,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'address_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 15 ),
 		'address_number_comp'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 16 ),
 		'address'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 17 ),
-		'postalcode'			=> array( 'type' => 'int', 'other' => '', 'gs_col_index' => 18 ),
+		'postalcode'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 18 ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 19 ),
 		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 20 ),
 		'tax_country'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 21 ),

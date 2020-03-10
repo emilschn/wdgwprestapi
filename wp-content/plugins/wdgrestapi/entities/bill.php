@@ -57,6 +57,9 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 			
 		} elseif ( !empty( $quickbooks_service ) ) {
 			//Add a new Invoice
+			$id_class = isset( $options->classid ) ? $options->classid : '';
+			$id_location = isset( $options->locationid ) ? $options->locationid : '';
+
 			$bill_object = Invoice::create( [
 				"Line"	=> [
 					[
@@ -64,13 +67,17 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 						"Description"	=> $options->itemdescription,
 						"DetailType"	=> "SalesItemLineDetail",
 						"SalesItemLineDetail" => [
-							"TaxCodeRef"	=>	$options->itemtaxid,
-							"ItemRef"		=>	$options->itemtitle
+							"TaxCodeRef"	=> $options->itemtaxid,
+							"ItemRef"		=> $options->itemtitle,
+							"ClassRef"		=> $id_class
 						]
 					]
 				],
 				"CustomerRef"	=> [
 					"value"	=> $options->customerid
+				],
+				"DepartmentRef"	=> [
+					"value"	=> $id_location
 				],
 				"CustomerMemo"	=> [
 					"value"	=> $options->billdescription
@@ -79,10 +86,14 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 					"Address"	=> $options->customeremail
 				],
 				"BillEmailBcc"	=> [
-					"Address"	=> "admin@wedogood.co"
+					"Address"	=> "administratif@wedogood.co"
 				]
 			] );
 			$resultingObj = $quickbooks_service->Add( $bill_object );
+
+			if ( isset( $options->sendemail ) && $options->sendemail == 1 ) {
+				$quickbooks_service->SendEmail( $resultingObj );
+			}
 
 			$error = $quickbooks_service->getLastError();
 			if ($error != null) {

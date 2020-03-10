@@ -44,17 +44,22 @@ class WDGRESTAPI_Route_BankInfo extends WDGRESTAPI_Route {
 	public function single_get( WP_REST_Request $request ) {
 		$bankinfo_email = $request->get_param( 'email' );
 		if ( !empty( $bankinfo_email ) ) {
-			$bankinfo_item = new WDGRESTAPI_Route_BankInfo( '', $bankinfo_email );
-			$loaded_data = $bankinfo_item->get_loaded_data();
-			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->log( "WDGRESTAPI_Route_BankInfo::single_get::" . $bankinfo_email, json_encode( $loaded_data ) );
-				return $loaded_data;
+			try {
+				$bankinfo_item = new WDGRESTAPI_Route_BankInfo( '', $bankinfo_email );
+				$loaded_data = $bankinfo_item->get_loaded_data();
 				
-			} else {
-				$this->log( "WDGRESTAPI_Route_BankInfo::single_get::" . $bankinfo_email, "404 : Invalid bank info e-mail" );
-				return new WP_Error( '404', "Invalid bank info e-mail" );
-				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_BankInfo::single_get::" . $bankinfo_email, "404 : Invalid bank info e-mail" );
+					return new WP_Error( '404', "Invalid bank info e-mail" );
+					
+				}
+
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_BankInfo::single_get::" . $bankinfo_email, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {

@@ -84,14 +84,16 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	 * @param type $item
 	 */
 	public static function standardize_data( $item ) {
-		$item->creation_date = WDGRESTAPI_Entity::standardize_date( $item->creation_date );
-		$item->contract_start_date = WDGRESTAPI_Entity::standardize_date( $item->contract_start_date );
-		$item->declarations_start_date = WDGRESTAPI_Entity::standardize_date( $item->declarations_start_date );
-		$item->declarations_end_date = WDGRESTAPI_Entity::standardize_date( $item->declarations_end_date );
-		$item->vote_start_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->vote_start_datetime );
-		$item->vote_end_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->vote_end_datetime );
-		$item->funding_start_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->funding_start_datetime );
-		$item->funding_end_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->funding_end_datetime );
+		if($item){
+			$item->creation_date = WDGRESTAPI_Entity::standardize_date( $item->creation_date );
+			$item->contract_start_date = WDGRESTAPI_Entity::standardize_date( $item->contract_start_date );
+			$item->declarations_start_date = WDGRESTAPI_Entity::standardize_date( $item->declarations_start_date );
+			$item->declarations_end_date = WDGRESTAPI_Entity::standardize_date( $item->declarations_end_date );
+			$item->vote_start_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->vote_start_datetime );
+			$item->vote_end_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->vote_end_datetime );
+			$item->funding_start_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->funding_start_datetime );
+			$item->funding_end_datetime = WDGRESTAPI_Entity::standardize_datetime( $item->funding_end_datetime );
+		}
 		return $item;
 	}
 	
