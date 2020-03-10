@@ -30,12 +30,6 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
 		$query = "SELECT * FROM " .$table_name. " WHERE email=" .$email;
 		$results = $wpdb->get_results( $query );
-		
-		foreach ( $results as $result ) {
-			// $result = WDGRESTAPI_Entity_Project_Draft::expand_single_data( $result );
-			// $result = WDGRESTAPI_Entity_Project_Draft::standardize_data( $result );
-		}
-		
 		return $results;
 	}
 
@@ -43,7 +37,6 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 	 * Retourne les données du statut du projet
 	 */
 	public function get_status() {
-		// $buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_status_by_project', $this->loaded_data->wpref );
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
 		$query = "SELECT status FROM " .$table_name. " WHERE guid=" .$this->loaded_data->guid;
