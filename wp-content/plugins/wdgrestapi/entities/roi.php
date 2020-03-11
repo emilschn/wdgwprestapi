@@ -67,6 +67,7 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 		'id_declaration'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'date_transfer'			=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
 		'amount'				=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'amount_tax_in_cents'	=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'id_transfer'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'id_investment_contract'	=> array( 'type' => 'id', 'other' => 'NOT NULL' )
