@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.805';
+	private $version = '0.0.806';
     
 	/**
 	 * Instanciation du singleton
@@ -79,6 +79,7 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'organization' );
 		$this->add_include_entity( 'user' );
 		$this->add_include_entity( 'project' );
+		$this->add_include_entity( 'project-draft' );
 		$this->add_include_entity( 'investment' );
 		$this->add_include_entity( 'investment-draft' );
 		$this->add_include_entity( 'investment-contract' );
@@ -113,6 +114,7 @@ class WDGRESTAPI {
 		$this->add_include_route( 'organization' );
 		$this->add_include_route( 'user' );
 		$this->add_include_route( 'project' );
+		$this->add_include_route( 'project-draft' );
 		$this->add_include_route( 'investment' );
 		$this->add_include_route( 'investment-draft' );
 		$this->add_include_route( 'investment-contract' );
@@ -139,6 +141,7 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Organization::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_User::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Project::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Project_Draft::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Investment::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_InvestmentDraft::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_InvestmentContract::register');
@@ -178,6 +181,7 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_Organization::upgrade_db();
 			WDGRESTAPI_Entity_User::upgrade_db();
 			WDGRESTAPI_Entity_Project::upgrade_db();
+			WDGRESTAPI_Entity_Project_Draft::upgrade_db();
 			WDGRESTAPI_Entity_Investment::upgrade_db();
 			WDGRESTAPI_Entity_InvestmentDraft::upgrade_db();
 			WDGRESTAPI_Entity_InvestmentContract::upgrade_db();
