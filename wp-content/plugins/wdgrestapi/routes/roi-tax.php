@@ -34,7 +34,8 @@ class WDGRESTAPI_Route_ROITax extends WDGRESTAPI_Route {
 	 */
 	public function list_get() {
 		try {
-			return WDGRESTAPI_Entity_ROITax::list_get( $this->get_current_client_autorized_ids_string() );
+			$input_id_roi = filter_input( INPUT_GET, 'id_roi' );
+			return WDGRESTAPI_Entity_ROITax::list_get( $this->get_current_client_autorized_ids_string(), $input_id_roi );
 			
 		} catch ( Exception $e ) {
 			$this->log( "WDGRESTAPI_Route_ROITax::list_get", $e->getMessage() );

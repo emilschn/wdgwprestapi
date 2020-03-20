@@ -14,10 +14,13 @@ class WDGRESTAPI_Entity_ROITax extends WDGRESTAPI_Entity {
 	 * Retourne la liste de tous les ROITax
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string ) {
+	public static function list_get( $authorized_client_id_string, $input_id_roi ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
+		if ( !empty( $input_id_roi ) ) {
+			$query .= " AND id_roi=" . $input_id_roi;
+		}
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
