@@ -17,7 +17,7 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 	public static function list_get( $authorized_client_id_string ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ROI::$entity_type );
-		$query = "SELECT id, id_investment, id_investment_contract, id_project, id_orga, id_user, recipient_type, id_declaration, date_transfer, amount, id_transfer, status FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string. " ORDER BY date_transfer ASC";
+		$query = "SELECT id, id_investment, id_investment_contract, id_project, id_orga, id_user, recipient_type, id_declaration, date_transfer, amount, amount_taxed_in_cents, id_transfer, status FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string. " ORDER BY date_transfer ASC";
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
@@ -30,7 +30,7 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 	public static function list_get_by_declaration_id( $declaration_id ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ROI::$entity_type );
-		$query = "SELECT id, id_investment, id_investment_contract, id_project, id_orga, id_user, recipient_type, id_declaration, date_transfer, amount, id_transfer, status FROM " .$table_name. " WHERE id_declaration = " .$declaration_id. " ORDER BY date_transfer ASC";
+		$query = "SELECT id, id_investment, id_investment_contract, id_project, id_orga, id_user, recipient_type, id_declaration, date_transfer, amount, amount_taxed_in_cents, id_transfer, status FROM " .$table_name. " WHERE id_declaration = " .$declaration_id. " ORDER BY date_transfer ASC";
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
@@ -46,7 +46,7 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 			return array();
 		}
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ROI::$entity_type );
-		$query = "SELECT id, id_investment, id_investment_contract, id_project, id_orga, id_user, recipient_type, id_declaration, date_transfer, amount, id_transfer, status FROM " .$table_name. " WHERE id_user = " .$recipient_id. " AND recipient_type = '" .$recipient_type. "' ORDER BY date_transfer ASC";
+		$query = "SELECT id, id_investment, id_investment_contract, id_project, id_orga, id_user, recipient_type, id_declaration, date_transfer, amount, amount_taxed_in_cents, id_transfer, status FROM " .$table_name. " WHERE id_user = " .$recipient_id. " AND recipient_type = '" .$recipient_type. "' ORDER BY date_transfer ASC";
 		$results = $wpdb->get_results( $query );
 		return $results;
 	}
@@ -67,7 +67,7 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 		'id_declaration'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'date_transfer'			=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'' ),
 		'amount'				=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
-		'amount_tax_in_cents'	=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'amount_taxed_in_cents'	=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'id_transfer'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'id_investment_contract'	=> array( 'type' => 'id', 'other' => 'NOT NULL' )
