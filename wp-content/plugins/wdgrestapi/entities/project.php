@@ -487,12 +487,13 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'turnover_per_declaration'	=> array( 'type' => 'int', 'other' => '', 'gs_col_index' => 37 ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => '', 'gs_col_index' => 38 ),
 		'team_contacts'			=> array( 'type' => 'longtext', 'other' => '', 'gs_col_index' => 39 ),
-		'minimum_goal_display'	=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 40 )
+		'minimum_goal_display'	=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 40 ),
+		'common_goods_turnover_percent'	=> array( 'type' => 'float', 'other' => '', 'gs_col_index' => 41 )
 	);
 	
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_Project::$entity_type, WDGRESTAPI_Entity_Project::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
 	
 }
