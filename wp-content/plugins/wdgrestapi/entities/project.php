@@ -467,6 +467,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'maximum_profit_precision'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 18 ),
 		'minimum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 19 ),
 		'contract_start_date'	=> array( 'type' => 'date', 'other' => '', 'gs_col_index' => 20 ),
+		'contract_start_date_is_undefined'	=> array( 'type' => 'bool', 'other' => '' ),
 		'declarations_start_date'	=> array( 'type' => 'date', 'other' => '', 'gs_col_index' => 21 ),
 		'spendings_description'	=> array( 'type' => 'longtext', 'other' => '', 'gs_col_index' => 22 ),
 		'earnings_description'	=> array( 'type' => 'longtext', 'other' => '', 'gs_col_index' => 23 ),
