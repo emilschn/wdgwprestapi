@@ -15,7 +15,7 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 		parent::__construct( $id, WDGRESTAPI_Entity_Project_Draft::$entity_type, WDGRESTAPI_Entity_Project_Draft::$db_properties );
 		if ( $guid != FALSE ) {
 			global $wpdb;
-			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
+			$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 			$query = 'SELECT * FROM ' .$table_name. ' WHERE guid=\''.$guid.'\'';
 			$this->loaded_data = $wpdb->get_row( $query );
 		}
@@ -53,6 +53,7 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
+		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		'guid'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
 		'id_user'				=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 3 ),
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 4 ),
