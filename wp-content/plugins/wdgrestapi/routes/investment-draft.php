@@ -61,7 +61,7 @@ class WDGRESTAPI_Route_InvestmentDraft extends WDGRESTAPI_Route {
 			try {
 				$investment_draft_item = new WDGRESTAPI_Entity_InvestmentDraft( $investment_draft_id );
 				$loaded_data = $investment_draft_item->get_loaded_data();
-				
+				$loaded_data = WDGRESTAPI_Entity_InvestmentDraft::complete_single_data( $loaded_data );
 				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 					return $loaded_data;
 					
