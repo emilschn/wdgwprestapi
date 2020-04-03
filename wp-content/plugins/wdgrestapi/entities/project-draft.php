@@ -12,7 +12,7 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 	public static $status_archive = 'archive';
 	
 	public function __construct( $id = FALSE, $guid = FALSE ) {
-		parent::__construct( $id, WDGRESTAPI_Entity_Project_Draft::$entity_type, WDGRESTAPI_Entity_Project_Draft::$db_properties );
+		parent::__construct( $id, self::$entity_type, self::$db_properties );
 		if ( $guid != FALSE ) {
 			global $wpdb;
 			$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
@@ -27,7 +27,7 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 	 */
 	public static function list_get( $email ) {
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT * FROM " .$table_name. " WHERE email='" .$email. "'";
 		$results = $wpdb->get_results( $query );
 		return $results;
@@ -38,7 +38,7 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 	 */
 	public function get_status() {
 		global $wpdb;
-		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project_Draft::$entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT status FROM " .$table_name. " WHERE guid=" .$this->loaded_data->guid;
 		$buffer = $wpdb->get_result( $query );
 		
@@ -65,7 +65,7 @@ class WDGRESTAPI_Entity_Project_Draft extends WDGRESTAPI_Entity {
 	
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_Project_Draft::$entity_type, WDGRESTAPI_Entity_Project_Draft::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
 	
 }

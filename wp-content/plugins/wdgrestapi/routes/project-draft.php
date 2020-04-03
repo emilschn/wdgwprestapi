@@ -50,21 +50,7 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 	public function list_get( WP_REST_Request $request ) {
 		try {
 			$email = $request->get_param( 'email' );
-
-			// Gestion cache
-			$cache_name = '/project-drafts';
-			$cached_version_entity = new WDGRESTAPI_Entity_Cache( FALSE, $cache_name );
-			$cached_value = $cached_version_entity->get_value( 60 );
-			
-			if ( !empty( $cached_value ) ) {
-				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_Project_Draft::use cache');
-				$buffer = json_decode( $cached_value );
-			} else {
-				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_Project_Draft::use request');
-				$buffer = WDGRESTAPI_Entity_Project_Draft::list_get( $email );
-				$cached_version_entity->save( $cache_name, json_encode( $buffer ) );
-			}
-			
+			$buffer = WDGRESTAPI_Entity_Project_Draft::list_get( $email );
 			return $buffer;
 			
 		} catch ( Exception $e ) {
