@@ -489,7 +489,9 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'employees_number'		=> array( 'type' => 'int', 'other' => '', 'gs_col_index' => 38 ),
 		'team_contacts'			=> array( 'type' => 'longtext', 'other' => '', 'gs_col_index' => 39 ),
 		'minimum_goal_display'	=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 40 ),
-		'common_goods_turnover_percent'	=> array( 'type' => 'float', 'other' => '', 'gs_col_index' => 41 )
+		'common_goods_turnover_percent'	=> array( 'type' => 'float', 'other' => '', 'gs_col_index' => 41 ),
+		'product_type'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 42 ),
+		'acquisition'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 43 )
 	);
 	
 	// Mise à jour de la bdd
