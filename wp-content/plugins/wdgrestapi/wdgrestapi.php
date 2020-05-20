@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.813';
+	private $version = '0.0.821';
 
     
 	/**
@@ -95,6 +95,7 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'contract-model' );
 		$this->add_include_entity( 'contract' );
 		$this->add_include_entity( 'queued-action' );
+		$this->add_include_entity( 'transaction' );
 		
 		$this->add_include_entity( 'organization-user' );
 		$this->add_include_entity( 'project-user' );
@@ -200,6 +201,7 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_ContractModel::upgrade_db();
 			WDGRESTAPI_Entity_Contract::upgrade_db();
 			WDGRESTAPI_Entity_QueuedAction::upgrade_db();
+			WDGRESTAPI_Entity_Transaction::upgrade_db();
 			
 			WDGRESTAPI_Entity_OrganizationUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectUser::upgrade_db();
