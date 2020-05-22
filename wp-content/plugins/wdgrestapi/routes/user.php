@@ -50,6 +50,13 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
+			'/user/(?P<id>\d+)/transactions',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_transactions'),
+			array( 'token' => array( 'default' => 0 ) )
+		);
+		
+		WDGRESTAPI_Route::register_wdg(
 			'/user/(?P<id>\d+)/activities',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get_activities'),
@@ -340,6 +347,42 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		}
 	}
 	
+	/**
+	 * Retourne les transactions liées à un utilisateur (par l'ID de l'utilisateur)
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_transactions( WP_REST_Request $request ) {
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
+		if ( !empty( $user_id ) ) {
+			try {
+				$user_item = new WDGRESTAPI_Entity_User( $user_id );
+				$loaded_data = $user_item->get_loaded_data();
+				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$transactions_data = $user_item->get_transactions();
+					return $transactions_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_User::single_get_transactions::" . $user_id, "404 : Invalid user ID" );
+					return new WP_Error( '404', "Invalid user ID" );
+					
+				}
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get_transactions::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_User::single_get_transactions", "404 : Invalid user ID (empty)" );
+			return new WP_Error( '404', "Invalid user ID (empty)" );
+		}
+	}
+	
 	
 	/**
 	 * Retourne les actions effectuées par un utilisateur (par l'ID de l'utilisateur)
@@ -357,8 +400,8 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 				$loaded_data = $user_item->get_loaded_data();
 				
 				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-					$rois_data = $user_item->get_activities();
-					return $rois_data;
+					$activities_data = $user_item->get_activities();
+					return $activities_data;
 					
 				} else {
 					$this->log( "WDGRESTAPI_Route_User::single_get_activities::" . $user_id, "404 : Invalid user ID" );

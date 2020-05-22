@@ -5,6 +5,21 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Organization::$entity_type, WDGRESTAPI_Entity_Organization::$db_properties );
 	}
+
+	/**
+	 * Récupère un utilisateur à partir de son id WP
+	 */
+	public static function get_by_wpref( $wpref ) {
+		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = 'SELECT * FROM ' .$table_name. ' WHERE wpref='.$wpref;
+		$result = $wpdb->get_row( $query );
+		$orga = new WDGRESTAPI_Entity_Organization( $result->id );
+		return $orga;
+	}
 	
 	public function save() {
 		parent::save();
@@ -78,6 +93,16 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	public function get_rois() {
 		$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_orga );
 		return $buffer;
+	}
+
+	/**
+	 * Retourne la liste des transactions de cette organisation
+	 */
+	public function get_transactions() {
+		if ( !empty( $this->loaded_data->gateway_list ) ) {
+			return WDGRESTAPI_Entity_Transaction::list_get_by_organization_id( $this->loaded_data->id, json_decode( $this->loaded_data->gateway_list ) );
+		}
+		return FALSE;
 	}
 	
 	/**
@@ -185,7 +210,8 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'linkedin_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'viadeo_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'metadata'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'geolocation'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' )
+		'geolocation'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd

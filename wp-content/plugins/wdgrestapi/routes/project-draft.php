@@ -50,21 +50,7 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 	public function list_get( WP_REST_Request $request ) {
 		try {
 			$email = $request->get_param( 'email' );
-
-			// Gestion cache
-			$cache_name = '/project-drafts';
-			$cached_version_entity = new WDGRESTAPI_Entity_Cache( FALSE, $cache_name );
-			$cached_value = $cached_version_entity->get_value( 60 );
-			
-			if ( !empty( $cached_value ) ) {
-				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_Project_Draft::use cache');
-				$buffer = json_decode( $cached_value );
-			} else {
-				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Route_Project_Draft::use request');
-				$buffer = WDGRESTAPI_Entity_Project_Draft::list_get( $email );
-				$cached_version_entity->save( $cache_name, json_encode( $buffer ) );
-			}
-			
+			$buffer = WDGRESTAPI_Entity_Project_Draft::list_get( $email );
 			return $buffer;
 			
 		} catch ( Exception $e ) {
@@ -162,21 +148,20 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 	 * @return \WP_Error
 	 */
 	public function single_edit( WP_REST_Request $request ) {
-		$project_id = $request->get_param( 'guid' );
+		$project_draft_guid = $request->get_param( 'guid' );
 		// TODO : code à vérifier
-		if ( !empty( $project_id ) ) {
-			$project_item = new WDGRESTAPI_Entity_Project_Draft( $project_id );
-			$loaded_data = $project_item->get_loaded_data();
+		if ( !empty( $project_draft_guid ) ) {
+			$project_draft_item = new WDGRESTAPI_Entity_Project_Draft( FALSE, $project_draft_guid );
+			$loaded_data = $project_draft_item->get_loaded_data();
 			
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-				$this->set_posted_properties( $project_item, WDGRESTAPI_Entity_Project_Draft::$db_properties );
-				$project_item->save();
-				$reloaded_data = $project_item->get_loaded_data();
-				$this->log( "WDGRESTAPI_Route_Project_Draft::single_edit::" . $project_id, json_encode( $reloaded_data ) );
+				$this->set_posted_properties( $project_draft_item, WDGRESTAPI_Entity_Project_Draft::$db_properties );
+				$project_draft_item->save();
+				$reloaded_data = $project_draft_item->get_loaded_data();
 				return $reloaded_data;
 				
 			} else {
-				$this->log( "WDGRESTAPI_Route_Project_Draft::single_edit::" . $project_id, "404 : Invalid project GUID" );
+				$this->log( "WDGRESTAPI_Route_Project_Draft::single_edit::" . $project_draft_guid, "404 : Invalid project GUID" );
 				return new WP_Error( '404', "Invalid project GUID" );
 				
 			}

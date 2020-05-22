@@ -3,7 +3,22 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	public static $entity_type = 'user';
 	
 	public function __construct( $id = FALSE ) {
-		parent::__construct( $id, WDGRESTAPI_Entity_User::$entity_type, WDGRESTAPI_Entity_User::$db_properties );
+		parent::__construct( $id, self::$entity_type, self::$db_properties );
+	}
+
+	/**
+	 * Récupère un utilisateur à partir de son id WP
+	 */
+	public static function get_by_wpref( $wpref ) {
+		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = 'SELECT * FROM ' .$table_name. ' WHERE wpref='.$wpref;
+		$result = $wpdb->get_row( $query );
+		$user = new WDGRESTAPI_Entity_User( $result->id );
+		return $user;
 	}
 	
 	/**
@@ -94,6 +109,16 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_user );
 		}
 		return $buffer;
+	}
+
+	/**
+	 * Retourne la liste des transactions de cette organisation
+	 */
+	public function get_transactions() {
+		if ( !empty( $this->loaded_data->gateway_list ) ) {
+			return WDGRESTAPI_Entity_Transaction::list_get_by_user_id( $this->loaded_data->id, json_decode( $this->loaded_data->gateway_list ) );
+		}
+		return FALSE;
 	}
 	
 	/**
@@ -325,7 +350,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'activation_key'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'password'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'signup_date'			=> array( 'type' => 'date', 'other' => '' ),
-		'royalties_notifications'=> array( 'type' => 'varchar', 'other' => '' )
+		'royalties_notifications'=> array( 'type' => 'varchar', 'other' => '' ),
+		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd

@@ -3,9 +3,9 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	
 	public static $entity_type = 'file';
 	
-	public static $file_entity_types = array( 'user', 'organization', 'project', 'declaration', 'investment', 'investment-draft' );
+	public static $file_entity_types = array( 'user', 'organization', 'project', 'project-draft', 'declaration', 'investment', 'investment-draft' );
 	
-	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'project_certificate', 'project_estimated_budget', 'project_document', 'contract', 'amendment', 'picture-check', 'picture-contract', 'bill' );
+	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'project_certificate', 'project_estimated_budget', 'project_document', 'contract', 'amendment', 'picture-check', 'picture-contract', 'bill', 'business' );
 	
 	private $file_data;
 

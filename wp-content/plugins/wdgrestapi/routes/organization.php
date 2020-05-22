@@ -178,6 +178,42 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	}
 	
 	/**
+	 * Retourne les transactions liées à une organisation (par l'ID de l'organisation)
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_transactions( WP_REST_Request $request ) {
+		$organization_id = FALSE;
+		if ( !empty( $request ) ) {
+			$organization_id = $request->get_param( 'id' );
+		}
+		if ( !empty( $organization_id ) ) {
+			try {
+				$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
+				$loaded_data = $organization_item->get_loaded_data();
+				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$transactions_data = $organization_item->get_transactions();
+					return $transactions_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Organization::single_get_transactions::" . $organization_id, "404 : Invalid organization ID" );
+					return new WP_Error( '404', "Invalid organization ID" );
+					
+				}
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Organization::single_get_transactions::" . $organization_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Organization::single_get_transactions", "404 : Invalid organization ID (empty)" );
+			return new WP_Error( '404', "Invalid organization ID (empty)" );
+		}
+	}
+	
+	/**
 	 * Crée une organisation
 	 * @param WP_REST_Request $request
 	 * @return \WP_Error

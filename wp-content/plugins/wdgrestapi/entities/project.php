@@ -467,6 +467,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'maximum_profit_precision'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 18 ),
 		'minimum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 19 ),
 		'contract_start_date'	=> array( 'type' => 'date', 'other' => '', 'gs_col_index' => 20 ),
+		'contract_start_date_is_undefined'	=> array( 'type' => 'bool', 'other' => '' ),
 		'declarations_start_date'	=> array( 'type' => 'date', 'other' => '', 'gs_col_index' => 21 ),
 		'spendings_description'	=> array( 'type' => 'longtext', 'other' => '', 'gs_col_index' => 22 ),
 		'earnings_description'	=> array( 'type' => 'longtext', 'other' => '', 'gs_col_index' => 23 ),
@@ -487,12 +488,15 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		'turnover_per_declaration'	=> array( 'type' => 'int', 'other' => '', 'gs_col_index' => 37 ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => '', 'gs_col_index' => 38 ),
 		'team_contacts'			=> array( 'type' => 'longtext', 'other' => '', 'gs_col_index' => 39 ),
-		'minimum_goal_display'	=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 40 )
+		'minimum_goal_display'	=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 40 ),
+		'common_goods_turnover_percent'	=> array( 'type' => 'float', 'other' => '', 'gs_col_index' => 41 ),
+		'product_type'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 42 ),
+		'acquisition'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 43 )
 	);
 	
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_Project::$entity_type, WDGRESTAPI_Entity_Project::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
 	
 }
