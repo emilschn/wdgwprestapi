@@ -212,6 +212,53 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 
 			$transaction_new->save();
 		}
+
+		// Récupère les investissements faits hors-Lemon Way (chèque et Mangopay)
+		$list_checks = WDGRESTAPI_Entity_Investment::get_list_by_user( $item_id, $is_legal_entity, 'publish', 'check' );
+		self::init_with_investments_list( $item_id, $is_legal_entity, 'check', $list_checks, $previous_items_by_gateway_id );
+		$list_mangopay = WDGRESTAPI_Entity_Investment::get_list_by_user( $item_id, $is_legal_entity, 'publish', FALSE, 'mangopay' );
+		self::init_with_investments_list( $item_id, $is_legal_entity, 'mangopay', $list_mangopay, $previous_items_by_gateway_id );
+
+
+		// TODO : Récupérer les versements de royalties qui ont été faits hors-Lemon Way (virement directs ?)
+	}
+
+	/**
+	 * Initialise les transactions avec les investissements
+	 */
+	private static function init_with_investments_list( $item_id, $is_legal_entity, $gateway_name, $list_investments, $previous_items_by_gateway_id ) {
+		foreach ( $list_investments as $item_investment ) {
+			if ( isset( $previous_items_by_gateway_id[ $gateway_name. '::' . $item_investment->id ] ) ) {
+				continue;
+			}
+
+			$transaction_new = new WDGRESTAPI_Entity_Transaction();
+
+			$transaction_new->set_property( 'datetime', $item_investment->invest_datetime );
+			$transaction_new->set_property( 'amount_in_cents', $item_investment->amount * 100 );
+
+			$transaction_new->set_property( 'sender_id', $item_id );
+			$transaction_new->set_property( 'sender_is_legal_entity', $is_legal_entity ? '1' : '0' );
+			$transaction_new->set_property( 'sender_wallet_type', '' );
+
+			$organizations_linked = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $item_investment->project );
+			$orga_linked_id = 0;
+			foreach ( $organizations_linked as $project_orga_link ) {
+				if ( $project_orga_link->type == WDGRESTAPI_Entity_ProjectOrganization::$link_type_manager ) {
+					$orga_linked_id = $project_orga_link->id_organization;
+				}
+			}
+			$transaction_new->set_property( 'recipient_id', $orga_linked_id );
+			$transaction_new->set_property( 'recipient_is_legal_entity', '1' );
+			$transaction_new->set_property( 'recipient_wallet_type', 'campaign' );
+
+			$transaction_new->set_property( 'type', 'investment' );
+			$transaction_new->set_property( 'status', 'success' );
+			$transaction_new->set_property( 'gateway_name', $gateway_name );
+			$transaction_new->set_property( 'gateway_transaction_id', $item_investment->id );
+
+			$transaction_new->save();
+		}
 	}
 	
 	
