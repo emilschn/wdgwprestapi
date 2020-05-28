@@ -59,11 +59,21 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			return;
 		}
 
-		// Réordonne les données précédemment enregistrées pour éviter les doublons
+		// Récupère les transactions précédemment enregistrées et réordonne par ID en index
+		// Permet d'éviter les doublons, sert de cache pour accélérer
+		$previous_items_by_wedogood_entity_id = array();
 		$previous_items_by_gateway_id = array();
 		$previous_items = self::list_get_by_entity_id( $item_id, $is_legal_entity );
-		foreach ( $previous_items as $item ) {
-			$previous_items_by_gateway_id[ $item->gateway_name. '::' . $item->gateway_transaction_id ] = $item;
+		if ( !empty( $previous_items ) ) {
+			foreach ( $previous_items as $item ) {
+				if ( !empty( $item->gateway_name ) && !empty( $item->type ) && !empty( $item->gateway_transaction_id ) ) {
+					$previous_items_by_gateway_id[ $item->gateway_name. '::' .$item->type. '::' .$item->gateway_transaction_id ] = $item;
+				}
+				
+				if ( !empty( $item->wedogood_entity ) && !empty( $item->wedogood_entity_id ) ) {
+					$previous_items_by_wedogood_entity_id[ $item->wedogood_entity. '::' .$item->wedogood_entity_id ] = $item;
+				}
+			}
 		}
 
 		// Récupération lib LW
@@ -71,27 +81,180 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
 		$lw = WDGRESTAPI_Lib_Lemonway::instance();
 
-		// Exécute la requête chez LW
+		// Exécute la requête chez LW et réordonne par ID en index si pas existant
+		$lw_items_by_gateway_id = array();
 		$lw_last_transactions = $lw->get_wallet_transactions( $lemonway_id );
-		// Parcours des données de LW pour les insérer si ce n'est pas un doublon
-		foreach ( $lw_last_transactions as $transaction_item ) {
-			if ( isset( $previous_items_by_gateway_id[ 'lemonway::' . $transaction_item->ID ] ) ) {
+		if ( !empty( $lw_last_transactions ) ) {
+			foreach ( $lw_last_transactions as $transaction_item ) {
+				if ( !isset( $previous_items_by_gateway_id[ 'lemonway::' .$transaction_item->TYPE. '::' .$transaction_item->ID ] ) ) {
+					$lw_items_by_gateway_id[ $transaction_item->TYPE. '::' . $transaction_item->ID ] = $transaction_item;
+				}
+			}
+		}
+
+		//***********************
+		// Récupère les investissements liés à cet utilisateur
+		$investments_by_user = WDGRESTAPI_Entity_Investment::get_list_by_user( $item_id, $is_legal_entity );
+		// Parcourt les éléments
+		if ( !empty( $investments_by_user ) ) {
+			foreach ( $investments_by_user as $investment_item ) {
+				// Ne prend pas les failed
+				if ( $investment_item->status == 'failed' ) {
+					continue;
+				}
+
+				// Ne prend pas ceux déjà enregistrés
+				if ( !isset( $previous_items_by_wedogood_entity_id[ 'investment::' .$investment_item->id ] ) ) {
+					// Récupération organisation liée au projet investi
+					$organizations_linked = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $investment_item->project );
+					$orga_linked_id = 0;
+					foreach ( $organizations_linked as $project_orga_link ) {
+						if ( $project_orga_link->type == WDGRESTAPI_Entity_ProjectOrganization::$link_type_manager ) {
+							$orga_linked_id = $project_orga_link->id_organization;
+						}
+					}
+
+					// Récupère un éventuel P2P lié
+					$linked_p2p = '';
+					// Si c'est par wallet, l'id est stocké juste après "wallet" dans la clé
+					if ( strpos( $investment_item->payment_key, 'wallet' ) !== FALSE ) {
+						$split_payment_key = explode( 'wallet_', $investment_item->payment_key );
+						if ( count( $split_payment_key ) > 1 ) {
+							$linked_p2p = $split_payment_key[ 1 ];
+						}
+					}
+					// Si c'est par virement, on n'a pas stocké d'identifiant
+					// Mais il y a tout de même un P2P correspondant quelque part...
+					if ( $investment_item->mean_payment == 'wire' ) {
+						// On parcourt les items LW restants
+						// On ne parcourt que 
+						// - les P2P
+						// - du même montant
+						// - partis vers l'organisation du projet
+						foreach ( $lw_items_by_gateway_id as $transaction_item ) {
+							if (	$transaction_item->TYPE == '2'
+									&& strpos( $transaction_item->REC, 'ORGA' .$orga_linked_id. 'W' ) !== FALSE
+									&& intval( $transaction_item->DEB ) == $investment_item->amount
+										) {
+								$linked_p2p = $transaction_item->ID;
+								break;
+							}
+						}
+
+						// TODO : 
+						// Si on en trouve, mettre à jour une donnée exploitable plus facilement quelque part dans la table investissement ?
+						// Si oui, où ? Nouvelle donnée Investment ?
+					}
+
+					// Supprimer dans la liste des items LW
+					if ( !empty( $linked_p2p ) ) {
+						unset( $lw_items_by_gateway_id[ '2::' .$linked_p2p ] );
+					}
+
+					$gateway_name = $investment_item->payment_provider;
+					if ( $investment_item->mean_payment == 'check' ) {
+						$gateway_name = 'check';
+					}
+
+					// Ajoute l'élément
+					self::insert_item(
+						$investment_item->invest_datetime, $investment_item->amount * 100,
+						$item_id, $is_legal_entity, '',
+						$orga_linked_id, true, 'campaign',
+						'investment', 'success',
+						$gateway_name, $linked_p2p,
+						'investment', $investment_item->id,
+						$investment_item->project
+					);
+
+				} else {
+					// Supprimer tout de même le P2P lié à la transaction existant pour ne pas l'ajouter en plus
+					$previous_transaction_item = $previous_items_by_wedogood_entity_id[ 'investment::' .$investment_item->id ];
+					unset( $lw_items_by_gateway_id[ '2::' .$previous_transaction_item->gateway_transaction_id ] );
+				}
+			}
+		}
+
+		//***********************
+		// Récupère les rois liées à cet utilisateur, puis parcours et supprime si déjà enregistré
+		$rois_by_recipient_id = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $item_id, $is_legal_entity ? 'orga' : 'user' );
+		if ( !empty( $rois_by_recipient_id ) ) {
+			foreach ( $rois_by_recipient_id as $roi_item ) {
+				// Ne prend que les transferred
+				if ( $roi_item->status != 'transferred' ) {
+					continue;
+				}
+
+				if ( !isset( $previous_items_by_wedogood_entity_id[ 'roi::' .$roi_item->id ] ) ) {
+					// Récupère un éventuel P2P lié
+					$linked_p2p = '';
+					if ( !empty( $roi_item->id_transfer ) ) {
+						$linked_p2p = $roi_item->id_transfer;
+					}
+
+					// Récupère la date du roi
+					$datetime = new DateTime( $roi_item->date_transfer );
+
+					if ( !empty( $linked_p2p ) ) {
+						// Si possible, Prend la date du P2P qui est plus précise
+						$datetime = DateTime::createFromFormat( 'd/m/Y H:i:s', $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->DATE );
+						
+						// Supprime dans la liste des items LW
+						unset( $lw_items_by_gateway_id[ '2::' .$linked_p2p ] );
+					}
+
+					$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
+
+					// Ajoute l'élément
+					// TODO : gérer les rois hors-lw
+					self::insert_item(
+						$transaction_datetime, $roi_item->amount * 100,
+						$roi_item->id_orga, true, 'royalties',
+						$item_id, $is_legal_entity, '',
+						'roi', 'success',
+						'lemonway', $linked_p2p,
+						'roi', $roi_item->id,
+						$roi_item->id_project
+					);
+
+				} else {
+					// Supprimer tout de même le P2P lié à la transaction existant pour ne pas l'ajouter en plus
+					$previous_transaction_item = $previous_items_by_wedogood_entity_id[ 'roi::' .$roi_item->id ];
+					unset( $lw_items_by_gateway_id[ '2::' .$previous_transaction_item->gateway_transaction_id ] );
+				}
+			}
+		}
+		
+		//***********************
+		// Parcours des données de LW restants pour les insérer si ce n'est pas un doublon
+		foreach ( $lw_items_by_gateway_id as $transaction_item ) {
+			if ( isset( $previous_items_by_gateway_id[ 'lemonway::' .$transaction_item->TYPE. '::' .$transaction_item->ID ] ) ) {
 				continue;
 			}
 
-			$transaction_new = new WDGRESTAPI_Entity_Transaction();
-			$current_client_id = 0;
-			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-			if ( !empty( $current_client ) ) {
-				$current_client_id = $current_client->ID;
+			$status = '';
+			switch ( $transaction_item->STATUS ) {
+				case '3': // transaction effectuée avec succès
+					$status = 'success';
+					break;
+				case '4': // erreur
+					$status = 'error';
+					break;
+				case '0': // en attente de finalisation
+					$status = 'pending';
+					break;
+				case '16': // en attente de validation (carte avec paiement différé)
+					$status = 'pending-validation';
+					break;
 			}
-			$transaction_new->set_property( 'client_user_id', $current_client_id );
 
-			$transaction_new->set_property( 'gateway_name', 'lemonway' );
-			$transaction_new->set_property( 'gateway_transaction_id', $transaction_item->ID );
-			
+			// On n'ajoute que les transactions réalisées avec succès
+			if ( $status != 'success' ) {
+				continue;
+			}
+
 			$datetime = DateTime::createFromFormat( 'd/m/Y H:i:s', $transaction_item->DATE );
-			$transaction_new->set_property( 'datetime', $datetime->format( 'Y-m-d H:i:s' ) );
+			$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
 			
 			$type = '';
 			$amount_in_cents = 0;
@@ -115,8 +278,6 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 					$recipient_wallet_id = $transaction_item->REC;
 					break;
 			}
-			$transaction_new->set_property( 'type', $type );
-			$transaction_new->set_property( 'amount_in_cents', $amount_in_cents );
 
 			// Découpe du nom de wallet de départ
 			$sender_id = 0;
@@ -186,79 +347,47 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 				}
 			}
 
-			$transaction_new->set_property( 'sender_is_legal_entity', $sender_is_legal_entity );
-			$transaction_new->set_property( 'recipient_is_legal_entity', $recipient_is_legal_entity );
-			$transaction_new->set_property( 'sender_id', $sender_id );
-			$transaction_new->set_property( 'recipient_id', $recipient_id );
-			$transaction_new->set_property( 'sender_wallet_type', $sender_wallet_type );
-			$transaction_new->set_property( 'recipient_wallet_type', $recipient_wallet_type );
-
-			$status = '';
-			switch ( $transaction_item->STATUS ) {
-				case '3': // transaction effectuée avec succès
-					$status = 'success';
-					break;
-				case '4': // erreur
-					$status = 'error';
-					break;
-				case '0': // en attente de finalisation
-					$status = 'pending';
-					break;
-				case '16': // en attente de validation (carte avec paiement différé)
-					$status = 'pending-validation';
-					break;
-			}
-			$transaction_new->set_property( 'status', $status );
-
-			$transaction_new->save();
+			self::insert_item(
+				$transaction_datetime, $amount_in_cents,
+				$sender_id, $sender_is_legal_entity, $sender_wallet_type,
+				$recipient_id, $recipient_is_legal_entity, $recipient_wallet_type,
+				$type, $status,
+				'lemonway', $transaction_item->ID,
+				'', 0,
+				0
+			);
 		}
-
-		// Récupère les investissements faits hors-Lemon Way (chèque et Mangopay)
-		$list_checks = WDGRESTAPI_Entity_Investment::get_list_by_user( $item_id, $is_legal_entity, 'publish', 'check' );
-		self::init_with_investments_list( $item_id, $is_legal_entity, 'check', $list_checks, $previous_items_by_gateway_id );
-		$list_mangopay = WDGRESTAPI_Entity_Investment::get_list_by_user( $item_id, $is_legal_entity, 'publish', FALSE, 'mangopay' );
-		self::init_with_investments_list( $item_id, $is_legal_entity, 'mangopay', $list_mangopay, $previous_items_by_gateway_id );
-
-
-		// TODO : Récupérer les versements de royalties qui ont été faits hors-Lemon Way (virement directs ?)
 	}
 
-	/**
-	 * Initialise les transactions avec les investissements
-	 */
-	private static function init_with_investments_list( $item_id, $is_legal_entity, $gateway_name, $list_investments, $previous_items_by_gateway_id ) {
-		foreach ( $list_investments as $item_investment ) {
-			if ( isset( $previous_items_by_gateway_id[ $gateway_name. '::' . $item_investment->id ] ) ) {
-				continue;
-			}
-
-			$transaction_new = new WDGRESTAPI_Entity_Transaction();
-
-			$transaction_new->set_property( 'datetime', $item_investment->invest_datetime );
-			$transaction_new->set_property( 'amount_in_cents', $item_investment->amount * 100 );
-
-			$transaction_new->set_property( 'sender_id', $item_id );
-			$transaction_new->set_property( 'sender_is_legal_entity', $is_legal_entity ? '1' : '0' );
-			$transaction_new->set_property( 'sender_wallet_type', '' );
-
-			$organizations_linked = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $item_investment->project );
-			$orga_linked_id = 0;
-			foreach ( $organizations_linked as $project_orga_link ) {
-				if ( $project_orga_link->type == WDGRESTAPI_Entity_ProjectOrganization::$link_type_manager ) {
-					$orga_linked_id = $project_orga_link->id_organization;
-				}
-			}
-			$transaction_new->set_property( 'recipient_id', $orga_linked_id );
-			$transaction_new->set_property( 'recipient_is_legal_entity', '1' );
-			$transaction_new->set_property( 'recipient_wallet_type', 'campaign' );
-
-			$transaction_new->set_property( 'type', 'investment' );
-			$transaction_new->set_property( 'status', 'success' );
-			$transaction_new->set_property( 'gateway_name', $gateway_name );
-			$transaction_new->set_property( 'gateway_transaction_id', $item_investment->id );
-
-			$transaction_new->save();
-		}
+	
+	private static function insert_item(
+				$datetime, $amount_in_cents,
+				$sender_id, $is_sender_legal_entity, $sender_wallet_type,
+				$recipient_id, $is_recipient_legal_entity, $recipient_wallet_type,
+				$type, $status,
+				$gateway_name, $gateway_transaction_id,
+				$wedogood_entity, $wedogood_entity_id,
+				$project_id
+			) {
+		$transaction_new = new WDGRESTAPI_Entity_Transaction();
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+		$transaction_new->set_property( 'client_user_id', $current_client->ID );
+		$transaction_new->set_property( 'datetime', $datetime );
+		$transaction_new->set_property( 'amount_in_cents', $amount_in_cents );
+		$transaction_new->set_property( 'sender_id', $sender_id );
+		$transaction_new->set_property( 'sender_is_legal_entity', $is_sender_legal_entity ? '1' : '0' );
+		$transaction_new->set_property( 'sender_wallet_type', $sender_wallet_type );
+		$transaction_new->set_property( 'recipient_id', $recipient_id );
+		$transaction_new->set_property( 'recipient_is_legal_entity', $is_recipient_legal_entity ? '1' : '0' );
+		$transaction_new->set_property( 'recipient_wallet_type', $recipient_wallet_type );
+		$transaction_new->set_property( 'type', $type );
+		$transaction_new->set_property( 'status', $status );
+		$transaction_new->set_property( 'gateway_name', $gateway_name );
+		$transaction_new->set_property( 'gateway_transaction_id', $gateway_transaction_id );
+		$transaction_new->set_property( 'wedogood_entity', $wedogood_entity );
+		$transaction_new->set_property( 'wedogood_entity_id', $wedogood_entity_id );
+		$transaction_new->set_property( 'project_id', $project_id );
+		$transaction_new->save();
 	}
 	
 	
@@ -280,7 +409,10 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		'type'						=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'status'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gateway_name'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'gateway_transaction_id'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' )
+		'gateway_transaction_id'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'wedogood_entity'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'wedogood_entity_id'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'project_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL' )
 	);
 	
 	// Mise à jour de la bdd

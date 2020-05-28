@@ -174,7 +174,6 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	public static function update_email( $param_email, $posted_array ) {
 		$buffer = array();
 		$new_email = $posted_array[ 'new_email' ];
-		WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_User::update_email > '.$new_email. ' != ' .$param_email );
 		
 		if ( empty( $new_email ) || $param_email == $new_email ) {
 			$buffer['error'] = '404';
@@ -185,7 +184,6 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				'new_email'	=> $new_email
 			);
 			$return = WDGRESTAPI_Entity::post_data_on_client_site( 'update_user_email', $param_email, $posted_params );
-			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_User::update_email > $return : ' . $return);
 			
 			if ( $return == 'success' ) {
 				$buffer = 'success';

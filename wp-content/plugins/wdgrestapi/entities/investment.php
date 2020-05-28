@@ -316,7 +316,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		}
 
 		global $wpdb;
-		$table_investments = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 
 		$query = "SELECT * FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
@@ -339,8 +339,9 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		if ( !empty( $payment_provider ) ) {
 			$query .= " AND payment_provider='" .$payment_provider. "'";
 		}
-
+		
 		$results = $wpdb->get_results( $query );
+		return $results;
 	}
 	
 	/**
