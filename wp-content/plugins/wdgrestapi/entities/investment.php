@@ -309,6 +309,40 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		}
 		return $results;
 	}
+
+	public static function get_list_by_user( $id_user, $is_legal_entity = FALSE, $status = 'publish', $payment_key = FALSE, $payment_provider = FALSE ) {
+		if ( empty( $id_user ) ) {
+			return FALSE;
+		}
+
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+
+		$query = "SELECT * FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
+		$query .= " AND user_id=" .$id_user;
+		
+		if ( $is_legal_entity ) {
+			$query .= " AND is_legal_entity=1";
+		} else {
+			$query .= " AND is_legal_entity=0";
+		}
+
+		if ( !empty( $status ) ) {
+			$query .= " AND status='" .$status. "'";
+		}
+		
+		if ( !empty( $payment_key ) ) {
+			$query .= " AND payment_key='" .$payment_key. "'";
+		}
+		
+		if ( !empty( $payment_provider ) ) {
+			$query .= " AND payment_provider='" .$payment_provider. "'";
+		}
+		
+		$results = $wpdb->get_results( $query );
+		return $results;
+	}
 	
 	/**
 	 * Retourne les statistiques qui concernent les investissements
@@ -317,7 +351,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		$buffer = array();
 		
 		global $wpdb;
-		$table_investments = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
+		$table_investments = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		
 		$count_query_success = "SELECT COUNT(*) AS nb FROM " .$table_investments. " WHERE status LIKE 'publish'";
 		$count_results_success = $wpdb->get_results( $count_query_success );
@@ -426,6 +460,8 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'payment_provider'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'payment_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'payment_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'payment_provider_p2p_id'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'payment_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
 		'signature_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
