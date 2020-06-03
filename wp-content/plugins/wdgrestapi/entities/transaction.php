@@ -116,34 +116,42 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 
 					// Récupère un éventuel P2P lié
 					$linked_p2p = '';
-					// Si c'est par wallet, l'id est stocké juste après "wallet" dans la clé
-					if ( strpos( $investment_item->payment_key, 'wallet' ) !== FALSE ) {
-						$split_payment_key = explode( 'wallet_', $investment_item->payment_key );
-						if ( count( $split_payment_key ) > 1 ) {
-							$linked_p2p = $split_payment_key[ 1 ];
-						}
-					}
-					// Si c'est par virement, on n'a pas stocké d'identifiant
-					// Mais il y a tout de même un P2P correspondant quelque part...
-					if ( $investment_item->mean_payment == 'wire' ) {
-						// On parcourt les items LW restants
-						// On ne parcourt que 
-						// - les P2P
-						// - du même montant
-						// - partis vers l'organisation du projet
-						foreach ( $lw_items_by_gateway_id as $transaction_item ) {
-							if (	$transaction_item->TYPE == '2'
-									&& strpos( $transaction_item->REC, 'ORGA' .$orga_linked_id. 'W' ) !== FALSE
-									&& intval( $transaction_item->DEB ) == $investment_item->amount
-										) {
-								$linked_p2p = $transaction_item->ID;
-								break;
+					if ( !empty( $investment_item->payment_provider_p2p_id ) ) {
+						$linked_p2p = $investment_item->payment_provider_p2p_id;
+
+					} else {
+						// Si c'est par wallet, l'id est stocké juste après "wallet" dans la clé
+						if ( strpos( $investment_item->payment_key, 'wallet' ) !== FALSE ) {
+							$split_payment_key = explode( 'wallet_', $investment_item->payment_key );
+							if ( count( $split_payment_key ) > 1 ) {
+								$linked_p2p = $split_payment_key[ 1 ];
 							}
 						}
-
-						// TODO : 
-						// Si on en trouve, mettre à jour une donnée exploitable plus facilement quelque part dans la table investissement ?
-						// Si oui, où ? Nouvelle donnée Investment ?
+						// Si c'est par virement, on n'a pas stocké d'identifiant
+						// Mais il y a tout de même un P2P correspondant quelque part...
+						if ( $investment_item->mean_payment == 'wire' ) {
+							// On parcourt les items LW restants
+							// On ne parcourt que 
+							// - les P2P
+							// - du même montant
+							// - partis vers l'organisation du projet
+							foreach ( $lw_items_by_gateway_id as $transaction_item ) {
+								if (	$transaction_item->TYPE == '2'
+										&& strpos( $transaction_item->REC, 'ORGA' .$orga_linked_id. 'W' ) !== FALSE
+										&& intval( $transaction_item->DEB ) == $investment_item->amount
+											) {
+									$linked_p2p = $transaction_item->ID;
+									break;
+								}
+							}
+						}
+	
+						// On met à jour la donnée d'investissement avec le P2P trouvé pour accélérer le processus la prochaine fois
+						if ( !empty( $linked_p2p ) ) {
+							$investment_item = new WDGRESTAPI_Entity_Investment( $investment_item->id );
+							$investment_item->payment_provider_p2p_id = $linked_p2p;
+							$investment_item->save();
+						}
 					}
 
 					// Supprimer dans la liste des items LW
@@ -162,7 +170,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 						$item_id, $is_legal_entity, '',
 						$orga_linked_id, true, 'campaign',
 						'investment', 'success',
-						$gateway_name, $linked_p2p,
+						$gateway_name, $investment_item->mean_payment, $linked_p2p,
 						'investment', $investment_item->id,
 						$investment_item->project
 					);
@@ -187,6 +195,12 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 
 				if ( !isset( $previous_items_by_wedogood_entity_id[ 'roi::' .$roi_item->id ] ) ) {
 					// Récupère un éventuel P2P lié
+					$gateway = $roi_item->gateway;
+					$mean_payment = 'wallet';
+					if ( $gateway != 'lemonway' ) {
+						$mean_payment = $gateway;
+					}
+
 					$linked_p2p = '';
 					if ( !empty( $roi_item->id_transfer ) ) {
 						$linked_p2p = $roi_item->id_transfer;
@@ -206,13 +220,12 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 					$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
 
 					// Ajoute l'élément
-					// TODO : gérer les rois hors-lw
 					self::insert_item(
 						$transaction_datetime, $roi_item->amount * 100,
 						$roi_item->id_orga, true, 'royalties',
 						$item_id, $is_legal_entity, '',
 						'roi', 'success',
-						'lemonway', $linked_p2p,
+						$gateway, $mean_payment, $linked_p2p,
 						'roi', $roi_item->id,
 						$roi_item->id_project
 					);
@@ -256,6 +269,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			$datetime = DateTime::createFromFormat( 'd/m/Y H:i:s', $transaction_item->DATE );
 			$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
 			
+			$mean_payment = '';
 			$type = '';
 			$amount_in_cents = 0;
 			$sender_wallet_id = 0;
@@ -263,16 +277,27 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			switch ( $transaction_item->TYPE ) {
 				case '0': // money in
 					$type = 'moneyin';
+					if ( isset( $result_item->EXTRA ) && !empty( $result_item->EXTRA->NUM ) ) {
+						$mean_payment = 'card';
+					} else {
+						if ( !empty( $result_item->MLABEL ) ) {
+							$mean_payment = 'mandate';
+						} else {
+							$mean_payment = 'wire';
+						}
+					}
 					$amount_in_cents = $transaction_item->CRED * 100;
 					$recipient_wallet_id = $transaction_item->REC;
 					break;
 				case '1': // money out
 					$type = 'moneyout';
+					$mean_payment = 'wire';
 					$amount_in_cents = $transaction_item->DEB * 100;
 					$sender_wallet_id = $transaction_item->SEN;
 					break;
 				case '2': // p2p
 					$type = 'p2p';
+					$mean_payment = 'wallet';
 					$amount_in_cents = $transaction_item->DEB * 100;
 					$sender_wallet_id = $transaction_item->SEN;
 					$recipient_wallet_id = $transaction_item->REC;
@@ -352,7 +377,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 				$sender_id, $sender_is_legal_entity, $sender_wallet_type,
 				$recipient_id, $recipient_is_legal_entity, $recipient_wallet_type,
 				$type, $status,
-				'lemonway', $transaction_item->ID,
+				'lemonway', $mean_payment, $transaction_item->ID,
 				'', 0,
 				0
 			);
@@ -365,7 +390,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 				$sender_id, $is_sender_legal_entity, $sender_wallet_type,
 				$recipient_id, $is_recipient_legal_entity, $recipient_wallet_type,
 				$type, $status,
-				$gateway_name, $gateway_transaction_id,
+				$gateway_name, $gateway_mean_payment, $gateway_transaction_id,
 				$wedogood_entity, $wedogood_entity_id,
 				$project_id
 			) {
@@ -383,6 +408,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		$transaction_new->set_property( 'type', $type );
 		$transaction_new->set_property( 'status', $status );
 		$transaction_new->set_property( 'gateway_name', $gateway_name );
+		$transaction_new->set_property( 'gateway_mean_payment', $gateway_mean_payment );
 		$transaction_new->set_property( 'gateway_transaction_id', $gateway_transaction_id );
 		$transaction_new->set_property( 'wedogood_entity', $wedogood_entity );
 		$transaction_new->set_property( 'wedogood_entity_id', $wedogood_entity_id );
@@ -409,6 +435,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		'type'						=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'status'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gateway_name'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'gateway_mean_payment'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gateway_transaction_id'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'wedogood_entity'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'wedogood_entity_id'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),

@@ -461,6 +461,8 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'payment_provider'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'payment_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'payment_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'payment_provider_p2p_id'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'payment_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
 		'signature_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'signature_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),

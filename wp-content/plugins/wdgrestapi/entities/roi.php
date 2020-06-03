@@ -70,7 +70,8 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 		'amount_taxed_in_cents'	=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'id_transfer'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'id_investment_contract'	=> array( 'type' => 'id', 'other' => 'NOT NULL' )
+		'id_investment_contract'	=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'gateway'				=> array( 'type' => 'varchar', 'other' => 'DEFAULT \'lemonway\'' )
 	);
 	
 	// Mise à jour de la bdd
