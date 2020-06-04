@@ -189,7 +189,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		if ( !empty( $rois_by_recipient_id ) ) {
 			foreach ( $rois_by_recipient_id as $roi_item ) {
 				// Ne prend que les transferred
-				if ( $roi_item->status != 'transferred' ) {
+				if ( $roi_item->status != 'transferred' || $roi_item->amount == 0 ) {
 					continue;
 				}
 
