@@ -164,9 +164,14 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 						$gateway_name = 'check';
 					}
 
+					// Aléatoirement, les dates d'investissement s'enregistrent une heure plus tôt
+					// Décalage d'une heure pour être sûr d'arriver après le remplissage du wallet
+					$invest_datetime = new DateTime( $investment_item->invest_datetime );
+					$invest_datetime->add( new DateInterval( 'PT1H' ) );
+
 					// Ajoute l'élément
 					self::insert_item(
-						$investment_item->invest_datetime, $investment_item->amount * 100,
+						$invest_datetime->format( 'Y-m-d H:i:s' ), $investment_item->amount * 100,
 						$item_id, $is_legal_entity, '',
 						$orga_linked_id, true, 'campaign',
 						'investment', 'success',
