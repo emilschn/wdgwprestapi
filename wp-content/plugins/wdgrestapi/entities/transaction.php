@@ -148,9 +148,9 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 	
 						// On met à jour la donnée d'investissement avec le P2P trouvé pour accélérer le processus la prochaine fois
 						if ( !empty( $linked_p2p ) ) {
-							$investment_item = new WDGRESTAPI_Entity_Investment( $investment_item->id );
-							$investment_item->payment_provider_p2p_id = $linked_p2p;
-							$investment_item->save();
+							$investment_item_update = new WDGRESTAPI_Entity_Investment( $investment_item->id );
+							$investment_item_update->set_property( 'payment_provider_p2p_id', $linked_p2p );
+							$investment_item_update->save();
 						}
 					}
 
