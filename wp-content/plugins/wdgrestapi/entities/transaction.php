@@ -216,7 +216,11 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 
 					if ( !empty( $linked_p2p ) ) {
 						// Si possible, Prend la date du P2P qui est plus précise
-						$datetime = DateTime::createFromFormat( 'd/m/Y H:i:s', $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->DATE );
+						if ( !empty( $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->DATE ) ) {
+							$datetime = DateTime::createFromFormat( 'd/m/Y H:i:s', $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->DATE );
+						} else {
+							WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_Transaction::update_with_lw_data > Erreur de conversion de date provenant de LW > ' . print_r( $lw_items_by_gateway_id[ '2::' .$linked_p2p ], true ) );
+						}
 						
 						// Supprime dans la liste des items LW
 						unset( $lw_items_by_gateway_id[ '2::' .$linked_p2p ] );
