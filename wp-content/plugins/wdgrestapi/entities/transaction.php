@@ -157,28 +157,28 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 					// Supprimer dans la liste des items LW
 					if ( !empty( $linked_p2p ) ) {
 						unset( $lw_items_by_gateway_id[ '2::' .$linked_p2p ] );
+
+						$gateway_name = $investment_item->payment_provider;
+						if ( $investment_item->mean_payment == 'check' ) {
+							$gateway_name = 'check';
+						}
+	
+						// Aléatoirement, les dates d'investissement s'enregistrent une heure plus tôt
+						// Décalage d'une heure pour être sûr d'arriver après le remplissage du wallet
+						$invest_datetime = new DateTime( $investment_item->invest_datetime );
+						$invest_datetime->add( new DateInterval( 'PT1H' ) );
+	
+						// Ajoute l'élément si il est bien lié à un p2p LW
+						self::insert_item(
+							$invest_datetime->format( 'Y-m-d H:i:s' ), $investment_item->amount * 100,
+							$item_id, $is_legal_entity, '',
+							$orga_linked_id, true, 'campaign',
+							'investment', 'success',
+							$gateway_name, $investment_item->mean_payment, $linked_p2p,
+							'investment', $investment_item->id,
+							$investment_item->project
+						);
 					}
-
-					$gateway_name = $investment_item->payment_provider;
-					if ( $investment_item->mean_payment == 'check' ) {
-						$gateway_name = 'check';
-					}
-
-					// Aléatoirement, les dates d'investissement s'enregistrent une heure plus tôt
-					// Décalage d'une heure pour être sûr d'arriver après le remplissage du wallet
-					$invest_datetime = new DateTime( $investment_item->invest_datetime );
-					$invest_datetime->add( new DateInterval( 'PT1H' ) );
-
-					// Ajoute l'élément
-					self::insert_item(
-						$invest_datetime->format( 'Y-m-d H:i:s' ), $investment_item->amount * 100,
-						$item_id, $is_legal_entity, '',
-						$orga_linked_id, true, 'campaign',
-						'investment', 'success',
-						$gateway_name, $investment_item->mean_payment, $linked_p2p,
-						'investment', $investment_item->id,
-						$investment_item->project
-					);
 
 				} else {
 					// Supprimer tout de même le P2P lié à la transaction existant pour ne pas l'ajouter en plus
@@ -224,24 +224,24 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 						
 						// Supprime dans la liste des items LW
 						unset( $lw_items_by_gateway_id[ '2::' .$linked_p2p ] );
-					}
 
-					if ( !empty( $datetime ) ) {
-						$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
-					} else {
-						$transaction_datetime = '2013-09-01 09:00:00';
+						if ( !empty( $datetime ) ) {
+							$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
+						} else {
+							$transaction_datetime = '2013-09-01 09:00:00';
+						}
+	
+						// Ajoute l'élément
+						self::insert_item(
+							$transaction_datetime, $roi_item->amount * 100,
+							$roi_item->id_orga, true, 'royalties',
+							$item_id, $is_legal_entity, '',
+							'roi', 'success',
+							$gateway, $mean_payment, $linked_p2p,
+							'roi', $roi_item->id,
+							$roi_item->id_project
+						);
 					}
-
-					// Ajoute l'élément
-					self::insert_item(
-						$transaction_datetime, $roi_item->amount * 100,
-						$roi_item->id_orga, true, 'royalties',
-						$item_id, $is_legal_entity, '',
-						'roi', 'success',
-						$gateway, $mean_payment, $linked_p2p,
-						'roi', $roi_item->id,
-						$roi_item->id_project
-					);
 
 				} else {
 					// Supprimer tout de même le P2P lié à la transaction existant pour ne pas l'ajouter en plus
