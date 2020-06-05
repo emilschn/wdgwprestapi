@@ -294,10 +294,10 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			switch ( $transaction_item->TYPE ) {
 				case '0': // money in
 					$type = 'moneyin';
-					if ( isset( $result_item->EXTRA ) && !empty( $result_item->EXTRA->NUM ) ) {
+					if ( isset( $transaction_item->EXTRA ) && !empty( $transaction_item->EXTRA->NUM ) ) {
 						$mean_payment = 'card';
 					} else {
-						if ( !empty( $result_item->MLABEL ) ) {
+						if ( !empty( $transaction_item->MLABEL ) ) {
 							$mean_payment = 'mandate';
 						} else {
 							$mean_payment = 'wire';
