@@ -226,7 +226,11 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 						unset( $lw_items_by_gateway_id[ '2::' .$linked_p2p ] );
 					}
 
-					$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
+					if ( !empty( $datetime ) ) {
+						$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
+					} else {
+						$transaction_datetime = '2013-09-01 09:00:00';
+					}
 
 					// Ajoute l'élément
 					self::insert_item(
@@ -276,7 +280,11 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			}
 
 			$datetime = DateTime::createFromFormat( 'd/m/Y H:i:s', $transaction_item->DATE );
-			$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
+			if ( !empty( $datetime ) ) {
+				$transaction_datetime = $datetime->format( 'Y-m-d H:i:s' );
+			} else {
+				$transaction_datetime = '2013-09-01 09:00:00';
+			}
 			
 			$mean_payment = '';
 			$type = '';
