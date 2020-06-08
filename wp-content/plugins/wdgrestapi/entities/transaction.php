@@ -25,7 +25,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 	/**
 	 * Crée la requête de récupération des transactions liées à un utilisateur ou une organisation
 	 */
-	private static function list_get_by_entity_id( $item_id, $is_legal_entity, $limit = FALSE ) {
+	private static function list_get_by_entity_id( $item_id, $is_legal_entity, $expanded = FALSE ) {
 		$is_legal_entity_str = $is_legal_entity ? '1' : '0';
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
@@ -35,7 +35,38 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		}
 		
 		$results = $wpdb->get_results( $query );
+
+		if ( $expanded ) {
+			$buffer = array();
+			foreach ( $results as $result ) {
+				$buffer_item = self::complete_single_data( $result );
+				array_push( $buffer, $buffer_item );
+			}
+
+			return $buffer;
+		}
+
 		return $results;
+	}
+
+	private static function complete_single_data( $transaction_item ) {
+		$buffer = array();
+		foreach ( self::$db_properties as $db_key => $db_property ) {
+			if ( $db_key != 'unique_key' ) {
+				$buffer[ $db_key ] = $transaction_item->{ $db_key };
+			}
+		}
+
+		$project_id = $transaction_item->project_id;
+		$project_entity = new WDGRESTAPI_Entity_Project( $project_id );
+		$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $project_id );
+		$project_organization = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
+		$project_organization_data = $project_organization->get_loaded_data();
+
+		$buffer[ 'project_name' ] = $project_entity->get_loaded_data( FALSE )->name;
+		$buffer[ 'project_organization_name' ] = $project_organization_data->name;
+
+		return $buffer;
 	}
 
 	/**
@@ -48,7 +79,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		}
 
 		// Retourne les résultats mis à jour
-		return self::list_get_by_entity_id( $item_id, $is_legal_entity );
+		return self::list_get_by_entity_id( $item_id, $is_legal_entity, true );
 	}
 
 	/**
@@ -156,6 +187,17 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 
 					// Supprimer dans la liste des items LW
 					if ( !empty( $linked_p2p ) ) {
+						$mean_payment_info = '';
+						if ( isset( $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->EXTRA ) && !empty( $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->EXTRA->NUM ) ) {
+							$mean_payment_info = $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->EXTRA->NUM;
+						} else {
+							if ( !empty( $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->MLABEL ) ) {
+								$mean_payment_info = $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->MLABEL;
+							} else {
+								$mean_payment_info = 'wire';
+							}
+						}
+
 						unset( $lw_items_by_gateway_id[ '2::' .$linked_p2p ] );
 
 						$gateway_name = $investment_item->payment_provider;
@@ -174,7 +216,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 							$item_id, $is_legal_entity, '',
 							$orga_linked_id, true, 'campaign',
 							'investment', 'success',
-							$gateway_name, $investment_item->mean_payment, $linked_p2p,
+							$gateway_name, $investment_item->mean_payment, $mean_payment_info, $linked_p2p,
 							'investment', $investment_item->id,
 							$investment_item->project
 						);
@@ -237,7 +279,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 							$roi_item->id_orga, true, 'royalties',
 							$item_id, $is_legal_entity, '',
 							'roi', 'success',
-							$gateway, $mean_payment, $linked_p2p,
+							$gateway, $mean_payment, '', $linked_p2p,
 							'roi', $roi_item->id,
 							$roi_item->id_project
 						);
@@ -286,7 +328,9 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 				$transaction_datetime = '2013-09-01 09:00:00';
 			}
 			
+			$project_id = 0;
 			$mean_payment = '';
+			$mean_payment_info = '';
 			$type = '';
 			$amount_in_cents = 0;
 			$sender_wallet_id = 0;
@@ -296,9 +340,11 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 					$type = 'moneyin';
 					if ( isset( $transaction_item->EXTRA ) && !empty( $transaction_item->EXTRA->NUM ) ) {
 						$mean_payment = 'card';
+						$mean_payment_info = $transaction_item->EXTRA->NUM;
 					} else {
 						if ( !empty( $transaction_item->MLABEL ) ) {
 							$mean_payment = 'mandate';
+							$mean_payment_info = $transaction_item->MLABEL;
 						} else {
 							$mean_payment = 'wire';
 						}
@@ -309,6 +355,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 				case '1': // money out
 					$type = 'moneyout';
 					$mean_payment = 'wire';
+					$mean_payment_info = $transaction_item->MLABEL;
 					$amount_in_cents = $transaction_item->DEB * 100;
 					$sender_wallet_id = $transaction_item->SEN;
 					break;
@@ -352,6 +399,9 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 						$entity = WDGRESTAPI_Entity_Organization::get_by_wpref( $sender_wpref );
 					}
 					$sender_id = $entity->get_loaded_data()->id;
+					if ( $sender_wallet_type != '' ) {
+						$project_id = $sender_id;
+					}
 				}
 			}
 
@@ -386,6 +436,9 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 						$entity = WDGRESTAPI_Entity_Organization::get_by_wpref( $recipient_wpref );
 					}
 					$recipient_id = $entity->get_loaded_data()->id;
+					if ( $recipient_wallet_type != '' ) {
+						$project_id = $recipient_id;
+					}
 				}
 			}
 
@@ -394,9 +447,9 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 				$sender_id, $sender_is_legal_entity, $sender_wallet_type,
 				$recipient_id, $recipient_is_legal_entity, $recipient_wallet_type,
 				$type, $status,
-				'lemonway', $mean_payment, $transaction_item->ID,
+				'lemonway', $mean_payment, $mean_payment_info, $transaction_item->ID,
 				'', 0,
-				0
+				$project_id
 			);
 		}
 	}
@@ -407,7 +460,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 				$sender_id, $is_sender_legal_entity, $sender_wallet_type,
 				$recipient_id, $is_recipient_legal_entity, $recipient_wallet_type,
 				$type, $status,
-				$gateway_name, $gateway_mean_payment, $gateway_transaction_id,
+				$gateway_name, $gateway_mean_payment, $gateway_mean_payment_info, $gateway_transaction_id,
 				$wedogood_entity, $wedogood_entity_id,
 				$project_id
 			) {
@@ -426,6 +479,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		$transaction_new->set_property( 'status', $status );
 		$transaction_new->set_property( 'gateway_name', $gateway_name );
 		$transaction_new->set_property( 'gateway_mean_payment', $gateway_mean_payment );
+		$transaction_new->set_property( 'gateway_mean_payment_info', $gateway_mean_payment_info );
 		$transaction_new->set_property( 'gateway_transaction_id', $gateway_transaction_id );
 		$transaction_new->set_property( 'wedogood_entity', $wedogood_entity );
 		$transaction_new->set_property( 'wedogood_entity_id', $wedogood_entity_id );
@@ -453,6 +507,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		'status'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gateway_name'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gateway_mean_payment'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'gateway_mean_payment_info'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gateway_transaction_id'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'wedogood_entity'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'wedogood_entity_id'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
