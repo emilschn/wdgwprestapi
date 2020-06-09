@@ -193,8 +193,6 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 						} else {
 							if ( !empty( $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->MLABEL ) ) {
 								$mean_payment_info = $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->MLABEL;
-							} else {
-								$mean_payment_info = 'wire';
 							}
 						}
 
