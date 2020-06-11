@@ -294,7 +294,20 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		//***********************
 		// Parcours des données de LW restants pour les insérer si ce n'est pas un doublon
 		foreach ( $lw_items_by_gateway_id as $transaction_item ) {
-			if ( isset( $previous_items_by_gateway_id[ 'lemonway::' .$transaction_item->TYPE. '::' .$transaction_item->ID ] ) ) {
+			$type = '';
+			switch ( $transaction_item->TYPE ) {
+				case '0': // money in
+					$type = 'moneyin';
+					break;
+				case '1': // money out
+					$type = 'moneyout';
+					break;
+				case '2': // p2p
+					$type = 'p2p';
+				break;
+			}
+
+			if ( isset( $previous_items_by_gateway_id[ 'lemonway::' .$type. '::' .$transaction_item->ID ] ) ) {
 				continue;
 			}
 
