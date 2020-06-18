@@ -211,7 +211,8 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'viadeo_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'metadata'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'geolocation'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' )
+		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' ),
+		'mandate_info'			=> array( 'type' => 'varchar', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd
