@@ -274,6 +274,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 14 ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 15 ),
 		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 16 ),
+		'transfer_delay'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'declared_by'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 17 )
 	);
 	
