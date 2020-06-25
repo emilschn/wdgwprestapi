@@ -5,7 +5,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	
 	public static $file_entity_types = array( 'user', 'organization', 'project', 'project-draft', 'declaration', 'investment', 'investment-draft' );
 	
-	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'project_certificate', 'project_estimated_budget', 'project_document', 'contract', 'amendment', 'picture-check', 'picture-contract', 'bill', 'business' );
+	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'project_certificate', 'project_estimated_budget', 'project_document', 'contract', 'amendment', 'picture-check', 'picture-contract', 'bill', 'business', 'mandate' );
 	
 	private $file_data;
 
@@ -21,8 +21,11 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	 * @return WDGRESTAPI_Entity_File
 	 */
 	public static function get_single( $entity_type, $entity_id, $file_type ) {
+		if ( empty( $entity_type ) || empty( $entity_id ) || empty( $file_type ) ) {
+			return FALSE;
+		}
+
 		$buffer = FALSE;
-		
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT id FROM " .$table_name. " WHERE entity_type='" .$entity_type. "' AND entity_id=" .$entity_id. " AND file_type='" .$file_type. "'";

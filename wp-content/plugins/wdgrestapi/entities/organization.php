@@ -139,19 +139,12 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	}
 	
 	public static function expand_data( $item ) {
-		$rand_project_manager = rand( 0, 20 );
-		$item->is_project_manager = ( $rand_project_manager > 17 ); // TODO
-		$item->representative_firstname = 'John'; // TODO
-		$item->representative_lastname = 'Doe'; // TODO
-		$item->accounting_contact = 'TODO'; // TODO
-		$item->invest_count = rand( 0, 30 ); //TODO
-		$item->invest_amount = rand( 0, 20000 ); //TODO
-		$item->invest_amount_royalties = rand( 0, 200 ); //TODO
-		$item->royalties_amount_received = rand( 0, 700 ); //TODO
-		$item->lw_amount_wallet = rand( 0, 500 ); //TODO
-		$item->lw_wallet_authentication = 'todo'; //TODO
-		$item->lw_iban_authentication = 'todo'; //TODO
-		
+		$item->mandate_file_url = '';
+		$mandate_file = WDGRESTAPI_Entity_File::get_single( self::$entity_type, $item->id, 'mandate' );
+		if ( !empty( $mandate_file ) ) {
+			$item_loaded_data = $mandate_file->get_loaded_data();
+			$item->mandate_file_url = $item_loaded_data->url;
+		}
 		return $item;
 	}
 	
@@ -211,7 +204,8 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'viadeo_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'metadata'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'geolocation'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' )
+		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' ),
+		'mandate_info'			=> array( 'type' => 'varchar', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd

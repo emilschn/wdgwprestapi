@@ -89,6 +89,10 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE, $with_links = FALSE ) {
+		if ( empty( $project_id ) ) {
+			return FALSE;
+		}
+		
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
 		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, percent_commission_without_tax, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE id_project = " .$project_id;
@@ -270,6 +274,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 14 ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 15 ),
 		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 16 ),
+		'transfer_delay'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'declared_by'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 17 )
 	);
 	
