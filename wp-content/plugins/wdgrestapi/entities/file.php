@@ -21,8 +21,11 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	 * @return WDGRESTAPI_Entity_File
 	 */
 	public static function get_single( $entity_type, $entity_id, $file_type ) {
+		if ( empty( $entity_type ) || empty( $entity_id ) || empty( $file_type ) ) {
+			return FALSE;
+		}
+
 		$buffer = FALSE;
-		
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		$query = "SELECT id FROM " .$table_name. " WHERE entity_type='" .$entity_type. "' AND entity_id=" .$entity_id. " AND file_type='" .$file_type. "'";
