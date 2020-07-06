@@ -314,6 +314,45 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_projects_categories' );
 		return $buffer;
 	}
+
+	/**
+	 * Retourne les statistiques de la page d'accueil du site
+	 */
+	public static function get_home_stats() {
+		global $wpdb;
+		$buffer = array();
+
+		// Somme des montants collectés
+		//SELECT SUM(amount_collected) FROM `wdgrestapi1524_entity_project` WHERE status = 'funded' OR status = 'closed'
+		$project_table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = 'SELECT SUM(amount_collected) AS amount FROM ' .$project_table_name . ' WHERE status=\'funded\' OR status=\'closed\'';
+		$result_amount_collected = $wpdb->get_results( $query );
+		$buffer[ 'amount_collected' ] = $result_amount_collected[ 0 ]->amount;
+
+		// Nombre d'investisseurs
+		//SELECT COUNT(DISTINCT user_id) FROM `wdgrestapi1524_entity_investment` investment LEFT JOIN `wdgrestapi1524_entity_project` project ON project.id = investment.project WHERE investment.status = 'publish' AND (project.status = 'funded' OR project.status = 'closed') 
+		$investment_table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
+		$query = 'SELECT COUNT(DISTINCT user_id) AS nb_investors FROM ' .$investment_table_name . ' investment';
+		$query .= ' LEFT JOIN ' .$project_table_name. ' project';
+		$query .= ' ON project.id = investment.project';
+		$query .= ' WHERE investment.status = \'publish\'';
+		$query .= ' AND (project.status=\'funded\' OR project.status=\'closed\')';
+		$result_count_investors = $wpdb->get_results( $query );
+		$buffer[ 'count_investors' ] = $result_count_investors[ 0 ]->nb_investors;
+
+		// Nombre de projets qui versent des royalties
+		//SELECT COUNT(DISTINCT id_project) FROM `wdgrestapi1524_entity_declaration` decla LEFT JOIN `wdgrestapi1524_entity_project` project ON project.id = decla.id_project WHERE decla.amount > 0 AND (project.status = 'funded' OR project.status = 'closed') 
+		$declaration_table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
+		$query = 'SELECT COUNT(DISTINCT id_project) AS nb_projects FROM ' .$declaration_table_name . ' declaration';
+		$query .= ' LEFT JOIN ' .$project_table_name. ' project';
+		$query .= ' ON project.id = declaration.id_project';
+		$query .= ' WHERE declaration.amount > 0';
+		$query .= ' AND (project.status=\'funded\')';
+		$result_count_royaltying_projects = $wpdb->get_results( $query );
+		$buffer[ 'royaltying_projects' ] = $result_count_royaltying_projects[ 0 ]->nb_projects;
+
+		return $buffer;
+	}
 	
 	/**
 	 * Retourne les statistiques qui concernent les projets
