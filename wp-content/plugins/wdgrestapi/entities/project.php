@@ -39,7 +39,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 	
 	public function get_loaded_data( $expand = TRUE, $with_investments = FALSE, $with_organization = FALSE, $with_poll_answers = FALSE, $authorized_client_id_string = FALSE ) {
 		$buffer = parent::get_loaded_data();
-		if ( $expand ) {
+		if ( $expand && !empty( $buffer ) ) {
 			$buffer = WDGRESTAPI_Entity_Project::expand_single_data( $buffer );
 		}
 		$buffer = WDGRESTAPI_Entity_Project::standardize_data( $buffer );
@@ -300,8 +300,10 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$results = $wpdb->get_results( $query );
 		
 		foreach ( $results as $result ) {
-			$result = WDGRESTAPI_Entity_Project::expand_single_data( $result );
-			$result = WDGRESTAPI_Entity_Project::standardize_data( $result );
+			if ( !empty( $result ) ) {
+				$result = WDGRESTAPI_Entity_Project::expand_single_data( $result );
+				$result = WDGRESTAPI_Entity_Project::standardize_data( $result );
+			}
 		}
 		
 		return $results;

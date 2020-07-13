@@ -83,7 +83,9 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 * @param type $item
 	 */
 	public static function standardize_data( $item ) {
-		$item->birthday_date = WDGRESTAPI_Entity::standardize_date( $item->birthday_date );
+		if ( !empty( $item ) ) {
+			$item->birthday_date = WDGRESTAPI_Entity::standardize_date( $item->birthday_date );
+		}
 		return $item;
 	}
 	
