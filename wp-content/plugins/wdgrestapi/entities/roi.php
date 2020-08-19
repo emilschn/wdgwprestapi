@@ -51,6 +51,22 @@ class WDGRESTAPI_Entity_ROI extends WDGRESTAPI_Entity {
 		return $results;
 	}
 	
+	/**
+	 * Retourne la liste des ROIs liés à un investissement
+	 * @param int $user_id
+	 * @return array
+	 */
+	public static function list_get_by_investment_wpref( $investment_wpref ) {
+		global $wpdb;
+		if ( !isset( $wpdb ) || empty( $investment_wpref ) ) {
+			return array();
+		}
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = "SELECT * FROM " .$table_name. " WHERE id_investment = " .$investment_wpref. " ORDER BY date_transfer ASC";
+		$results = $wpdb->get_results( $query );
+		return $results;
+	}
+	
 	
 /*******************************************************************************
  * GESTION BDD

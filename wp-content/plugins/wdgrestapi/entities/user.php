@@ -90,6 +90,94 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne la liste des investissements de cet utilisateur
+	 * @return array
+	 */
+	public function get_investments( $input_sort = FALSE ) {
+		if ( empty( $this->loaded_data->id ) ) {
+			return FALSE;
+		}
+		
+		$investments = WDGRESTAPI_Entity_Investment::get_list_by_user( $this->loaded_data->id );
+
+		if ( empty( $input_sort ) ) {
+			return $investments;
+		}
+
+		if ( $input_sort == 'project' ) {
+			$investment_contracts = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
+	
+			$investment_contracts_by_subscription_id = array();
+			foreach ( $investment_contracts as $investment_contract_item ) {
+				$investment_contracts_by_subscription_id[ $investment_contract_item->subscription_id ] = $investment_contract_item;
+			}
+	
+			$projects_by_id = array();
+			foreach ( $investments as $investment_item ) {
+				if ( $investment_item->status != 'publish' && $investment_item->status != 'pending' ) {
+					continue;
+				}
+
+				if ( empty( $projects_by_id[ $investment_item->project ] ) ) {
+					$projects_by_id[ $investment_item->project ] = array();
+					$projects_by_id[ $investment_item->project ][ 'project_id' ] = $investment_item->project;
+	
+					// Données liées au projet
+					$project_entity = new WDGRESTAPI_Entity_Project( $investment_item->project );
+					$project_entity_data = $project_entity->get_loaded_data( FALSE );
+					$projects_by_id[ $investment_item->project ][ 'project_wpref' ] = $investment_item->wpref;
+					$projects_by_id[ $investment_item->project ][ 'project_name' ] = $project_entity_data->name;
+					$projects_by_id[ $investment_item->project ][ 'project_status' ] = $project_entity_data->status;
+					$projects_by_id[ $investment_item->project ][ 'project_amount' ] = $project_entity_data->amount_collected;
+					$projects_by_id[ $investment_item->project ][ 'project_funding_end_date' ] = $project_entity_data->funding_end_datetime;
+					$projects_by_id[ $investment_item->project ][ 'project_contract_start_date' ] = $project_entity_data->contract_start_date;
+					$projects_by_id[ $investment_item->project ][ 'project_funding_duration' ] = $project_entity_data->funding_duration;
+					$projects_by_id[ $investment_item->project ][ 'project_roi_percent' ] = $project_entity_data->roi_percent;
+					$projects_by_id[ $investment_item->project ][ 'project_roi_percent_estimated' ] = $project_entity_data->roi_percent_estimated;
+					$projects_by_id[ $investment_item->project ][ 'project_goal_maximum' ] = $project_entity_data->goal_maximum;
+					$projects_by_id[ $investment_item->project ][ 'project_first_payment_date' ] = '';
+					$projects_by_id[ $investment_item->project ][ 'project_url' ] = $project_entity_data->url;
+					$projects_by_id[ $investment_item->project ][ 'project_estimated_turnover' ] = $project_entity_data->estimated_turnover;
+					$projects_by_id[ $investment_item->project ][ 'project_estimated_turnover_unit' ] = '';
+
+					$projects_by_id[ $investment_item->project ][ 'declarations' ] = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $investment_item->project, TRUE );
+
+					$projects_by_id[ $investment_item->project ][ 'investments' ] = array();
+				}
+
+				$new_item = array();
+	
+				// Données intrinsèques à l'investissement
+				$new_item[ 'id' ] = $investment_item->id;
+				$new_item[ 'wpref' ] = $investment_item->wpref;
+				$new_item[ 'amount' ] = $investment_item->amount;
+				$new_item[ 'invest_datetime' ] = $investment_item->invest_datetime;
+				$new_item[ 'status' ] = $investment_item->status;
+				$new_item[ 'mean_payment' ] = $investment_item->mean_payment;
+				
+				// Données liées au contrat
+				$new_item[ 'contract_status' ] = '';
+				if ( !empty( $investment_contracts_by_subscription_id[ $investment_item->id ] ) ) {
+					$new_item[ 'contract_status' ] = $investment_contracts_by_subscription_id[ $investment_item->id ]->status;
+				}
+	
+				// Données liées aux royalties
+				$new_item[ 'rois' ] = WDGRESTAPI_Entity_ROI::list_get_by_investment_wpref( $investment_item->wpref );
+	
+				array_push( $projects_by_id[ $investment_item->project ][ 'investments' ], $new_item );
+			}
+
+			// Re-liste des projets en tableau non-associatif
+			$buffer = array();
+			foreach ( $projects_by_id as $project_item ) {
+				array_push( $buffer, $project_item );
+			}
+		}
+		
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne la liste des contrats d'investissement de cet utilisateur
 	 * @return array
 	 */
