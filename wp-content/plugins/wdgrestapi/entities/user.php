@@ -140,7 +140,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 					$projects_by_id[ $investment_item->project ][ 'project_estimated_turnover' ] = $project_entity_data->estimated_turnover;
 					$projects_by_id[ $investment_item->project ][ 'project_estimated_turnover_unit' ] = '';
 
-					$projects_by_id[ $investment_item->project ][ 'declarations' ] = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $investment_item->project, TRUE );
+					$projects_by_id[ $investment_item->project ][ 'declarations' ] = WDGRESTAPI_Entity_Declaration::list_get_by_project_id( $investment_item->project, TRUE, TRUE );
 
 					$projects_by_id[ $investment_item->project ][ 'investments' ] = array();
 				}
