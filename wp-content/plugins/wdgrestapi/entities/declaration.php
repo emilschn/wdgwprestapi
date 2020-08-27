@@ -88,7 +88,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les déclarations
 	 * @return array
 	 */
-	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE, $with_links = FALSE ) {
+	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE, $with_links = FALSE, $with_simple_adjustments = FALSE ) {
 		if ( empty( $project_id ) ) {
 			return FALSE;
 		}
@@ -107,6 +107,17 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 						$single_result->adjustments = $item_declaration->get_adjustments( $with_links );
 						$single_result->rois = $item_declaration->get_rois();
 						$single_result->files = $item_declaration->get_files( 'bill' );
+						array_push( $buffer, $single_result );
+					}
+				}
+				return $buffer;
+	
+			} else if ( $with_simple_adjustments ) {
+				$buffer = array();
+				if ( !empty( $results ) ) {
+					foreach ( $results as $single_result ) {
+						$item_declaration = new WDGRESTAPI_Entity_Declaration( $single_result->id );
+						$single_result->adjustments = $item_declaration->get_adjustments( FALSE );
 						array_push( $buffer, $single_result );
 					}
 				}
