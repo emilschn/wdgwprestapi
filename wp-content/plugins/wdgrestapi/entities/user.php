@@ -125,7 +125,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 					// Données liées au projet
 					$project_entity = new WDGRESTAPI_Entity_Project( $investment_item->project );
 					$project_entity_data = $project_entity->get_loaded_data( FALSE );
-					$projects_by_id[ $investment_item->project ][ 'project_wpref' ] = $investment_item->wpref;
+					$projects_by_id[ $investment_item->project ][ 'project_wpref' ] = $project_entity_data->wpref;
 					$projects_by_id[ $investment_item->project ][ 'project_name' ] = $project_entity_data->name;
 					$projects_by_id[ $investment_item->project ][ 'project_status' ] = $project_entity_data->status;
 					$projects_by_id[ $investment_item->project ][ 'project_amount' ] = $project_entity_data->amount_collected;
