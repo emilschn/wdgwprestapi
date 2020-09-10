@@ -355,6 +355,30 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 
 		return $buffer;
 	}
+
+	/**
+	 * Retourne la liste des projets à chercher
+	 */
+	public static function get_search_list() {
+		global $wpdb;
+
+		// 
+		$project_table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$organization_table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Organization::$entity_type );
+		$project_organization_table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ProjectOrganization::$entity_type );
+		$query = '
+SELECT project.wpref as wpref, project.name as name, project.url as url, organization.name as organization_name FROM ' .$project_table_name . ' project
+LEFT JOIN ' .$project_organization_table_name. ' project_organization
+ON project.id = project_organization.id_project
+LEFT JOIN ' .$organization_table_name. ' organization
+ON organization.id = project_organization.id_organization
+WHERE status=\''. self::$status_vote .'\' OR status=\''. self::$status_collecte .'\' OR status=\''. self::$status_funded .'\' OR status=\''. self::$status_closed .'\' OR status=\''. self::$status_archive .'\'
+';
+
+		$result_project_list = $wpdb->get_results( $query );
+
+		return $result_project_list;
+	}
 	
 	/**
 	 * Retourne les statistiques qui concernent les projets
