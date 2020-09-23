@@ -39,7 +39,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		if ( $expanded ) {
 			$buffer = array();
 			foreach ( $results as $result ) {
-				$buffer_item = self::complete_single_data( $result );
+				$buffer_item = self::complete_single_data( $result, $item_id );
 				array_push( $buffer, $buffer_item );
 			}
 
@@ -49,7 +49,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 		return $results;
 	}
 
-	private static function complete_single_data( $transaction_item ) {
+	private static function complete_single_data( $transaction_item, $item_id ) {
 		$buffer = array();
 		foreach ( self::$db_properties as $db_key => $db_property ) {
 			if ( $db_key != 'unique_key' ) {
@@ -57,14 +57,23 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			}
 		}
 
+		// Si un projet avait déjà été défini comme faisant partie de la transaction, on récupère son nom
 		$project_id = $transaction_item->project_id;
-		$project_entity = new WDGRESTAPI_Entity_Project( $project_id );
-		$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $project_id );
-		$project_organization = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
-		$project_organization_data = $project_organization->get_loaded_data();
+		if ( $project_id != 0 ) {
+			$project_entity = new WDGRESTAPI_Entity_Project( $project_id );
+			$project_organizations = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $project_id );
+			$project_organization = new WDGRESTAPI_Entity_Organization( $project_organizations[0]->id_organization );
+			$project_organization_data = $project_organization->get_loaded_data();
 
-		$buffer[ 'project_name' ] = $project_entity->get_loaded_data( FALSE )->name;
-		$buffer[ 'project_organization_name' ] = $project_organization_data->name;
+			$buffer[ 'project_name' ] = $project_entity->get_loaded_data( FALSE )->name;
+			$buffer[ 'project_organization_name' ] = $project_organization_data->name;
+
+		} elseif ( $item_id == $transaction_item->recipient_id ) {
+			$project_organization = new WDGRESTAPI_Entity_Organization( $transaction_item->sender_id );
+			$buffer[ 'project_organization_name' ] = $project_organization_data->name;
+
+		}
+
 
 		return $buffer;
 	}
@@ -411,7 +420,10 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 					}
 					$sender_id = $entity->get_loaded_data()->id;
 					if ( $sender_wallet_type != '' ) {
-						$project_id = $sender_id;
+						$organization_projects = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_organization_id( $sender_id );
+						if ( count( $organization_projects ) == 1 ) {
+							$project_id = $organization_projects[ 0 ]->id_project;
+						}
 					}
 				}
 			}
@@ -448,7 +460,10 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 					}
 					$recipient_id = $entity->get_loaded_data()->id;
 					if ( $recipient_wallet_type != '' ) {
-						$project_id = $recipient_id;
+						$organization_projects = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_organization_id( $recipient_id );
+						if ( count( $organization_projects ) == 1 ) {
+							$project_id = $organization_projects[ 0 ]->id_project;
+						}
 					}
 				}
 			}
