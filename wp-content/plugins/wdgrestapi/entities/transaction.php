@@ -68,8 +68,9 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			$buffer[ 'project_name' ] = $project_entity->get_loaded_data( FALSE )->name;
 			$buffer[ 'project_organization_name' ] = $project_organization_data->name;
 
-		} elseif ( $item_id == $transaction_item->recipient_id ) {
+		} elseif ( $item_id == $transaction_item->recipient_id && $transaction_item->sender_is_legal_entity == '1' ) {
 			$project_organization = new WDGRESTAPI_Entity_Organization( $transaction_item->sender_id );
+			$project_organization_data = $project_organization->get_loaded_data();
 			$buffer[ 'project_organization_name' ] = $project_organization_data->name;
 
 		}
