@@ -88,7 +88,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les déclarations
 	 * @return array
 	 */
-	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE, $with_links = FALSE ) {
+	public static function list_get_by_project_id( $project_id, $is_data_restricted_to_entity = FALSE, $with_links = FALSE, $with_simple_adjustments = FALSE ) {
 		if ( empty( $project_id ) ) {
 			return FALSE;
 		}
@@ -107,6 +107,17 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 						$single_result->adjustments = $item_declaration->get_adjustments( $with_links );
 						$single_result->rois = $item_declaration->get_rois();
 						$single_result->files = $item_declaration->get_files( 'bill' );
+						array_push( $buffer, $single_result );
+					}
+				}
+				return $buffer;
+	
+			} else if ( $with_simple_adjustments ) {
+				$buffer = array();
+				if ( !empty( $results ) ) {
+					foreach ( $results as $single_result ) {
+						$item_declaration = new WDGRESTAPI_Entity_Declaration( $single_result->id );
+						$single_result->adjustments = $item_declaration->get_adjustments( FALSE );
 						array_push( $buffer, $single_result );
 					}
 				}
@@ -162,6 +173,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 			'file_list'					=> $result->file_list,
 			'turnover'					=> $result->turnover,
 			'message'					=> $result->message,
+			'message_rich'				=> $result->message_rich,
 			'adjustment'				=> $result->adjustment,
 			'employees_number'			=> $result->employees_number,
 			'other_fundings'			=> $result->other_fundings
@@ -271,6 +283,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		'file_list'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'turnover'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 12 ),
 		'message'				=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 13 ),
+		'message_rich'			=> array( 'type' => 'bool', 'other' => 'DEFAULT 0' ),
 		'adjustment'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 14 ),
 		'employees_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 15 ),
 		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 16 ),

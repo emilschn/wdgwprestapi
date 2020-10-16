@@ -33,7 +33,9 @@ class WDGRESTAPI_Route_Email extends WDGRESTAPI_Route {
 	 */
 	public function list_get() {
 		try {
-			return WDGRESTAPI_Entity_Email::list_get( $this->get_current_client_autorized_ids_string() );
+			$input_id_template = filter_input( INPUT_GET, 'id_template' );
+			$input_recipient_email = filter_input( INPUT_GET, 'recipient_email' );
+			return WDGRESTAPI_Entity_Email::list_get( $input_id_template, $input_recipient_email );
 			
 		} catch ( Exception $e ) {
 			$this->log( "WDGRESTAPI_Route_Email::list_get", $e->getMessage() );

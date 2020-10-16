@@ -16,6 +16,13 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
+			'/project-draft/id/(?P<id>\d+)',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_by_id'),
+			array( 'guid' => array( 'default' => 0 ) )
+		);
+		
+		WDGRESTAPI_Route::register_wdg(
 			'/project-draft',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create'),
@@ -89,6 +96,39 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 		} else {
 			$this->log( "WDGRESTAPI_Route_Project_Draft::single_get", "404 : Invalid project GUID (empty)" );
 			return new WP_Error( '404', "Invalid project GUID (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne un brouillon de projet par son ID
+	 * @param WP_REST_Request $request
+	 * @return \WDGRESTAPI_Entity_Project_Draft
+	 */
+	public function single_get_by_id( WP_REST_Request $request ) {
+		
+		$project_draft_id = $request->get_param( 'id' );
+		if ( !empty( $project_draft_id ) ) {
+			try {
+				$project_item = new WDGRESTAPI_Entity_Project_Draft( project_draft_id );
+				$loaded_data = $project_item->get_loaded_data( FALSE);
+				
+				if ( !empty( $loaded_data )) {
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Project_Draft::single_get_by_id::" . $project_draft_id, "404 : Invalid project ID" );
+					return new WP_Error( '404', "Invalid project ID" );
+					
+				}
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Project_Draft::single_get_by_id::" . $project_draft_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Project_Draft::single_get_by_id", "404 : Invalid project ID (empty)" );
+			return new WP_Error( '404', "Invalid project ID (empty)" );
 		}
 	}
 	

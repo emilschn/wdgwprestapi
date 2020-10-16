@@ -15,6 +15,18 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
+			'/projects/home-stats',
+			WP_REST_Server::READABLE,
+			array( $this, 'list_get_home_stats')
+		);
+		
+		WDGRESTAPI_Route::register_wdg(
+			'/projects/search-list',
+			WP_REST_Server::READABLE,
+			array( $this, 'list_get_search_list')
+		);
+		
+		WDGRESTAPI_Route::register_wdg(
 			'/projects/stats',
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_stats')
@@ -184,6 +196,34 @@ class WDGRESTAPI_Route_Project extends WDGRESTAPI_Route {
 			
 		} catch ( Exception $e ) {
 			$this->log( "WDGRESTAPI_Route_Project::get_categories", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
+	}
+	
+	/**
+	 * Retourne les statistiques affichées sur la page d'accueil
+	 * @return array
+	 */
+	public function list_get_home_stats() {
+		try {
+			return WDGRESTAPI_Entity_Project::get_home_stats();
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_Project::list_get_home_stats", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
+	}
+	
+	/**
+	 * Retourne la liste des projets à rechercher
+	 * @return array
+	 */
+	public function list_get_search_list() {
+		try {
+			return WDGRESTAPI_Entity_Project::get_search_list();
+			
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_Project::list_get_search_list", $e->getMessage() );
 			return new WP_Error( 'cant-get', $e->getMessage() );
 		}
 	}
