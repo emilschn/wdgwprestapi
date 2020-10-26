@@ -433,7 +433,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			$recipient_id = 0;
 			$recipient_wallet_type = '';
 			$recipient_is_legal_entity = ( strpos( $recipient_wallet_id, 'ORGA' ) !== FALSE ) ? 1 : 0;
-			if ( $recipient_wallet_id == 'SC' ) {
+			if ( $recipient_wallet_id === 'SC' ) {
 				$recipient_wallet_type = 'society';
 
 			} else {
