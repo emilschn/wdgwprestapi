@@ -107,9 +107,9 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		if ( $input_sort == 'project' ) {
 			$investment_contracts = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
 	
-			$investment_contracts_by_subscription_id = array();
+			$investment_contracts_by_subscription_wpref = array();
 			foreach ( $investment_contracts as $investment_contract_item ) {
-				$investment_contracts_by_subscription_id[ $investment_contract_item->subscription_id ] = $investment_contract_item;
+				$investment_contracts_by_subscription_wpref[ $investment_contract_item->subscription_id ] = $investment_contract_item;
 			}
 	
 			$projects_by_id = array();
@@ -157,8 +157,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				
 				// Données liées au contrat
 				$new_item[ 'contract_status' ] = '';
-				if ( !empty( $investment_contracts_by_subscription_id[ $investment_item->id ] ) ) {
-					$new_item[ 'contract_status' ] = $investment_contracts_by_subscription_id[ $investment_item->id ]->status;
+				if ( !empty( $investment_contracts_by_subscription_wpref[ $investment_item->wpref ] ) ) {
+					$new_item[ 'contract_status' ] = $investment_contracts_by_subscription_wpref[ $investment_item->wpref ]->status;
 				}
 	
 				// Données liées aux royalties
