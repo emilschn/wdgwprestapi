@@ -162,7 +162,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				}
 	
 				// Données liées aux royalties
-				$new_item[ 'rois' ] = WDGRESTAPI_Entity_ROI::list_get_by_investment_wpref( $investment_item->wpref );
+				$new_item[ 'rois' ] = WDGRESTAPI_Entity_ROI::list_get_by_investment_wpref_and_user( $investment_item->wpref, $this->loaded_data->id );
 	
 				array_push( $projects_by_id[ $investment_item->project ][ 'investments' ], $new_item );
 			}
