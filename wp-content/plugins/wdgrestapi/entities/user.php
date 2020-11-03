@@ -186,6 +186,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				$new_item[ 'contract_status' ] = '';
 				if ( !empty( $investment_contracts_by_subscription_wpref[ $investment_item->wpref ] ) ) {
 					$new_item[ 'contract_status' ] = $investment_contracts_by_subscription_wpref[ $investment_item->wpref ]->status;
+					$new_item[ 'amount' ] = $investment_contracts_by_subscription_wpref[ $investment_item->wpref ]->subscription_amount;
 				}
 	
 				// Données liées aux royalties
