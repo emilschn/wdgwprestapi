@@ -111,7 +111,34 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			foreach ( $investment_contracts as $investment_contract_item ) {
 				$investment_contracts_by_subscription_wpref[ $investment_contract_item->subscription_id ] = $investment_contract_item;
 			}
+
+			// *****
+			// Certains contrats d'investissement sont orphelins :
+			// ils existent sans que l'utilisateur n'ait investi lui-même
+			// Exemple : succession, ...
+			$orphans_investment_contracts = array();
+			foreach ( $investment_contracts as $investment_contract_item ) {
+				$orphans_investment_contracts[ $investment_contract_item->subscription_id ] = $investment_contract_item;
+			}
+			// Premier parcours des investissements pour garder les contrats d'investissement sans investissement
+			foreach ( $investments as $investment_item ) {
+				if ( $investment_item->status != 'publish' && $investment_item->status != 'pending' ) {
+					continue;
+				}
+				if ( !empty( $orphans_investment_contracts[ $investment_item->wpref ] ) ) {
+					unset( $orphans_investment_contracts[ $investment_item->wpref ] );
+				}
+			}
+			// Parcours des contrats d'investissement restants,
+			// récupération de l'investissement d'origine
+			// et ajout dans la liste des investissements "normaux"
+			foreach ( $orphans_investment_contracts as $orphan_contract_wpref => $orphan_contract ) {
+				$new_investment_item = new WDGRESTAPI_Entity_Investment( FALSE, FALSE, $orphan_contract_wpref );
+				array_push( $investments, $new_investment_item );
+			}
+			// *****
 	
+			// Vraie initialisation des données d'investissement
 			$projects_by_id = array();
 			foreach ( $investments as $investment_item ) {
 				if ( $investment_item->status != 'publish' && $investment_item->status != 'pending' ) {
