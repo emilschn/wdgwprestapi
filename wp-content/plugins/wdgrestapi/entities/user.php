@@ -134,7 +134,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			// et ajout dans la liste des investissements "normaux"
 			foreach ( $orphans_investment_contracts as $orphan_contract_wpref => $orphan_contract ) {
 				$new_investment_item = new WDGRESTAPI_Entity_Investment( FALSE, FALSE, $orphan_contract_wpref );
-				array_push( $investments, $new_investment_item );
+				array_push( $investments, $new_investment_item->get_loaded_data() );
 			}
 			// *****
 	
