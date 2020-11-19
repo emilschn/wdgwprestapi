@@ -40,8 +40,8 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 		if ( $this->loaded_data->tool == WDGRESTAPI_Entity_Bill::$tool_quickbooks ) {
 			$quickbook_invoice_id = $this->save_on_quickbooks( json_decode( $this->loaded_data->options ) );
 			if ( !empty( $quickbook_invoice_id ) ) {
-				parent::save();
 				$this->set_property( 'tool_id', $quickbook_invoice_id );
+				parent::save();
 				return TRUE;
 			}
 		}
@@ -90,6 +90,28 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 				]
 			] );
 			$resultingObj = $quickbooks_service->Add( $bill_object );
+
+			$loaded_data = $this->get_loaded_data();
+			if ( $loaded_data->object == 'royalties-commission' ) {
+				if ( isset( $resultingObj->Id ) ) {
+					try {
+						$invoice = Invoice::create([
+							"Id" => $resultingObj->Id
+						]);
+						$pdf_local_file = $quickbooks_service->DownloadPDF( $invoice, dirname(__FILE__) );
+	
+						$file_entity = new WDGRESTAPI_Entity_File();
+						$file_entity->set_file_data( base64_encode( $pdf_local_file ) );
+						$file_entity->set_property( 'entity_type', 'declaration' );
+						$file_entity->set_property( 'entity_id', $loaded_data->object_id );
+						$file_entity->set_property( 'file_type', 'bill' );
+						$file_entity->set_property( 'file_extension', 'pdf' );
+						$file_entity->save();
+	
+					} catch ( Exception $e ) {
+					}
+				}
+			}
 
 			if ( isset( $options->sendemail ) && $options->sendemail == 1 ) {
 				$quickbooks_service->SendEmail( $resultingObj );
