@@ -2,10 +2,19 @@
 class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 	public static $entity_type = 'sendinblue_template';
 
-	public function __construct( $id = FALSE ) {
-		parent::__construct( $id, self::$entity_type, self::$db_properties );
-	}
+	public function __construct( $slug = FALSE ) {
+		parent::__construct( FALSE, self::$entity_type, self::$db_properties );
 
+		if ( !empty( $slug ) ) {
+			global $wpdb;
+			$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+			$query = "SELECT * FROM " .$table_name. " WHERE slug = '" .$slug. "'";
+			$row_data = $wpdb->get_row( $query );
+			if ( !empty( $row_data ) ) {
+				$this->loaded_data = $row_data;
+			}
+		}
+	}
 
 
 /*******************************************************************************
