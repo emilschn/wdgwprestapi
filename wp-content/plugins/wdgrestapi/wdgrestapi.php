@@ -28,7 +28,7 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 
 class WDGRESTAPI {
-	private $version = '0.0.823';
+	private $version = '0.0.8231';
 
     
 	/**
@@ -63,6 +63,7 @@ class WDGRESTAPI {
 		$this->add_include_lib( 'geolocation' );
 		$this->add_include_lib( 'validator' );
 		$this->add_include_lib( 'google-api' );
+		$this->add_include_lib( 'transifex' );
 	}
 	public function add_include_lib( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'libs/' . $include_name . '.php');
@@ -95,6 +96,7 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'contract-model' );
 		$this->add_include_entity( 'contract' );
 		$this->add_include_entity( 'queued-action' );
+		$this->add_include_entity( 'sendinblue-template' );
 		$this->add_include_entity( 'transaction' );
 		
 		$this->add_include_entity( 'organization-user' );
@@ -136,6 +138,7 @@ class WDGRESTAPI {
 		$this->add_include_route( 'project-user' );
 		$this->add_include_route( 'project-organization' );
 		$this->add_include_route( 'queued-action' );
+		$this->add_include_route( 'sendinblue-template' );
 	}
 	public function add_include_route( $include_name ) {
 		include_once( plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php');
@@ -163,6 +166,7 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Contract::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_PollAnswer::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_QueuedAction::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_SendinblueTemplate::register');
 		
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_OrganizationUser::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectUser::register');
@@ -201,6 +205,7 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_ContractModel::upgrade_db();
 			WDGRESTAPI_Entity_Contract::upgrade_db();
 			WDGRESTAPI_Entity_QueuedAction::upgrade_db();
+			WDGRESTAPI_Entity_SendinblueTemplate::upgrade_db();
 			WDGRESTAPI_Entity_Transaction::upgrade_db();
 			
 			WDGRESTAPI_Entity_OrganizationUser::upgrade_db();
