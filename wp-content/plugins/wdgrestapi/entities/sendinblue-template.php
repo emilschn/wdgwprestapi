@@ -17,6 +17,16 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 	}
 
 	/**
+	 * Met à jour les textes à la fois sur SendInBlue et sur Transifex, selon les avancées des uns et des autres
+	 */
+	public function update_texts() {
+		// On commence par récupérer les chaines traduites (car si on met à jour Transifex d'abord, ça les écrasera)
+		$this->update_language_content_from_transifex( 'en' );
+		// Puis on renvoie les données du template français vers Transifex
+		$this->send_french_content_to_transifex();
+	}
+
+	/**
 	 * Retourne l'objet SIB
 	 */
 	private function get_sendinblue() {

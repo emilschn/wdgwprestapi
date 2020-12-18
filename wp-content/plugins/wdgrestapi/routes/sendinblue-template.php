@@ -26,6 +26,7 @@ class WDGRESTAPI_Route_SendinblueTemplate extends WDGRESTAPI_Route {
 		$sendinblue_template_item = new WDGRESTAPI_Entity_SendinblueTemplate( $sendinblue_template_slug );
 		$this->set_posted_properties( $sendinblue_template_item, WDGRESTAPI_Entity_SendinblueTemplate::$db_properties );
 		$sendinblue_template_item->save();
+		$sendinblue_template_item->update_texts();
 
 		$reloaded_data = $sendinblue_template_item->get_loaded_data();
 		$this->log( "WDGRESTAPI_Route_SendinblueTemplate::single_create_or_update", json_encode( $reloaded_data ) );
