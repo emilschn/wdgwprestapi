@@ -20,6 +20,24 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		$user = new WDGRESTAPI_Entity_User( $result->id );
 		return $user;
 	}
+
+	/**
+	 * Récupère un utilisateur à partir de son adresse e-mail
+	 */
+	public static function get_by_email( $email ) {
+		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = 'SELECT * FROM ' .$table_name. ' WHERE email=\''.$email.'\'';
+		$result = $wpdb->get_row( $query );
+		if ( empty( $result ) || empty( $result->id ) ) {
+			return FALSE;
+		}
+		$user = new WDGRESTAPI_Entity_User( $result->id );
+		return $user;
+	}
 	
 	/**
 	 * Override de la fonction de sauvegarde pour supprimer le cache des listes d'utilisateur

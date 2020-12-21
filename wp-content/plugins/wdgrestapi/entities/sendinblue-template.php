@@ -16,6 +16,21 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 		}
 	}
 
+	public static function get_by_fr_id( $fr_id ) {
+		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = 'SELECT * FROM ' .$table_name. ' WHERE id_sib_fr=' .$fr_id;
+		$result = $wpdb->get_row( $query );
+		if ( empty( $result ) || empty( $result->id ) ) {
+			return FALSE;
+		}
+		$user = new WDGRESTAPI_Entity_SendinblueTemplate( $result->slug );
+		return $user;
+	}
+
 	/**
 	 * Met à jour les textes à la fois sur SendInBlue et sur Transifex, selon les avancées des uns et des autres
 	 */
