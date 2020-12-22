@@ -74,8 +74,6 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 	public function update_language_content_from_transifex( $language_code ) {
 		// Récupération du contenu traduit sur Transifex
 		$translation_content = WDGRESTAPI_Lib_Transifex::get_resource_translation( $this->loaded_data->slug, $language_code );
-		//echo '<br><br>translation_content :<br>';
-		//print_r( $translation_content );
 		if ( empty( $translation_content ) ) {
 			return FALSE;
 		}
@@ -83,13 +81,11 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 		$mailin = $this->get_sendinblue();
 
 		// Si il n'y a pas encore de template traduit, on le crée
-		if ( empty( $this->loaded_data->id_sib_en ) ) {
+		if ( empty( $this->loaded_data->{ 'id_sib_' .$language_code } ) ) {
 			// Récupération des données du template français de base pour reprendre le plus gros des données
 			$data = array( 'id' => $this->loaded_data->id_sib_fr );
 			$sendinblue_fr_template = $mailin->get_campaign_v2( $data );
 			$template_fr_data = $sendinblue_fr_template[ 'data' ][ 0 ];
-			//echo '<br><br>sendinblue_fr_template :<br>';
-			//print_r( $template_fr_data );
 
 			// Définition des données pour le nouveau template
 			$data = array(
@@ -105,19 +101,15 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 				'status'			=> 0,
 				'attachment_url'	=> ''
 			);
-			//echo '<br><br>data :<br>';
-			//print_r( $data );
 			$result = $mailin->create_template( $data );
-			echo '<br><br>result :<br>';
-			print_r( $result );
 
 			// Si le template traduit est créé, on met à jour l'id dans la BDD
-			$this->loaded_data->id_sib_en = $result[ 'data' ][ 'id' ];
+			$this->loaded_data->{ 'id_sib_' .$language_code } = $result[ 'data' ][ 'id' ];
 			$this->save();
 
 		} else {
 			$data = array(
-				'id'			=> $this->loaded_data->id_sib_en,
+				'id'			=> $this->loaded_data->{ 'id_sib_' .$language_code },
 				'html_content'	=> $translation_content
 			);
 			$mailin->update_template( $data );

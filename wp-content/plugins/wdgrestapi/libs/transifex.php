@@ -24,8 +24,6 @@ class WDGRESTAPI_Lib_Transifex {
 			$url = self::$transifex_url_2;
 		}
 		$url .= $uri;
-		echo '<br><br>$url : <br>';
-		print_r($url);
 		curl_setopt( $curl_handle, CURLOPT_URL, $url );
 
 		// Paramètres d'authentification
@@ -39,7 +37,6 @@ class WDGRESTAPI_Lib_Transifex {
 			if ( $method_post ) {
 				curl_setopt( $curl_handle, CURLOPT_POST, TRUE );
 			} else {
-				// curl_setopt( $curl_handle, CURLOPT_PUT, TRUE );
 				curl_setopt( $curl_handle, CURLOPT_CUSTOMREQUEST, 'PUT' );
 				array_push( $headers, 'X-HTTP-Method-Override: PUT' );
 			}
@@ -50,13 +47,8 @@ class WDGRESTAPI_Lib_Transifex {
 		// Exécution de la requête est gestion d'erreur
 		$buffer = curl_exec( $curl_handle );
 		if ( curl_errno( $curl_handle ) ) {
-			echo '<br><br>$curl_handle : <br>';
-			print_r( $curl_handle );
-			echo '<br><br>curl_error : <br>';
-			print_r( curl_error( $curl_handle ) );
+			WDGRESTAPI_Lib_Logs::log( 'Transifex error : ' . print_r( curl_error( $curl_handle ), TRUE ) );
 		}
-		echo '<br><br>buffer : <br>';
-		print_r($buffer);
 
 		// Finitions
 		curl_close( $curl_handle );
@@ -123,6 +115,10 @@ class WDGRESTAPI_Lib_Transifex {
 					$resource_name = $resource_slug;
 				}
 				self::create_resource( $resource_slug, $resource_name, $content );
+
+			// Log au cas où
+			} else {
+				WDGRESTAPI_Lib_Logs::log( 'Transifex get_resource_info error : ' . print_r( $resource_info, TRUE ) );
 			}
 		
 		// Sinon, la resource existe, il faut la mettre à jour

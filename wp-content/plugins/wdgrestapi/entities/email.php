@@ -68,7 +68,11 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 				if ( !empty( $user_recipient_language ) && $user_recipient_language != 'fr' ) {
 					$template_entity = WDGRESTAPI_Entity_SendinblueTemplate::get_by_fr_id( $template_id );
 					$template_entity_data = $template_entity->get_loaded_data();
-					$template_id = $template_entity_data->id_sib_en;
+					if ( !empty( $template_entity_data->{ 'id_sib_' .$user_recipient_language } ) ) {
+						$template_id = $template_entity_data->{ 'id_sib_' .$user_recipient_language };
+					} else {
+						$template_id = $template_entity_data->id_sib_en;
+					}
 					$this->loaded_data->template = $template_id;
 				}
 			}
