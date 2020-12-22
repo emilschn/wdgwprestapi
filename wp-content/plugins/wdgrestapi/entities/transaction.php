@@ -251,6 +251,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 				if ( !isset( $previous_items_by_wedogood_entity_id[ 'roi::' .$roi_item->id ] ) ) {
 					// Récupère un éventuel P2P lié
 					$gateway = $roi_item->gateway;
+					$amount = $roi_item->amount * 100;
 					$mean_payment = 'wallet';
 					if ( $gateway != 'lemonway' ) {
 						$mean_payment = $gateway;
@@ -265,11 +266,16 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 					$datetime = new DateTime( $roi_item->date_transfer );
 
 					if ( !empty( $linked_p2p ) ) {
-						// Si possible, Prend la date du P2P qui est plus précise
+						// Si possible, prend la date du P2P qui est plus précise
 						if ( !empty( $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->DATE ) ) {
 							$datetime = DateTime::createFromFormat( 'd/m/Y H:i:s', $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->DATE );
 						} else {
 							WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_Transaction::update_with_lw_data > Erreur de conversion de date provenant de LW > ' . print_r( $lw_items_by_gateway_id[ '2::' .$linked_p2p ], true ) );
+						}
+
+						// Si possible, prend le montant du P2P pour avoir le vrai montant si il y a eu des prélèvements sociaux
+						if ( !empty( $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->CRED ) ) {
+							$amount = $lw_items_by_gateway_id[ '2::' .$linked_p2p ]->CRED * 100;
 						}
 						
 						// Supprime dans la liste des items LW
@@ -283,7 +289,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 	
 						// Ajoute l'élément
 						self::insert_item(
-							$transaction_datetime, $roi_item->amount * 100,
+							$transaction_datetime, $amount,
 							$roi_item->id_orga, true, 'royalties',
 							$item_id, $is_legal_entity, '',
 							'roi', 'success',
@@ -433,7 +439,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity {
 			$recipient_id = 0;
 			$recipient_wallet_type = '';
 			$recipient_is_legal_entity = ( strpos( $recipient_wallet_id, 'ORGA' ) !== FALSE ) ? 1 : 0;
-			if ( $recipient_wallet_id == 'SC' ) {
+			if ( $recipient_wallet_id === 'SC' ) {
 				$recipient_wallet_type = 'society';
 
 			} else {

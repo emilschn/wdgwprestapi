@@ -20,6 +20,24 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		$user = new WDGRESTAPI_Entity_User( $result->id );
 		return $user;
 	}
+
+	/**
+	 * Récupère un utilisateur à partir de son adresse e-mail
+	 */
+	public static function get_by_email( $email ) {
+		global $wpdb;
+		if ( empty( $wpdb ) ) {
+			return FALSE;
+		}
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = 'SELECT * FROM ' .$table_name. ' WHERE email=\''.$email.'\'';
+		$result = $wpdb->get_row( $query );
+		if ( empty( $result ) || empty( $result->id ) ) {
+			return FALSE;
+		}
+		$user = new WDGRESTAPI_Entity_User( $result->id );
+		return $user;
+	}
 	
 	/**
 	 * Override de la fonction de sauvegarde pour supprimer le cache des listes d'utilisateur
@@ -107,11 +125,38 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		if ( $input_sort == 'project' ) {
 			$investment_contracts = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
 	
-			$investment_contracts_by_subscription_id = array();
+			$investment_contracts_by_subscription_wpref = array();
 			foreach ( $investment_contracts as $investment_contract_item ) {
-				$investment_contracts_by_subscription_id[ $investment_contract_item->subscription_id ] = $investment_contract_item;
+				$investment_contracts_by_subscription_wpref[ $investment_contract_item->subscription_id ] = $investment_contract_item;
 			}
+
+			// *****
+			// Certains contrats d'investissement sont orphelins :
+			// ils existent sans que l'utilisateur n'ait investi lui-même
+			// Exemple : succession, ...
+			$orphans_investment_contracts = array();
+			foreach ( $investment_contracts as $investment_contract_item ) {
+				$orphans_investment_contracts[ $investment_contract_item->subscription_id ] = $investment_contract_item;
+			}
+			// Premier parcours des investissements pour garder les contrats d'investissement sans investissement
+			foreach ( $investments as $investment_item ) {
+				if ( $investment_item->status != 'publish' && $investment_item->status != 'pending' ) {
+					continue;
+				}
+				if ( !empty( $orphans_investment_contracts[ $investment_item->wpref ] ) ) {
+					unset( $orphans_investment_contracts[ $investment_item->wpref ] );
+				}
+			}
+			// Parcours des contrats d'investissement restants,
+			// récupération de l'investissement d'origine
+			// et ajout dans la liste des investissements "normaux"
+			foreach ( $orphans_investment_contracts as $orphan_contract_wpref => $orphan_contract ) {
+				$new_investment_item = new WDGRESTAPI_Entity_Investment( FALSE, FALSE, $orphan_contract_wpref );
+				array_push( $investments, $new_investment_item->get_loaded_data() );
+			}
+			// *****
 	
+			// Vraie initialisation des données d'investissement
 			$projects_by_id = array();
 			foreach ( $investments as $investment_item ) {
 				if ( $investment_item->status != 'publish' && $investment_item->status != 'pending' ) {
@@ -157,12 +202,13 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				
 				// Données liées au contrat
 				$new_item[ 'contract_status' ] = '';
-				if ( !empty( $investment_contracts_by_subscription_id[ $investment_item->id ] ) ) {
-					$new_item[ 'contract_status' ] = $investment_contracts_by_subscription_id[ $investment_item->id ]->status;
+				if ( !empty( $investment_contracts_by_subscription_wpref[ $investment_item->wpref ] ) ) {
+					$new_item[ 'contract_status' ] = $investment_contracts_by_subscription_wpref[ $investment_item->wpref ]->status;
+					$new_item[ 'amount' ] = $investment_contracts_by_subscription_wpref[ $investment_item->wpref ]->subscription_amount;
 				}
 	
 				// Données liées aux royalties
-				$new_item[ 'rois' ] = WDGRESTAPI_Entity_ROI::list_get_by_investment_wpref( $investment_item->wpref );
+				$new_item[ 'rois' ] = WDGRESTAPI_Entity_ROI::list_get_by_investment_wpref_and_user( $investment_item->wpref, $this->loaded_data->id );
 	
 				array_push( $projects_by_id[ $investment_item->project ][ 'investments' ], $new_item );
 			}

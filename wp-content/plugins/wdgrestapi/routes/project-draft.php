@@ -109,7 +109,7 @@ class WDGRESTAPI_Route_Project_Draft extends WDGRESTAPI_Route {
 		$project_draft_id = $request->get_param( 'id' );
 		if ( !empty( $project_draft_id ) ) {
 			try {
-				$project_item = new WDGRESTAPI_Entity_Project_Draft( project_draft_id );
+				$project_item = new WDGRESTAPI_Entity_Project_Draft( $project_draft_id );
 				$loaded_data = $project_item->get_loaded_data( FALSE);
 				
 				if ( !empty( $loaded_data )) {

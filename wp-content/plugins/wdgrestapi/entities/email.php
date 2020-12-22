@@ -54,12 +54,35 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	private function send_sendinblue_mail() {
 		include_once( plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php');
 		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
+
+		// Détermination de la langue d'affichage en fonction du recipient
+		// Par défaut, on envoie le template français
+		$template_id = $this->loaded_data->template;
+		// Pour l'instant, on ne cherche la langue que quand il y a un seul destinataire
+		// TODO : envoyer des templates différents selon les groupes d'utilisateurs par langue
+		if ( strpos( $this->loaded_data->recipient, ',' ) === FALSE ) {
+			$user_recipient = WDGRESTAPI_Entity_User::get_by_email( $this->loaded_data->recipient );
+			if ( !empty( $user_recipient ) ) {
+				$user_recipient_data = $user_recipient->get_loaded_data();
+				$user_recipient_language = $user_recipient_data->language;
+				if ( !empty( $user_recipient_language ) && $user_recipient_language != 'fr' ) {
+					$template_entity = WDGRESTAPI_Entity_SendinblueTemplate::get_by_fr_id( $template_id );
+					$template_entity_data = $template_entity->get_loaded_data();
+					if ( !empty( $template_entity_data->{ 'id_sib_' .$user_recipient_language } ) ) {
+						$template_id = $template_entity_data->{ 'id_sib_' .$user_recipient_language };
+					} else {
+						$template_id = $template_entity_data->id_sib_en;
+					}
+					$this->loaded_data->template = $template_id;
+				}
+			}
+		}
 		
 		$recipients = str_replace( ',', '|', $this->loaded_data->recipient );
 		$options = json_decode( $this->loaded_data->options );
 		$replyto = ( empty( $options->replyto ) ) ? 'bonjour@wedogood.co' : $options->replyto;
 		$data = array(
-			'id'		=> $this->loaded_data->template,
+			'id'		=> $template_id,
 			'to'		=> 'admin@wedogood.co',
 			'bcc'		=> $recipients,
 			'replyto'	=> $replyto,
