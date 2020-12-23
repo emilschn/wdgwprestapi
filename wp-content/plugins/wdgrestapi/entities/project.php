@@ -556,7 +556,8 @@ WHERE status=\''. self::$status_vote .'\' OR status=\''. self::$status_collecte 
 		'minimum_goal_display'	=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 40 ),
 		'common_goods_turnover_percent'	=> array( 'type' => 'float', 'other' => '', 'gs_col_index' => 41 ),
 		'product_type'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 42 ),
-		'acquisition'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 43 )
+		'acquisition'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 43 ),
+		'legal_procedure'		=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 44 )
 	);
 	
 	// Mise à jour de la bdd
