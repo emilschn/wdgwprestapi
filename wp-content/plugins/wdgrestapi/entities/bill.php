@@ -50,6 +50,7 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 	}
 	
 	private function save_on_quickbooks( $options ) {
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_Bill::save_on_quickbooks > $options : ' . print_r($options, true) );
 		$quickbooks_service = WDGRESTAPI_Entity_Bill::get_quickbooks_service();
 
 		if ( is_wp_error( $quickbooks_service ) ) {
@@ -61,6 +62,7 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 			$id_location = isset( $options->locationid ) ? $options->locationid : '';
 
 			$bill_object = Invoice::create( [
+				"AutoDocNumber" => 1,
 				"Line"	=> [
 					[
 						"Amount"		=> $options->itemvalue,
@@ -89,16 +91,25 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 					"Address"	=> "administratif@wedogood.co"
 				]
 			] );
-			$resultingObj = $quickbooks_service->Add( $bill_object );
+			try {
+				$resultingObj = $quickbooks_service->Add( $bill_object );
+			} catch ( Exception $e ) {
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_Bill::save_on_quickbooks > Add - ERROR : ' . print_r($e, true) );
+			}
+
+			if ( isset( $options->sendemail ) && $options->sendemail == 1 ) {
+				$quickbooks_service->SendEmail( $resultingObj );
+			}
 
 			$loaded_data = $this->get_loaded_data();
 			if ( $loaded_data->object == 'royalties-commission' ) {
-				if ( isset( $resultingObj->Id ) ) {
+				if ( isset( $resultingObj->Id ) && !empty( $resultingObj->Id ) ) {
 					try {
 						$invoice = Invoice::create([
 							"Id" => $resultingObj->Id
 						]);
 						$pdf_local_file = $quickbooks_service->DownloadPDF( $invoice, dirname(__FILE__) );
+						WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_Bill::save_on_quickbooks > $pdf_local_file : ' . $pdf_local_file );
 	
 						$file_entity = new WDGRESTAPI_Entity_File();
 						$file_entity->set_file_data( base64_encode( $pdf_local_file ) );
@@ -109,12 +120,9 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 						$file_entity->save();
 	
 					} catch ( Exception $e ) {
+						WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_Bill::save_on_quickbooks > DownloadPDF - ERROR : ' . print_r($e, true) );
 					}
 				}
-			}
-
-			if ( isset( $options->sendemail ) && $options->sendemail == 1 ) {
-				$quickbooks_service->SendEmail( $resultingObj );
 			}
 
 			$error = $quickbooks_service->getLastError();
