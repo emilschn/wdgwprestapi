@@ -117,6 +117,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		}
 		
 		$investments = WDGRESTAPI_Entity_Investment::get_list_by_user( $this->loaded_data->id );
+		$investments_pending = WDGRESTAPI_Entity_Investment::get_list_by_user( $this->loaded_data->id, FALSE, 'pending' );
+		$investments = array_merge( $investments, $investments_pending );
 
 		if ( empty( $input_sort ) ) {
 			return $investments;
