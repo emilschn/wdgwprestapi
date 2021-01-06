@@ -112,7 +112,7 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 						WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_Bill::save_on_quickbooks > $pdf_local_file : ' . $pdf_local_file );
 	
 						$file_entity = new WDGRESTAPI_Entity_File();
-						$file_entity->set_file_data( base64_encode( $pdf_local_file ) );
+						$file_entity->set_file_to_move( $pdf_local_file );
 						$file_entity->set_property( 'entity_type', 'declaration' );
 						$file_entity->set_property( 'entity_id', $loaded_data->object_id );
 						$file_entity->set_property( 'file_type', 'bill' );
