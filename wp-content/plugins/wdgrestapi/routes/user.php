@@ -70,6 +70,13 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			array( 'token' => array( 'default' => 0 ) )
 		);
 		
+		WDGRESTAPI_Route::register_wdg(
+			'/user/(?P<id>\d+)/virtual-iban',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_virtual_iban'),
+			array( 'token' => array( 'default' => 0 ) )
+		);
+		
 		WDGRESTAPI_Route::register_external(
 			'/user/(?P<email>[a-zA-Z0-9\-\@\.]+)',
 			WP_REST_Server::EDITABLE,
@@ -464,4 +471,39 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		}
 	}
 	
+	/**
+	 * Retourne un vIBAN associé à un investisseur (en le créant si nécessaire)
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_virtual_iban( WP_REST_Request $request ) {
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
+		if ( !empty( $user_id ) ) {
+			try {
+				$user_item = new WDGRESTAPI_Entity_User( $user_id );
+				$loaded_data = $user_item->get_loaded_data();
+				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$viban_data = $user_item->get_viban();
+					return $viban_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_User::single_get_virtual_iban::" . $user_id, "404 : Invalid user ID" );
+					return new WP_Error( '404', "Invalid user ID" );
+					
+				}
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get_virtual_iban::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_User::single_get_virtual_iban", "404 : Invalid user ID (empty)" );
+			return new WP_Error( '404', "Invalid user ID (empty)" );
+		}
+	}
 }

@@ -104,6 +104,26 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		}
 		return FALSE;
 	}
+
+	/**
+	 * Recherche un vIBAN existant
+	 * Si pas trouvé, en crée un et le retourne
+	 */
+	public function get_viban() {
+		$buffer = FALSE;
+		$wdgrestapi = WDGRESTAPI::instance();
+		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
+		$lw = WDGRESTAPI_Lib_Lemonway::instance();
+		$gateway_list_decoded = json_decode( $this->loaded_data->gateway_list );
+		if ( isset( $gateway_list_decoded->lemonway ) ) {
+			$lw_wallet_id = $gateway_list_decoded->lemonway;
+			$buffer = $lw->get_viban( $lw_wallet_id );
+			if ( empty( $buffer ) ) {
+				$buffer = $lw->create_viban( $lw_wallet_id );
+			}
+		}
+		return $buffer;
+	}
 	
 	/**
 	 * Retourne la liste de toutes les organisations

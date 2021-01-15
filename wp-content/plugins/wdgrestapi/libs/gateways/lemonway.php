@@ -3,6 +3,10 @@ class WDGRESTAPI_Lib_Lemonway {
 	private static $_instance = null;
 	private static $_cache;
 
+	private static $iban_type_virtual = 2;
+	private static $iban_status_disabled = 8;
+	private static $iban_status_rejected = 9;
+
 	private $soap_client;
 	private $params;
 	private $last_error;
@@ -15,7 +19,7 @@ class WDGRESTAPI_Lib_Lemonway {
 			'wlLogin'	=> YP_LW_LOGIN,
 			'wlPass'	=> YP_LW_PASSWORD,
 			'language'	=> 'fr',
-			'version'	=> '1.9', //Version actuelle au moment du développement
+			'version'	=> '2.6', //Version actuelle au moment du développement
 			'walletIp'	=> $_SERVER['REMOTE_ADDR'],
 			'walletUa'	=> $_SERVER['HTTP_USER_AGENT'],
 		);
@@ -25,6 +29,7 @@ class WDGRESTAPI_Lib_Lemonway {
 			$this->soap_client = @new SoapClient( YP_LW_URL );
 
 		} catch ( SoapFault $E ) {
+			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_Lemonway::__construct > ' . $E->faultstring );
 			$this->set_error( 'SOAPCLIENTINIT', $E->faultstring );
 			$this->soap_client = FALSE;
 		}
@@ -140,6 +145,29 @@ class WDGRESTAPI_Lib_Lemonway {
 */
 	/**
 	 * @param int $wallet_id
+	 */
+	public function get_wallet_details( $wallet_id ) {
+		if ( empty( $wallet_id ) ) return FALSE;
+		
+		$result = FALSE;
+
+		if ( !empty( $wallet_id ) ) {
+			$param_list = array( 'wallet' => $wallet_id );
+			$result = $this->call( 'GetWalletDetails', $param_list );
+		}
+		
+		/**
+		 * Retourne les éléments suivants :
+		 * ID (identifiant) ; BAL (solde) ; NAME ; EMAIL ; DOCS (liste de documents dont le statut a changé) ; IBANS (liste des IBANs) ; S (statut)
+		 */
+		if ( !empty( $result->WALLET ) ) {
+			return $result->WALLET;
+		}
+		return FALSE;
+	}
+
+	/**
+	 * @param int $wallet_id
 	 * @param int $date_start Secondes UTC
 	 * @param int $date_end Secondes UTC
 	 * @return type
@@ -163,6 +191,72 @@ class WDGRESTAPI_Lib_Lemonway {
 		$result = $this->call( 'GetWalletTransHistory', $param_list );
 		
 		return $result->TRANS->HPAY;
+	}
+
+	/**
+	 * @param int $wallet_id
+	 */
+	public function create_viban( $wallet_id ) {
+		if ( empty( $wallet_id ) ) {
+			return FALSE;
+		}
+
+		$param_list = array(
+			'wallet'	=> $wallet_id
+		);
+
+		$result = $this->call( 'CreateIBAN', $param_list );
+		if ( !empty( $result ) ) {
+			if ( isset( $result->E ) ) {
+				$result = FALSE;
+			} else {
+				$result = $result->CreateIBANResult;
+			}
+		}
+		return $result;
+	}
+
+/**
+* HELPERS
+*/
+	/**
+	 * Retourne le vIBAN lié à un wallet
+	 */
+	public function get_viban( $wallet_id ) {
+		$buffer = FALSE;
+
+		$wallet_details = $this->get_wallet_details( $wallet_id );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_Lemonway::get_viban > wallet_details : ' .print_r( $wallet_details, true ) );
+		if ( isset( $wallet_details->IBANS->IBAN ) ) {
+			if ( is_array( $wallet_details->IBANS->IBAN ) ) {
+				$iban_item = $wallet_details->IBANS->IBAN[ 0 ];
+
+				// Si le premier élément est bien virtuel et actif, on le prend
+				if ( $iban_item->TYPE == self::$iban_type_virtual && $iban_item->S != self::$iban_status_disabled && $iban_item->S != self::$iban_status_rejected ) {
+					$buffer = $iban_item;
+				}
+
+				// Si le premier IBAN ne correspond pas, on va chercher dans la suite
+				if ( empty( $buffer ) && count( $wallet_details->IBANS->IBAN ) > 1 ) {
+					foreach ( $wallet_details->IBANS->IBAN as $iban_item ) {
+						if ( $iban_item->TYPE == self::$iban_type_virtual && $iban_item->S != self::$iban_status_disabled && $iban_item->S != self::$iban_status_rejected ) {
+							$buffer = $iban_item;
+							break;
+						}
+					}
+				}
+
+			// Cas particulier : un seul IBAN (n'est pas retourné dans un tableau)
+			} else {
+				$iban_item = $wallet_details->IBANS->IBAN;
+				if ( $iban_item->TYPE == self::$iban_type_virtual ) {
+					$buffer = $iban_item;
+				}
+			}
+		}
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_Lemonway::get_viban > buffer : ' .print_r( $buffer, true ) );
+
+		return $buffer;
 	}
 	
 }
