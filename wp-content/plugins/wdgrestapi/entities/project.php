@@ -557,7 +557,8 @@ WHERE status=\''. self::$status_vote .'\' OR status=\''. self::$status_collecte 
 		'common_goods_turnover_percent'	=> array( 'type' => 'float', 'other' => '', 'gs_col_index' => 41 ),
 		'product_type'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 42 ),
 		'acquisition'			=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 43 ),
-		'legal_procedure'		=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 44 )
+		'legal_procedure'		=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 44 ),
+		'campaign_funding_type'		=> array( 'type' => 'varchar', 'other' => '', 'gs_col_index' => 45 )
 	);
 	
 	// Mise à jour de la bdd
