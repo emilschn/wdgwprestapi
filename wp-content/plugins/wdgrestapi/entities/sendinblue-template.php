@@ -53,19 +53,22 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 	/**
 	 * Va chercher le contenu du template sur SiB
 	 */
-	public function get_french_content() {
+	private function get_french_data() {
 		$mailin = $this->get_sendinblue();
 		$data = array( 'id' => $this->loaded_data->id_sib_fr );
 		$sendinblue_result = $mailin->get_campaign_v2( $data );
-		return $sendinblue_result[ 'data' ][ 0 ][ 'html_content' ];
+		return $sendinblue_result[ 'data' ][ 0 ];
 	}
 
 	/**
 	 * Envoie le contenu français (d'origine) vers Transifex
 	 */
 	public function send_french_content_to_transifex() {
-		$french_content = $this->get_french_content();
+		$french_data = $this->get_french_data();
+		$french_content = $french_data[ 'html_content' ];
 		WDGRESTAPI_Lib_Transifex::create_or_update_resource( $this->loaded_data->slug, $french_content, 'Template ' .$this->loaded_data->slug );
+		$french_subject = $french_data[ 'subject' ];
+		WDGRESTAPI_Lib_Transifex::create_or_update_resource( $this->loaded_data->slug. '-subject', $french_subject, 'Template ' .$this->loaded_data->slug. ' - subject' );
 	}
 
 	/**
@@ -76,6 +79,13 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 		$translation_content = WDGRESTAPI_Lib_Transifex::get_resource_translation( $this->loaded_data->slug, $language_code );
 		if ( empty( $translation_content ) ) {
 			return FALSE;
+		}
+
+		// Object du template
+		$translation_subject = $template_fr_data[ 'subject' ] . ' [en]';
+		$translation_subject_from_transifex = WDGRESTAPI_Lib_Transifex::get_resource_translation( $this->loaded_data->slug. '-subject', $language_code );
+		if ( !empty( $translation_subject_from_transifex ) ) {
+			$translation_subject = $translation_subject_from_transifex;
 		}
 
 		$mailin = $this->get_sendinblue();
@@ -94,7 +104,7 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 				'bat'				=> '',
 				'html_content'		=> $translation_content,
 				'html_url' 			=> '',
-				'subject'			=> $template_fr_data[ 'subject' ] . ' [en]',
+				'subject'			=> $translation_subject,
 				'from_email'		=> $template_fr_data[ 'from_email' ],
 				'reply_to'			=> $template_fr_data[ 'reply_to' ],
 				'to_field'			=> $template_fr_data[ 'to_field' ],

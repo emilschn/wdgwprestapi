@@ -179,6 +179,7 @@ class WDGRESTAPI_Lib_Transifex {
 		$uri .= '/translation/' .$lang_code;
 
 		$result = self::get( $uri, self::$transifex_api_version_2 );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_Transifex::get_resource_translation [' .$resource_slug. '] [' .$lang_code. '] : ' . print_r($result, true) );
 		return $result->content;
 	}
 }
