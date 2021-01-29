@@ -307,7 +307,6 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		if ( isset( $gateway_list_decoded->lemonway ) ) {
 			$lw_wallet_id = $gateway_list_decoded->lemonway;
 			$buffer = $lw->get_viban( $lw_wallet_id );
-			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_User::get_viban > $viban_item : ' . print_r( $buffer, true ) );
 			if ( empty( $buffer ) ) {
 				$create_result = $lw->create_viban( $lw_wallet_id );
 				$buffer = $create_result;

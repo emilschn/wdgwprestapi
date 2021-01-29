@@ -50,9 +50,9 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
-			'/user/(?P<id>\d+)/viban',
+			'/organization/(?P<id>\d+)/virtual-iban',
 			WP_REST_Server::READABLE,
-			array( $this, 'single_get_viban'),
+			array( $this, 'single_get_virtual_iban'),
 			array( 'token' => array( 'default' => 0 ) )
 		);
 	}
@@ -225,11 +225,12 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	 * @param WP_REST_Request $request
 	 * @return object
 	 */
-	public function single_get_viban( WP_REST_Request $request ) {
+	public function single_get_virtual_iban( WP_REST_Request $request ) {
 		$organization_id = FALSE;
 		if ( !empty( $request ) ) {
 			$organization_id = $request->get_param( 'id' );
 		}
+		
 		if ( !empty( $organization_id ) ) {
 			try {
 				$organization_item = new WDGRESTAPI_Entity_Organization( $organization_id );
@@ -240,18 +241,18 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 					return $viban_data;
 					
 				} else {
-					$this->log( "WDGRESTAPI_Route_Organization::single_get_viban::" . $organization_id, "404 : Invalid organization ID" );
+					$this->log( "WDGRESTAPI_Route_Organization::single_get_virtual_iban::" . $organization_id, "404 : Invalid organization ID" );
 					return new WP_Error( '404', "Invalid organization ID" );
 					
 				}
 				
 			} catch ( Exception $e ) {
-				$this->log( "WDGRESTAPI_Route_Organization::single_get_viban::" . $organization_id, $e->getMessage() );
+				$this->log( "WDGRESTAPI_Route_Organization::single_get_virtual_iban::" . $organization_id, $e->getMessage() );
 				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 			
 		} else {
-			$this->log( "WDGRESTAPI_Route_Organization::single_get_viban", "404 : Invalid organization ID (empty)" );
+			$this->log( "WDGRESTAPI_Route_Organization::single_get_virtual_iban", "404 : Invalid organization ID (empty)" );
 			return new WP_Error( '404', "Invalid organization ID (empty)" );
 		}
 	}
