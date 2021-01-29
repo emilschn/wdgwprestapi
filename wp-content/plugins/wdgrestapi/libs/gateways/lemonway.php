@@ -202,7 +202,8 @@ class WDGRESTAPI_Lib_Lemonway {
 		}
 
 		$param_list = array(
-			'wallet'	=> $wallet_id
+			'wallet'	=> $wallet_id,
+			'country'	=> 'FR'
 		);
 
 		$result = $this->call( 'CreateIBAN', $param_list );
@@ -210,7 +211,7 @@ class WDGRESTAPI_Lib_Lemonway {
 			if ( isset( $result->E ) ) {
 				$result = FALSE;
 			} else {
-				$result = $result->CreateIBANResult;
+				$result = $result;
 			}
 		}
 		return $result;

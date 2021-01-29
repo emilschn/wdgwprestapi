@@ -309,7 +309,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			$buffer = $lw->get_viban( $lw_wallet_id );
 			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_User::get_viban > $viban_item : ' . print_r( $buffer, true ) );
 			if ( empty( $buffer ) ) {
-				$buffer = $lw->create_viban( $lw_wallet_id );
+				$create_result = $lw->create_viban( $lw_wallet_id );
+				$buffer = $create_result;
+				$buffer->DATA = $create_result->IBAN;
+				$buffer->SWIFT = $create_result->BIC;
 			}
 		}
 		return $buffer;

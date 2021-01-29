@@ -119,7 +119,10 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 			$lw_wallet_id = $gateway_list_decoded->lemonway;
 			$buffer = $lw->get_viban( $lw_wallet_id );
 			if ( empty( $buffer ) ) {
-				$buffer = $lw->create_viban( $lw_wallet_id );
+				$create_result = $lw->create_viban( $lw_wallet_id );
+				$buffer = $create_result;
+				$buffer->DATA = $create_result->IBAN;
+				$buffer->SWIFT = $create_result->BIC;
 			}
 		}
 		return $buffer;
