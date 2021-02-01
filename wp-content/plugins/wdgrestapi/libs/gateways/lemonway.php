@@ -151,10 +151,8 @@ class WDGRESTAPI_Lib_Lemonway {
 		
 		$result = FALSE;
 
-		if ( !empty( $wallet_id ) ) {
-			$param_list = array( 'wallet' => $wallet_id );
-			$result = $this->call( 'GetWalletDetails', $param_list );
-		}
+		$param_list = array( 'wallet' => $wallet_id );
+		$result = $this->call( 'GetWalletDetails', $param_list );
 		
 		/**
 		 * Retourne les éléments suivants :
@@ -213,6 +211,8 @@ class WDGRESTAPI_Lib_Lemonway {
 			} else {
 				$result = $result;
 			}
+		} else {
+			$result = FALSE;
 		}
 		return $result;
 	}
