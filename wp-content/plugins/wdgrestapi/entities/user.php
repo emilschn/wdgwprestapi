@@ -293,6 +293,29 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		);
 		return $buffer;
 	}
+
+	/**
+	 * Recherche un vIBAN existant
+	 * Si pas trouvé, en crée un et le retourne
+	 */
+	public function get_viban() {
+		$buffer = FALSE;
+		$wdgrestapi = WDGRESTAPI::instance();
+		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
+		$lw = WDGRESTAPI_Lib_Lemonway::instance();
+		$gateway_list_decoded = json_decode( $this->loaded_data->gateway_list );
+		if ( isset( $gateway_list_decoded->lemonway ) ) {
+			$lw_wallet_id = $gateway_list_decoded->lemonway;
+			$buffer = $lw->get_viban( $lw_wallet_id );
+			if ( empty( $buffer ) ) {
+				$create_result = $lw->create_viban( $lw_wallet_id );
+				$buffer = $create_result;
+				$buffer->DATA = $create_result->IBAN;
+				$buffer->SWIFT = $create_result->BIC;
+			}
+		}
+		return $buffer;
+	}
 	
 	/**
 	 * Récupération des données de royalties concernant un utilisateur
