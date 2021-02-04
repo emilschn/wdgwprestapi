@@ -88,7 +88,7 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity {
 					"Address"	=> $options->customeremail
 				],
 				"BillEmailBcc"	=> [
-					"Address"	=> "administratif@wedogood.co"
+					"Address"	=> "support@wedogood.co"
 				]
 			] );
 			try {
