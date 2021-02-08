@@ -62,7 +62,6 @@ class WDGRESTAPI {
 		$this->add_include_lib( 'logs' );
 		$this->add_include_lib( 'geolocation' );
 		$this->add_include_lib( 'validator' );
-		$this->add_include_lib( 'google-api' );
 		$this->add_include_lib( 'transifex' );
 	}
 	public function add_include_lib( $include_name ) {
