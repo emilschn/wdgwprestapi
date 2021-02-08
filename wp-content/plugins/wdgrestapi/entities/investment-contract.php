@@ -13,7 +13,6 @@ class WDGRESTAPI_Entity_InvestmentContract extends WDGRESTAPI_Entity {
 	
 	public function save() {
 		parent::save();
-		WDGRESTAPI_Lib_GoogleAPI::set_investment_contract_values( $this->loaded_data->id, $this->loaded_data );
 	}
 	
 	/**

@@ -44,9 +44,6 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 */
 	public function save() {
 		$buffer = parent::save();
-		if ( !empty( $this->loaded_data->id ) ) {
-			WDGRESTAPI_Lib_GoogleAPI::set_user_values( $this->loaded_data->id, $this->loaded_data );
-		}
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/users' );
 		return $buffer;
 	}

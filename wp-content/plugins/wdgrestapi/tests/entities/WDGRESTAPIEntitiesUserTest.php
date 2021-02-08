@@ -1,6 +1,5 @@
 <?php
 require_once dirname( __FILE__ ) . '/../../../restapi-user-basic-access/classes/authentication.php';
-require_once dirname( __FILE__ ) . '/../../libs/google-api.php';
 require_once dirname( __FILE__ ) . '/../../libs/logs.php';
 require_once dirname( __FILE__ ) . '/../../entities/entity.php';
 require_once dirname( __FILE__ ) . '/../../entities/user.php';
