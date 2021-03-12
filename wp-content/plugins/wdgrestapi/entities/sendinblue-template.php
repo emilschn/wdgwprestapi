@@ -2,7 +2,7 @@
 class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 	public static $entity_type = 'sendinblue_template';
 
-	public function __construct( $slug = FALSE ) {
+	public function __construct($slug = FALSE) {
 		parent::__construct( FALSE, self::$entity_type, self::$db_properties );
 
 		if ( !empty( $slug ) ) {
@@ -16,7 +16,7 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 		}
 	}
 
-	public static function get_by_fr_id( $fr_id ) {
+	public static function get_by_fr_id($fr_id) {
 		global $wpdb;
 		if ( empty( $wpdb ) ) {
 			return FALSE;
@@ -28,6 +28,7 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 			return FALSE;
 		}
 		$user = new WDGRESTAPI_Entity_SendinblueTemplate( $result->slug );
+
 		return $user;
 	}
 
@@ -45,8 +46,9 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 	 * Retourne l'objet SIB
 	 */
 	private function get_sendinblue() {
-		include_once( plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php');
+		include_once plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php';
 		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
+
 		return $mailin;
 	}
 
@@ -57,6 +59,7 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 		$mailin = $this->get_sendinblue();
 		$data = array( 'id' => $this->loaded_data->id_sib_fr );
 		$sendinblue_result = $mailin->get_campaign_v2( $data );
+
 		return $sendinblue_result[ 'data' ][ 0 ];
 	}
 
@@ -74,7 +77,7 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 	/**
 	 * Envoie le contenu traduit sur Transifex vers SendInBlue
 	 */
-	public function update_language_content_from_transifex( $language_code ) {
+	public function update_language_content_from_transifex($language_code) {
 		// Récupération du contenu traduit sur Transifex
 		$translation_content = WDGRESTAPI_Lib_Transifex::get_resource_translation( $this->loaded_data->slug, $language_code );
 		if ( empty( $translation_content ) ) {
@@ -82,11 +85,7 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 		}
 
 		// Object du template
-		$translation_subject = $template_fr_data[ 'subject' ] . ' [en]';
 		$translation_subject_from_transifex = WDGRESTAPI_Lib_Transifex::get_resource_translation( $this->loaded_data->slug. '-subject', $language_code );
-		if ( !empty( $translation_subject_from_transifex ) ) {
-			$translation_subject = $translation_subject_from_transifex;
-		}
 
 		$mailin = $this->get_sendinblue();
 
@@ -96,6 +95,11 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 			$data = array( 'id' => $this->loaded_data->id_sib_fr );
 			$sendinblue_fr_template = $mailin->get_campaign_v2( $data );
 			$template_fr_data = $sendinblue_fr_template[ 'data' ][ 0 ];
+
+			$translation_subject = $template_fr_data[ 'subject' ] . ' [' .$language_code. ']';
+			if ( !empty( $translation_subject_from_transifex ) ) {
+				$translation_subject = $translation_subject_from_transifex;
+			}
 
 			// Définition des données pour le nouveau template
 			$data = array(
@@ -112,24 +116,31 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 				'attachment_url'	=> ''
 			);
 			$result = $mailin->create_template( $data );
+			//WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_SendinblueTemplate::update_language_content_from_transifex [' .$this->loaded_data->slug. '] [' .$language_code. '] :CREATE: ' . print_r( $data, true ) );
+			//WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_SendinblueTemplate::update_language_content_from_transifex [' .$this->loaded_data->slug. '] [' .$language_code. '] :CREATE: ' . print_r( $result, true ) );
 
 			// Si le template traduit est créé, on met à jour l'id dans la BDD
 			$this->loaded_data->{ 'id_sib_' .$language_code } = $result[ 'data' ][ 'id' ];
 			$this->save();
-
 		} else {
 			$data = array(
 				'id'			=> $this->loaded_data->{ 'id_sib_' .$language_code },
 				'html_content'	=> $translation_content
 			);
-			$mailin->update_template( $data );
+			if ( !empty( $translation_subject_from_transifex ) ) {
+				$translation_subject_from_transifex = str_replace( '<p>', '', $translation_subject_from_transifex );
+				$translation_subject_from_transifex = str_replace( '</p>', '', $translation_subject_from_transifex );
+				$data[ 'subject' ]	= $translation_subject_from_transifex;
+			}
+			$result = $mailin->update_template( $data );
+			//WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_SendinblueTemplate::update_language_content_from_transifex [' .$this->loaded_data->slug. '] [' .$language_code. '] :UPDATE: ' . print_r( $data, true ) );
+			//WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_SendinblueTemplate::update_language_content_from_transifex [' .$this->loaded_data->slug. '] [' .$language_code. '] :UPDATE: ' . print_r( $result, true ) );
 		}
 	}
 
-
-/*******************************************************************************
- * GESTION BDD
- ******************************************************************************/
+	/*******************************************************************************
+	 * GESTION BDD
+	 ******************************************************************************/
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
@@ -140,10 +151,9 @@ class WDGRESTAPI_Entity_SendinblueTemplate extends WDGRESTAPI_Entity {
 		'variables_names'		=> array( 'type' => 'longtext', 'other' => '' ),
 		'wdg_email_cc'			=> array( 'type' => 'longtext', 'other' => '' )
 	);
-	
+
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
 		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
-	
 }
