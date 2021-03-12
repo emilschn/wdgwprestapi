@@ -46,6 +46,9 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 			case 'sendinblue':
 				$buffer = $this->send_sendinblue_mail();
 				break;
+			case 'sendinblue-v3':
+				$buffer = $this->send_sendinblue_mail_v3();
+				break;
 			case 'sms':
 				$buffer = $this->send_sendinblue_sms();
 				break;
@@ -122,6 +125,73 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 				$buffer = 'success';
 			}
 			$this->loaded_data->result = json_encode( $sendinblue_result );
+		} catch ( Exception $e ) {
+			$this->loaded_data->result = 'Error : ' . $e->getMessage();
+		}
+
+		$this->save();
+
+		return $buffer;
+	}
+
+	private function send_sendinblue_mail_v3() {
+		$wdgrestapi = WDGRESTAPI::instance();
+		$wdgrestapi->add_include_lib( 'sendinblue/sendinblue-v3-helper' );
+
+		$sib_instance = SIBv3Helper::instance();
+
+		$options = json_decode( $this->loaded_data->options );
+		$is_personal = ( isset( $options->personal ) && !empty( $options->personal ) );
+		$is_admin_skipped = ( isset( $options->skip_admin ) && !empty( $options->skip_admin ) );
+
+		// Détermination de la langue d'affichage en fonction du recipient
+		// Par défaut, on envoie le template vide français
+		$template_id = $this->loaded_data->template;
+
+		// Séparation des destinataires pour transmettre à SiB
+		$list_recipients = array( 'admin@wedogood.co' );
+		$list_recipients_bcc = explode( ',', $this->loaded_data->recipient );
+		$list_recipients_cc = array();
+		$replyto = ( empty( $options->replyto ) ) ? 'bonjour@wedogood.co' : $options->replyto;
+
+		// Est-ce qu'on envoie directement à l'utilisateur ?
+		if ( $is_personal ) {
+			$list_recipients = $list_recipients_bcc;
+			$list_recipients_bcc = array( 'admin@wedogood.co' );
+
+		// Pour certains templates, on n'envoie pas de copie à admin, on envoie directement à l'utilisateur
+		} else {
+			if ( $is_admin_skipped ) {
+				$list_recipients = $list_recipients_bcc;
+				$list_recipients_bcc = array();
+			}
+		}
+
+		// Possibilité d'ajouter une pièce jointe
+		$attachment_url = '';
+		if ( isset( $options->url_attachment ) && !empty( $options->url_attachment ) ) {
+			$attachment_url = $options->url_attachment;
+		}
+
+		$attributes = array();
+		$attributes[ 'OBJECT' ] = $options->object;
+		$attributes[ 'CONTENT' ] = $options->content;
+		$attributes = json_decode( json_encode( $attributes ) );
+
+		$buffer = 'error';
+		try {
+			$sendinblue_result = $sib_instance->sendTransactionalEmail($template_id, $list_recipients, $list_recipients_bcc, $list_recipients_cc, $replyto, $attachment_url, $attributes);
+			if ( !empty( $sendinblue_result ) ) {
+				$result_to_save = array(
+					'code' => 'success',
+					'data' => array(
+						'message-id' => $sendinblue_result
+					),
+				);
+				$this->loaded_data->result = json_encode( $result_to_save );
+			} else {
+				$this->loaded_data->result = SIBv3Helper::getLastErrorMessage();
+			}
 		} catch ( Exception $e ) {
 			$this->loaded_data->result = 'Error : ' . $e->getMessage();
 		}
