@@ -49,7 +49,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * @return array
 	 */
 	public function get_linked_adjustments() {
-		$buffer = WDGRESTAPI_Entity_Adjustment::list_get_by_declaration_id( $this->loaded_data->id );
+		$buffer = WDGRESTAPI_Entity_AdjustmentDeclaration::get_list_by_declaration_id( $this->loaded_data->id );
 		return $buffer;
 	}
 	
