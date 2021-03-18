@@ -176,7 +176,6 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		$attributes = array();
 		$attributes[ 'OBJECT' ] = $options->object;
 		$attributes[ 'CONTENT' ] = $options->content;
-		$attributes = json_decode( json_encode( $attributes ) );
 
 		$buffer = 'error';
 		try {

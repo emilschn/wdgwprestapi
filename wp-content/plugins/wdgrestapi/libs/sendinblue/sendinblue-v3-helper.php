@@ -149,29 +149,54 @@ class SIBv3Helper {
 	public function sendTransactionalEmail($template_id, $list_recipients, $list_recipients_bcc, $list_recipients_cc, $replyto, $attachment_url, $attributes) {
 		$api_transactional_emails = self::getTransactionalEmailsApi();
 
-		$sendEmail = new \SendinBlue\Client\Model\SendEmail();
+		$sendSmtpEmail = new \SendinBlue\Client\Model\SendSmtpEmail();
+		if ( !empty( $template_id ) ) {
+			$sendSmtpEmail->setTemplateId( (int)$template_id );
+		}
 		if ( !empty( $list_recipients ) ) {
-			$sendEmail->setEmailTo( $list_recipients );
+			$list_recipients_object = array();
+			foreach ( $list_recipients as $recipient_email ) {
+				$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailTo();
+				$recipient_item->setEmail( $recipient_email );
+				array_push( $list_recipients_object, $recipient_item );
+			}
+			$sendSmtpEmail->setTo( $list_recipients_object );
 		}
 		if ( !empty( $list_recipients_bcc ) ) {
-			$sendEmail->setEmailBcc( $list_recipients_bcc );
+			$list_recipients_bcc_object = array();
+			foreach ( $list_recipients_bcc as $recipient_email ) {
+				$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailBcc();
+				$recipient_item->setEmail( $recipient_email );
+				array_push( $list_recipients_bcc_object, $recipient_item );
+			}
+			$sendSmtpEmail->setBcc( $list_recipients_bcc_object );
 		}
 		if ( !empty( $list_recipients_cc ) ) {
-			$sendEmail->setEmailCc( $list_recipients_cc );
+			$list_recipients_cc_object = array();
+			foreach ( $list_recipients_cc as $recipient_email ) {
+				$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailCc();
+				$recipient_item->setEmail( $recipient_email );
+				array_push( $list_recipients_cc_object, $recipient_item );
+			}
+			$sendSmtpEmail->setCc( $list_recipients_cc_object );
 		}
 		if ( !empty( $replyto ) ) {
-			$sendEmail->setReplyTo( $replyto );
+			$list_recipients_reply_to_object = new \SendinBlue\Client\Model\SendSmtpEmailReplyTo();
+			$list_recipients_reply_to_object->setEmail( $replyto );
+			$sendSmtpEmail->setReplyTo( $list_recipients_reply_to_object );
 		}
 		if ( !empty( $attachment_url ) ) {
-			$sendEmail->setAttachmentUrl( $attachment_url );
+			$attachment_url_object = new \SendinBlue\Client\Model\SendSmtpEmailAttachment();
+			$attachment_url_object->setUrl( $attachment_url );
+			$sendSmtpEmail->setAttachment( $attachment_url_object );
 		}
 		if ( !empty( $attributes ) ) {
-			$sendEmail->setAttributes( $attributes );
+			$sendSmtpEmail[ 'params' ] = $attributes;
 		}
 
 		try {
-			WDGRESTAPI_Lib_Logs::log( print_r( $sendEmail, true ) );
-			$result = $api_transactional_emails->sendTemplate( $template_id, $sendEmail );
+			WDGRESTAPI_Lib_Logs::log( print_r( $sendSmtpEmail, true ) );
+			$result = $api_transactional_emails->sendTransacEmail( $sendSmtpEmail );
 
 			return $result->getMessageId();
 		} catch (Exception $e) {
