@@ -16,95 +16,95 @@
   *
   * @package QuickBooksOnline
   */
- class GuzzleHttpClient implements HttpClientInterface
- {
-     /**
-      * @var \GuzzleHttp\Client Guzzle Client
-      */
-     private $guzzleClient = null;
+ class GuzzleHttpClient implements HttpClientInterface {
+ 	/**
+ 	 * @var \GuzzleHttp\Client Guzzle Client
+ 	 */
+ 	private $guzzleClient = null;
 
-     /**
-     * @var IntuitResponse | False The parsed response from curl client to Intuit customized response
-     */
-     private $intuitResponse = false;
+ 	/**
+ 	* @var IntuitResponse | False The parsed response from curl client to Intuit customized response
+ 	*/
+ 	private $intuitResponse = false;
 
-     /**
-      * @var array Store the Options for GuzzleClient
-      */
-     private $guzzleOpts = [];
+ 	/**
+ 	 * @var array Store the Options for GuzzleClient
+ 	 */
+ 	private $guzzleOpts = [];
 
-     /**
-      * Constructor for GuzzleHttpClient
-      * @param Client guzzleClient passed to the constructor
-      */
-     public function __construct(Client $guzzleClient = null){
-        if(isset($guzzleClient)){
-            $this->guzzleClient = $guzzleClient;
-        }else{
-            $this->guzzleClient = new Client();
-        }
-     }
+ 	/**
+ 	 * Constructor for GuzzleHttpClient
+ 	 * @param Client guzzleClient passed to the constructor
+ 	 */
+ 	public function __construct(Client $guzzleClient = null) {
+ 		if (isset($guzzleClient)) {
+ 			$this->guzzleClient = $guzzleClient;
+ 		} else {
+ 			$this->guzzleClient = new Client();
+ 		}
+ 	}
 
-     /**
-      * @inheritdoc
-      */
-     public function makeAPICall($url, $method, array $headers, $body, $timeOut, $verifySSL){
-        $this->clearResponse();
-        try{
-            $this->prepareRequest($url, $method, $headers, $body, $timeOut, $verifySSL);
-            $guzzleResponse = $this->guzzleClient->request($method, $url, $this->guzzleOpts);
-            $this->setIntuitResponse($guzzleResponse);
-            return $this->getLastResponse();
-        } catch(RequestException $e){
-            if($e->hasResponse()){
-                throw new SdkException("A networking error occurs during Guzzle client request:" . Psr7\str($e->getResponse()));
-            }else{
-                throw new SdkException("Network Error:" . $e->getMessage());
-            }
-        }
-     }
+ 	/**
+ 	 * @inheritdoc
+ 	 */
+ 	public function makeAPICall($url, $method, array $headers, $body, $timeOut, $verifySSL) {
+ 		$this->clearResponse();
+ 		try {
+ 			$this->prepareRequest($url, $method, $headers, $body, $timeOut, $verifySSL);
+ 			$guzzleResponse = $this->guzzleClient->request($method, $url, $this->guzzleOpts);
+ 			$this->setIntuitResponse($guzzleResponse);
 
-     /**
-      * @inheritdoc
-      */
-     public function prepareRequest($url, $method, array $headers, $body, $timeOut, $verifySSL){
-        $opts = [];
+ 			return $this->getLastResponse();
+ 		} catch (RequestException $e) {
+ 			if ($e->hasResponse()) {
+ 				throw new SdkException("A networking error occurs during Guzzle client request:" . Psr7\str($e->getResponse()));
+ 			} else {
+ 				throw new SdkException("Network Error:" . $e->getMessage());
+ 			}
+ 		}
+ 	}
 
-        if (isset($method) && $method !== "GET" && isset($body)) {
-            $opts['body'] = $body;
-        }
+ 	/**
+ 	 * @inheritdoc
+ 	 */
+ 	public function prepareRequest($url, $method, array $headers, $body, $timeOut, $verifySSL) {
+ 		$opts = [];
 
-        if(isset($verifySSL) && $verifySSL == true){
-            $opts['verify'] = CoreConstants::getCertPath();
-        }
+ 		if (isset($method) && $method !== "GET" && isset($body)) {
+ 			$opts['body'] = $body;
+ 		}
 
-        $opts['timeout'] = isset($timeOut) ? $timeOut : 100;
-        $opts['headers'] = $headers;
-        $this->guzzleOpts = $opts;
-     }
+ 		if (isset($verifySSL) && $verifySSL == true) {
+ 			$opts['verify'] = CoreConstants::getCertPath();
+ 		}
 
-     /**
-      * @inheritdoc
-      */
-     public function setIntuitResponse($response){
-         $headersArray = $response->getHeaders();
-         $body = $response->getBody();
-         $httpStatusCode = $response->getStatusCode();
-         $theIntuitResponse = new IntuitResponse($headersArray, $body, $httpStatusCode, false);
-         $this->intuitResponse = $theIntuitResponse;
-     }
+ 		$opts['timeout'] = isset($timeOut) ? $timeOut : 500;
+ 		$opts['headers'] = $headers;
+ 		$this->guzzleOpts = $opts;
+ 	}
 
-     /**
-      * @inheritdoc
-      */
-     public function getLastResponse(){
-         return $this->intuitResponse;
-     }
+ 	/**
+ 	 * @inheritdoc
+ 	 */
+ 	public function setIntuitResponse($response) {
+ 		$headersArray = $response->getHeaders();
+ 		$body = $response->getBody();
+ 		$httpStatusCode = $response->getStatusCode();
+ 		$theIntuitResponse = new IntuitResponse($headersArray, $body, $httpStatusCode, false);
+ 		$this->intuitResponse = $theIntuitResponse;
+ 	}
 
-     /**
-      * Before making any API call, clear the stored response from previous request.
-      */
-     public function clearResponse(){
-       $this->intuitResponse = false;
-     }
-}
+ 	/**
+ 	 * @inheritdoc
+ 	 */
+ 	public function getLastResponse() {
+ 		return $this->intuitResponse;
+ 	}
+
+ 	/**
+ 	 * Before making any API call, clear the stored response from previous request.
+ 	 */
+ 	public function clearResponse() {
+ 		$this->intuitResponse = false;
+ 	}
+ }
