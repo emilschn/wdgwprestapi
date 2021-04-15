@@ -140,6 +140,8 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		$list_recipients_bcc = explode( ',', $this->loaded_data->recipient );
 		$list_recipients_cc = array();
 		$replyto = ( empty( $options->replyto ) ) ? 'bonjour@wedogood.co' : $options->replyto;
+		$sender_name = ( empty( $options->sender_name ) ) ? 'WE DO GOOD' : $options->sender_name;
+		$sender_email = ( empty( $options->sender_email ) ) ? 'admin@wedogood.co' : $options->sender_email;
 
 		// Est-ce qu'on envoie directement à l'utilisateur ?
 		if ( $is_personal ) {
@@ -153,9 +155,6 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 				$list_recipients_bcc = array();
 			}
 		}
-
-		$sender_name = "WE DO GOOD";
-		$sender_email = "admin@wedogood.co";
 
 		// Possibilité d'ajouter une pièce jointe
 		$attachment_url = '';
