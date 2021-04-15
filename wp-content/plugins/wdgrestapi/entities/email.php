@@ -6,6 +6,9 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		parent::__construct( $id, self::$entity_type, self::$db_properties );
 	}
 
+	/**
+	 * Retourne tous les mails liés à un destinataire
+	 */
 	public static function list_get($id_template, $recipient_email) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
@@ -15,6 +18,9 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		return $results;
 	}
 
+	/**
+	 * Liste des mails envoyés liés à un projet
+	 */
 	public static function list_get_by_project($project_id) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
@@ -25,7 +31,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	}
 
 	/**
-	 *
+	 * Enregistrement BDD pour garder une trace de l'action
 	 */
 	public function save() {
 		if ( empty( $this->loaded_data->id ) ) {
@@ -39,7 +45,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	}
 
 	/**
-	 * Mail sending procedure
+	 * Envoi de notification
 	 */
 	public function send() {
 		switch ( $this->loaded_data->tool ) {
@@ -57,6 +63,9 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 
+	/**
+	 * Envoi de mail via SendInBlue v2
+	 */
 	private function send_sendinblue_mail() {
 		include_once plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php';
 		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
@@ -64,27 +73,6 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		// Détermination de la langue d'affichage en fonction du recipient
 		// Par défaut, on envoie le template français
 		$template_id = $this->loaded_data->template;
-		// Pour l'instant, on ne cherche la langue que quand il y a un seul destinataire
-		// TODO : envoyer des templates différents selon les groupes d'utilisateurs par langue
-		if ( strpos( $this->loaded_data->recipient, ',' ) === FALSE ) {
-			$user_recipient = WDGRESTAPI_Entity_User::get_by_email( $this->loaded_data->recipient );
-			if ( !empty( $user_recipient ) ) {
-				$user_recipient_data = $user_recipient->get_loaded_data();
-				$user_recipient_language = $user_recipient_data->language;
-				if ( !empty( $user_recipient_language ) && $user_recipient_language != 'fr' ) {
-					$template_entity = WDGRESTAPI_Entity_SendinblueTemplate::get_by_fr_id( $template_id );
-					$template_entity_data = $template_entity->get_loaded_data();
-					if ( !empty( $template_entity_data->{ 'id_sib_' .$user_recipient_language } ) ) {
-						$template_id = $template_entity_data->{ 'id_sib_' .$user_recipient_language };
-					} else {
-						if ( !empty( $template_entity_data->id_sib_en ) ) {
-							$template_id = $template_entity_data->id_sib_en;
-						}
-					}
-					$this->loaded_data->template = $template_id;
-				}
-			}
-		}
 
 		$recipients = str_replace( ',', '|', $this->loaded_data->recipient );
 		$options = json_decode( $this->loaded_data->options );
@@ -134,6 +122,9 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		return $buffer;
 	}
 
+	/**
+	 * Envoi de mail via SendInBlue v3
+	 */
 	private function send_sendinblue_mail_v3() {
 		$wdgrestapi = WDGRESTAPI::instance();
 		$wdgrestapi->add_include_lib( 'sendinblue/sendinblue-v3-helper' );
@@ -143,10 +134,6 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		$options = json_decode( $this->loaded_data->options );
 		$is_personal = ( isset( $options->personal ) && !empty( $options->personal ) );
 		$is_admin_skipped = ( isset( $options->skip_admin ) && !empty( $options->skip_admin ) );
-
-		// Détermination de la langue d'affichage en fonction du recipient
-		// Par défaut, on envoie le template vide français
-		$template_id = $this->loaded_data->template;
 
 		// Séparation des destinataires pour transmettre à SiB
 		$list_recipients = array( 'admin@wedogood.co' );
@@ -167,19 +154,18 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 			}
 		}
 
+		$sender_name = "WE DO GOOD";
+		$sender_email = "admin@wedogood.co";
+
 		// Possibilité d'ajouter une pièce jointe
 		$attachment_url = '';
 		if ( isset( $options->url_attachment ) && !empty( $options->url_attachment ) ) {
 			$attachment_url = $options->url_attachment;
 		}
 
-		$attributes = array();
-		$attributes[ 'OBJECT' ] = $options->object;
-		$attributes[ 'CONTENT' ] = $options->content;
-
 		$buffer = 'error';
 		try {
-			$sendinblue_result = $sib_instance->sendTransactionalEmail($template_id, $list_recipients, $list_recipients_bcc, $list_recipients_cc, $replyto, $attachment_url, $attributes);
+			$sendinblue_result = $sib_instance->sendHtmlEmail($options->content, $options->object, $list_recipients, $list_recipients_bcc, $list_recipients_cc, $sender_name, $sender_email, $replyto, $attachment_url);
 			if ( !empty( $sendinblue_result ) ) {
 				$result_to_save = array(
 					'code' => 'success',
@@ -201,6 +187,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	}
 
 	/**
+	 * Envoi de SMS via SendInBlue
 	 * Processus complet : création d'une nouvelle liste, ajout des e-mails à la liste et création d'une campagne avec la liste
 	 * @return boolean
 	 */
@@ -251,6 +238,9 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		return true;
 	}
 
+	/**
+	 * Nettoie une liste de destinataires sur SendInBlue
+	 */
 	public static function clean_sms_list() {
 		include_once plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php';
 		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
@@ -284,8 +274,8 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	}
 
 	/*******************************************************************************
- * GESTION BDD
- ******************************************************************************/
+	 * GESTION BDD
+	 ******************************************************************************/
 
 	public static $db_properties = array(
 		'unique_key'			=> 'id',

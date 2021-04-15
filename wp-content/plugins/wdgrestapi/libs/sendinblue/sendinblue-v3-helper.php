@@ -146,12 +146,18 @@ class SIBv3Helper {
 		}
 	}
 
-	public function sendTransactionalEmail($template_id, $list_recipients, $list_recipients_bcc, $list_recipients_cc, $replyto, $attachment_url, $attributes) {
+	/**
+	 * Envoie un e-mail transactionnel avec un contenu html
+	 */
+	public function sendHtmlEmail($content_html, $subject, $list_recipients, $list_recipients_bcc, $list_recipients_cc, $sender_name, $sender, $replyto, $attachment_url) {
 		$api_transactional_emails = self::getTransactionalEmailsApi();
 
 		$sendSmtpEmail = new \SendinBlue\Client\Model\SendSmtpEmail();
-		if ( !empty( $template_id ) ) {
-			$sendSmtpEmail->setTemplateId( (int)$template_id );
+		if ( !empty( $content_html ) ) {
+			$sendSmtpEmail->setHtmlContent( $content_html );
+		}
+		if ( !empty( $subject ) ) {
+			$sendSmtpEmail->setSubject( $subject );
 		}
 		if ( !empty( $list_recipients ) ) {
 			$list_recipients_object = array();
@@ -180,22 +186,26 @@ class SIBv3Helper {
 			}
 			$sendSmtpEmail->setCc( $list_recipients_cc_object );
 		}
+		if ( !empty( $sender ) ) {
+			$sender_object = new \SendinBlue\Client\Model\SendSmtpEmailSender();
+			$sender_object->setEmail( $sender );
+			if ( !empty( $sender_name ) ) {
+				$sender_object->setName( $sender_name );
+			}
+			$sendSmtpEmail->setSender( $sender_object );
+		}
 		if ( !empty( $replyto ) ) {
-			$list_recipients_reply_to_object = new \SendinBlue\Client\Model\SendSmtpEmailReplyTo();
-			$list_recipients_reply_to_object->setEmail( $replyto );
-			$sendSmtpEmail->setReplyTo( $list_recipients_reply_to_object );
+			$reply_to_object = new \SendinBlue\Client\Model\SendSmtpEmailReplyTo();
+			$reply_to_object->setEmail( $replyto );
+			$sendSmtpEmail->setReplyTo( $reply_to_object );
 		}
 		if ( !empty( $attachment_url ) ) {
 			$attachment_url_object = new \SendinBlue\Client\Model\SendSmtpEmailAttachment();
 			$attachment_url_object->setUrl( $attachment_url );
 			$sendSmtpEmail->setAttachment( $attachment_url_object );
 		}
-		if ( !empty( $attributes ) ) {
-			$sendSmtpEmail[ 'params' ] = $attributes;
-		}
 
 		try {
-			WDGRESTAPI_Lib_Logs::log( print_r( $sendSmtpEmail, true ) );
 			$result = $api_transactional_emails->sendTransacEmail( $sendSmtpEmail );
 
 			return $result->getMessageId();
