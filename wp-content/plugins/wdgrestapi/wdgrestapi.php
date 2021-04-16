@@ -58,7 +58,6 @@ class WDGRESTAPI {
 		$this->add_include_lib( 'logs' );
 		$this->add_include_lib( 'geolocation' );
 		$this->add_include_lib( 'validator' );
-		$this->add_include_lib( 'transifex' );
 	}
 	public function add_include_lib($include_name) {
 		include_once plugin_dir_path( __FILE__ ) . 'libs/' . $include_name . '.php';
@@ -157,7 +156,6 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Contract::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_PollAnswer::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_QueuedAction::register');
-		add_action( 'rest_api_init', 'WDGRESTAPI_Route_SendinblueTemplate::register');
 
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_OrganizationUser::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectUser::register');
