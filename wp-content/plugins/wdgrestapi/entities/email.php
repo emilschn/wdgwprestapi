@@ -191,43 +191,22 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	 * @return boolean
 	 */
 	private function send_sendinblue_sms() {
-		include_once plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php';
-		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
+		$wdgrestapi = WDGRESTAPI::instance();
+		$wdgrestapi->add_include_lib( 'sendinblue/sendinblue-v3-helper' );
+
+		$sib_instance = SIBv3Helper::instance();
 
 		try {
-			// Création d'une nouvelle liste
-			$current_date = new DateTime();
-			$data_new_list = array(
-				'list_name'		=> "(Supprimer API) Liste temporaire - date : " . $current_date->format( 'Y-m-d H:i:s' ),
-				'list_parent'	=> 1
-			);
-			$create_list_result = $mailin->create_list( $data_new_list );
+			$user_entity = WDGRESTAPI_Entity_User::get_by_email( $this->loaded_data->recipient );
+			$user_entity_data = $user_entity->get_loaded_data();
+			$user_phone_number = $user_entity_data->phone_number;
+			$sendinblue_result = $sib_instance->sendSmsTransactional( $user_phone_number, $this->loaded_data->template );
 
-			if ( !isset( $create_list_result[ 'data' ] ) || !isset( $create_list_result[ 'data' ][ 'id' ] ) ) {
-				$sendinblue_result = $create_list_result;
+			if ( !empty( $sendinblue_result ) ) {
+				$this->loaded_data->result = json_encode( $sendinblue_result );
 			} else {
-				$new_list_id = $create_list_result[ 'data' ][ 'id' ];
-
-				// Ajout des utilisateurs à la liste
-				$recipient_list = explode( ',', $this->loaded_data->recipient );
-				$data_add_users = array(
-					'id'		=> $new_list_id,
-					'users'		=> $recipient_list
-				);
-				$mailin->add_users_list( $data_add_users );
-
-				// Création de la campagne avec envoi direct
-				$data = array(
-					'name'			=> "(Supprimer API) Campagne temporaire - date : " . $current_date->format( 'Y-m-d H:i:s' ),
-					'sender'		=> "WE DO GOOD",
-					'content'		=> $this->loaded_data->template,
-					'listid'		=> array( $new_list_id ),
-					'send_now'		=> 1
-				);
-				$sendinblue_result = $mailin->create_sms_campaign( $data );
+				$this->loaded_data->result = SIBv3Helper::getLastErrorMessage();
 			}
-
-			$this->loaded_data->result = json_encode( $sendinblue_result );
 		} catch ( Exception $e ) {
 			$this->loaded_data->result = 'Error : ' . $e->getMessage();
 		}
@@ -235,41 +214,6 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 		$this->save();
 
 		return true;
-	}
-
-	/**
-	 * Nettoie une liste de destinataires sur SendInBlue
-	 */
-	public static function clean_sms_list() {
-		include_once plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php';
-		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
-
-		try {
-			$data_list = array(
-				'list_parent'	=> 1
-			);
-			$array_mailin_list = $mailin->get_lists( $data_list );
-			$date_today = new DateTime();
-
-			foreach ( $array_mailin_list[ 'data' ] as $mailin_list_item ) {
-				if ( isset( $mailin_list_item[ 'name' ] ) ) {
-					// Si c'est une liste à supprimer
-					$list_name = $mailin_list_item[ 'name' ];
-					if ( strpos( $list_name, 'Supprimer API' ) !== FALSE ) {
-						// Si la liste a été créée il y a plus de 2 jours
-						$date_entered = new DateTime( $mailin_list_item[ 'entered' ] );
-						$date_interval = $date_today->diff( $date_entered );
-						if ( $date_interval->days > 2 ) {
-							$data = array(
-								'id' => $mailin_list_item[ 'id' ]
-							);
-							$mailin->delete_list( $data );
-						}
-					}
-				}
-			}
-		} catch ( Exception $e ) {
-		}
 	}
 
 	/*******************************************************************************

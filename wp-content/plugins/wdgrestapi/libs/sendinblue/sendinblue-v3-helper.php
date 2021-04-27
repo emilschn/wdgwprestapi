@@ -42,6 +42,7 @@ class SIBv3Helper {
 	private static $sib_config;
 	private static $api_instance_contacts;
 	private static $api_instance_transactional_emails;
+	private static $api_instance_sms_transactional;
 
 	/**
 	 * Récupération de l'API de contacts en Singleton
@@ -65,6 +66,17 @@ class SIBv3Helper {
 		}
 
 		return self::$api_instance_transactional_emails;
+	}
+
+	/**
+	 * Récupèration de l'API de campagnes de SMS en Singleton
+	 */
+	private static function getTransactionalSMSApi() {
+		if ( !isset( self::$api_instance_sms_transactional ) ) {
+			self::$api_instance_sms_transactional = new SendinBlue\Client\Api\TransactionalSMSApi(new GuzzleHttp\Client(), self::$sib_config);
+		}
+
+		return self::$api_instance_sms_transactional;
 	}
 
 	/**
@@ -258,5 +270,42 @@ class SIBv3Helper {
 		}
 
 		return FALSE;
+	}
+
+	/**
+	 * Crée une campagne SMS
+	 */
+	public function sendSmsTransactional($phone_number, $content) {
+		$api_sms_transactional = self::getTransactionalSMSApi();
+		$sendTransacSms = new \SendinBlue\Client\Model\SendTransacSms();
+
+		$sendTransacSms->setSender( 'WEDOGOOD' );
+		$sendTransacSms->setContent( $content );
+		$sendTransacSms->setRecipient( self::format_phone_number( $phone_number ) );
+
+		try {
+			$result = $api_sms_transactional->sendTransacSms( $sendTransacSms );
+
+			return $result;
+		} catch (Exception $e) {
+			self::$last_error = $e->getMessage();
+
+			return FALSE;
+		}
+	}
+
+	private static function format_phone_number($phone_number) {
+		// Si ça commence par un "+" on peut estimer que la personne a déjà fait attention, donc on ne formattera pas au style français
+		$skip_french_format = false;
+		if ( substr( $phone_number, 0, 1 ) == '+' ) {
+			$skip_french_format = true;
+		}
+		$buffer = str_replace( array(' ', '.', '-', '+'), '', $phone_number);
+		if ( !empty( $buffer ) && !$skip_french_format ) {
+			$buffer = substr( $buffer, -9 );
+			$buffer = '33' . $buffer;
+		}
+
+		return $buffer;
 	}
 }
