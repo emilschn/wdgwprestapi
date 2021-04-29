@@ -1,15 +1,15 @@
 <?php
 class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	public static $entity_type = 'user';
-	
-	public function __construct( $id = FALSE ) {
+
+	public function __construct($id = FALSE) {
 		parent::__construct( $id, self::$entity_type, self::$db_properties );
 	}
 
 	/**
 	 * Récupère un utilisateur à partir de son id WP
 	 */
-	public static function get_by_wpref( $wpref ) {
+	public static function get_by_wpref($wpref) {
 		global $wpdb;
 		if ( empty( $wpdb ) ) {
 			return FALSE;
@@ -18,43 +18,43 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		$query = 'SELECT * FROM ' .$table_name. ' WHERE wpref='.$wpref;
 		$result = $wpdb->get_row( $query );
 		$user = new WDGRESTAPI_Entity_User( $result->id );
+
 		return $user;
 	}
 
 	/**
 	 * Récupère un utilisateur à partir de son adresse e-mail
 	 */
-	public static function get_by_email( $email ) {
+	public static function get_by_email($email) {
 		global $wpdb;
 		if ( empty( $wpdb ) ) {
 			return FALSE;
 		}
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
-		$query = 'SELECT * FROM ' .$table_name. ' WHERE email=\''.$email.'\'';
+		$query = 'SELECT * FROM ' .$table_name. ' WHERE email=\''.$email.'\' LIMIT 1';
 		$result = $wpdb->get_row( $query );
 		if ( empty( $result ) || empty( $result->id ) ) {
 			return FALSE;
 		}
 		$user = new WDGRESTAPI_Entity_User( $result->id );
+
 		return $user;
 	}
-	
+
 	/**
 	 * Override de la fonction de sauvegarde pour supprimer le cache des listes d'utilisateur
 	 */
 	public function save() {
 		$buffer = parent::save();
-		if ( !empty( $this->loaded_data->id ) ) {
-			WDGRESTAPI_Lib_GoogleAPI::set_user_values( $this->loaded_data->id, $this->loaded_data );
-		}
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/users' );
+
 		return $buffer;
 	}
-	
-	public function get_loaded_data( $with_links = FALSE ) {
+
+	public function get_loaded_data($with_links = FALSE) {
 		$buffer = parent::get_loaded_data();
 		$buffer = WDGRESTAPI_Entity_User::standardize_data( $buffer );
-		
+
 		if ( !empty( $with_links ) ) {
 			// Récupération des projets liés
 			$project_list_by_user_id = WDGRESTAPI_Entity_ProjectUser::get_list_by_user_id( $this->loaded_data->id );
@@ -62,61 +62,58 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			foreach ( $project_list_by_user_id as $link_item ) {
 				$project = new WDGRESTAPI_Entity_Project( $link_item->id_project );
 				$loaded_data = $project->get_loaded_data();
-				array_push( 
-					$project_list,
-					array( 
+				array_push( $project_list, array(
 						"id"	=> $loaded_data->id,
 						"wpref"	=> $loaded_data->wpref,
 						"name"	=> $loaded_data->name,
 						"type"	=> $link_item->type
-					)
-				);
+					));
 			}
 			$buffer->projects = $project_list;
-			
+
 			// Récupération des organisations liées
 			$organization_list_by_user_id = WDGRESTAPI_Entity_OrganizationUser::get_list_by_user_id( $this->loaded_data->id );
 			$organization_list = array();
 			foreach ( $organization_list_by_user_id as $link_item ) {
 				$organization = new WDGRESTAPI_Entity_Organization( $link_item->id_organization );
 				$loaded_data = $organization->get_loaded_data();
-				array_push( 
-					$organization_list,
-					array( 
+				array_push( $organization_list, array(
 						"id"	=> $loaded_data->id,
 						"wpref"	=> $loaded_data->wpref,
 						"name"	=> $loaded_data->name,
 						"type"	=> $link_item->type
-					)
-				);
+					));
 			}
 			$buffer->organizations = $organization_list;
 		}
-		
+
 		return $buffer;
 	}
-	
+
 	/**
 	 * Refait un tour des données pour les retourner au meilleur format
 	 * @param type $item
 	 */
-	public static function standardize_data( $item ) {
+	public static function standardize_data($item) {
 		if ( !empty( $item ) ) {
 			$item->birthday_date = WDGRESTAPI_Entity::standardize_date( $item->birthday_date );
 		}
+
 		return $item;
 	}
-	
+
 	/**
 	 * Retourne la liste des investissements de cet utilisateur
 	 * @return array
 	 */
-	public function get_investments( $input_sort = FALSE ) {
+	public function get_investments($input_sort = FALSE) {
 		if ( empty( $this->loaded_data->id ) ) {
 			return FALSE;
 		}
-		
+
 		$investments = WDGRESTAPI_Entity_Investment::get_list_by_user( $this->loaded_data->id );
+		$investments_pending = WDGRESTAPI_Entity_Investment::get_list_by_user( $this->loaded_data->id, FALSE, 'pending' );
+		$investments = array_merge( $investments, $investments_pending );
 
 		if ( empty( $input_sort ) ) {
 			return $investments;
@@ -124,7 +121,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 
 		if ( $input_sort == 'project' ) {
 			$investment_contracts = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
-	
+
 			$investment_contracts_by_subscription_wpref = array();
 			foreach ( $investment_contracts as $investment_contract_item ) {
 				$investment_contracts_by_subscription_wpref[ $investment_contract_item->subscription_id ] = $investment_contract_item;
@@ -155,7 +152,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				array_push( $investments, $new_investment_item->get_loaded_data() );
 			}
 			// *****
-	
+
 			// Vraie initialisation des données d'investissement
 			$projects_by_id = array();
 			foreach ( $investments as $investment_item ) {
@@ -166,7 +163,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				if ( empty( $projects_by_id[ $investment_item->project ] ) ) {
 					$projects_by_id[ $investment_item->project ] = array();
 					$projects_by_id[ $investment_item->project ][ 'project_id' ] = $investment_item->project;
-	
+
 					// Données liées au projet
 					$project_entity = new WDGRESTAPI_Entity_Project( $investment_item->project );
 					$project_entity_data = $project_entity->get_loaded_data( FALSE );
@@ -191,7 +188,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				}
 
 				$new_item = array();
-	
+
 				// Données intrinsèques à l'investissement
 				$new_item[ 'id' ] = $investment_item->id;
 				$new_item[ 'wpref' ] = $investment_item->wpref;
@@ -199,17 +196,17 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				$new_item[ 'invest_datetime' ] = $investment_item->invest_datetime;
 				$new_item[ 'status' ] = $investment_item->status;
 				$new_item[ 'mean_payment' ] = $investment_item->mean_payment;
-				
+
 				// Données liées au contrat
 				$new_item[ 'contract_status' ] = '';
 				if ( !empty( $investment_contracts_by_subscription_wpref[ $investment_item->wpref ] ) ) {
 					$new_item[ 'contract_status' ] = $investment_contracts_by_subscription_wpref[ $investment_item->wpref ]->status;
 					$new_item[ 'amount' ] = $investment_contracts_by_subscription_wpref[ $investment_item->wpref ]->subscription_amount;
 				}
-	
+
 				// Données liées aux royalties
 				$new_item[ 'rois' ] = WDGRESTAPI_Entity_ROI::list_get_by_investment_wpref_and_user( $investment_item->wpref, $this->loaded_data->id );
-	
+
 				array_push( $projects_by_id[ $investment_item->project ][ 'investments' ], $new_item );
 			}
 
@@ -219,10 +216,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				array_push( $buffer, $project_item );
 			}
 		}
-		
+
 		return $buffer;
 	}
-	
+
 	/**
 	 * Retourne la liste des contrats d'investissement de cet utilisateur
 	 * @return array
@@ -232,9 +229,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		if ( !empty( $this->loaded_data->id ) ) {
 			$buffer = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'user' );
 		}
+
 		return $buffer;
 	}
-	
+
 	/**
 	 * Retourne la liste des ROIs de cet utilisateur
 	 * @return array
@@ -244,6 +242,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		if ( !empty( $this->loaded_data->id ) ) {
 			$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_user );
 		}
+
 		return $buffer;
 	}
 
@@ -254,9 +253,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		if ( !empty( $this->loaded_data->gateway_list ) ) {
 			return WDGRESTAPI_Entity_Transaction::list_get_by_user_id( $this->loaded_data->id, json_decode( $this->loaded_data->gateway_list ) );
 		}
+
 		return FALSE;
 	}
-	
+
 	/**
 	 * Retourne la liste des actions effectuées par l'utilisateur
 	 */
@@ -289,63 +289,86 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				),
 			)
 		);
+
 		return $buffer;
 	}
-	
+
+	/**
+	 * Recherche un vIBAN existant
+	 * Si pas trouvé, en crée un et le retourne
+	 */
+	public function get_viban() {
+		$buffer = FALSE;
+		$wdgrestapi = WDGRESTAPI::instance();
+		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
+		$lw = WDGRESTAPI_Lib_Lemonway::instance();
+		$gateway_list_decoded = json_decode( $this->loaded_data->gateway_list );
+		if ( isset( $gateway_list_decoded->lemonway ) ) {
+			$lw_wallet_id = $gateway_list_decoded->lemonway;
+			$buffer = $lw->get_viban( $lw_wallet_id );
+			if ( empty( $buffer ) ) {
+				$create_result = $lw->create_viban( $lw_wallet_id );
+				$buffer = $create_result;
+				$buffer->DATA = $create_result->IBAN;
+				$buffer->SWIFT = $create_result->BIC;
+			}
+		}
+
+		return $buffer;
+	}
+
 	/**
 	 * Récupération des données de royalties concernant un utilisateur
 	 * @return string
 	 */
-	public static function get_royalties_data( $param_email ) {
+	public static function get_royalties_data($param_email) {
 		$buffer = WDGRESTAPI_Entity::get_data_on_client_site( 'get_royalties_by_user', $param_email );
+
 		return $buffer;
 	}
-	
+
 	/**
 	 * Met à jour l'e-mail de l'utilisateur
 	 * @param string $param_email
 	 * @param array $posted_array
 	 * @return string
 	 */
-	public static function update_email( $param_email, $posted_array ) {
+	public static function update_email($param_email, $posted_array) {
 		$buffer = array();
 		$new_email = $posted_array[ 'new_email' ];
-		
+
 		if ( empty( $new_email ) || $param_email == $new_email ) {
 			$buffer['error'] = '404';
 			$buffer['error-message'] = 'Invalid new email';
-			
 		} else {
 			$posted_params = array(
 				'new_email'	=> $new_email
 			);
 			$return = WDGRESTAPI_Entity::post_data_on_client_site( 'update_user_email', $param_email, $posted_params );
-			
+
 			if ( $return == 'success' ) {
 				$buffer = 'success';
-				
 			} else {
 				$buffer['error'] = '404';
 				$buffer['error-message'] = $return;
 			}
-			
 		}
-		
+
 		return $buffer;
 	}
-	
+
 	/**
 	 * Retourne la liste de tous les utilisateurs
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $offset = 0, $limit = FALSE, $full = FALSE, $input_link_to_project = FALSE ) {
+	public static function list_get($authorized_client_id_string, $offset = 0, $limit = FALSE, $full = FALSE, $input_link_to_project = FALSE) {
 		global $wpdb;
 		if ( !isset( $wpdb ) ) {
 			return FALSE;
 		}
 
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
-		
+
 		if ( !empty( $input_link_to_project ) ) {
 			// TODO : changer requete pour faire liaison avec table votes et table investissements
 			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string. " ORDER BY email ASC";
@@ -354,14 +377,14 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string. " ORDER BY email ASC";
 			$count_query = "SELECT COUNT(*) AS nb FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		}
-		
+
 		// Gestion offset et limite
 		if ( empty( $limit ) ) {
 			$limit = 100;
 		}
 		if ( $offset > 0 || !empty( $limit ) ) {
 			$query .= " LIMIT ";
-			
+
 			if ( $offset > 0 ) {
 				$query .= $offset . ", ";
 				if ( empty( $limit ) ) {
@@ -372,7 +395,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				$query .= $limit;
 			}
 		}
-		
+
 		$results = $wpdb->get_results( $query );
 		foreach ( $results as $result ) {
 			$result->type = 'user';
@@ -380,7 +403,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			$result->is_project_manager = ( $rand_project_manager > 17 ); // TODO
 			$result = WDGRESTAPI_Entity_Project::standardize_data( $result );
 		}
-		
+
 		if ( $full ) {
 			foreach ( $results as $result ) {
 				$result->vote_count = rand( 0, 20 ); //TODO
@@ -393,9 +416,9 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 				$result->lw_iban_authentication = 'todo'; //TODO
 			}
 		}
-		
+
 		$count_results = $wpdb->get_results( $count_query );
-		
+
 		$buffer = array(
 			'offset'	=> $offset,
 			'limit'		=> $limit,
@@ -403,10 +426,10 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 			'total'		=> $count_results[ 0 ]->nb,
 			'results'	=> $results
 		);
-		
+
 		return $buffer;
 	}
-	
+
 	/**
 	 * Retourne les statistiques qui concernent les utilisateurs
 	 */
@@ -418,14 +441,14 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 
 		$buffer->investors_count = 0;
 		$buffer->investors_multi_count = 0;
-		
+
 		global $wpdb;
 		if ( isset( $wpdb ) ) {
 			$table_investments = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
 			$count_query = "SELECT COUNT( DISTINCT user_id ) AS nb FROM " .$table_investments;
 			$count_results = $wpdb->get_results( $count_query );
 			$buffer->investors_count = $count_results[ 0 ]->nb;
-			
+
 			$count_multi_query = "SELECT COUNT( DISTINCT user_id ) AS nb FROM " .$table_investments. " GROUP BY user_id HAVING COUNT( user_id ) > 1";
 			$count_multi_results = $wpdb->get_results( $count_multi_query );
 			$buffer->investors_multi_count = $count_multi_results[ 0 ]->nb;
@@ -433,12 +456,11 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 
 		return $buffer;
 	}
-	
-	
-/*******************************************************************************
- * GESTION BDD
- ******************************************************************************/
-	
+
+	/*******************************************************************************
+	 * GESTION BDD
+	 ******************************************************************************/
+
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
@@ -488,10 +510,9 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'language'				=> array( 'type' => 'varchar', 'other' => '' )
 	);
-	
+
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
 		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_User::$entity_type, WDGRESTAPI_Entity_User::$db_properties );
 	}
-	
 }

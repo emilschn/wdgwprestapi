@@ -11,7 +11,6 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 		$current_datetime = new DateTime();
 		$this->loaded_data->date = $current_datetime->format( 'Y-m-d H:i:s' );
 		parent::save();
-		WDGRESTAPI_Lib_GoogleAPI::set_poll_values( $this->loaded_data->id, $this->loaded_data );
 	}
 	
 	/**
@@ -48,12 +47,6 @@ class WDGRESTAPI_Entity_PollAnswer extends WDGRESTAPI_Entity {
 		}
 		
 		$buffer = $wpdb->get_results( $query );
-		
-		if ( !empty( $apply_in_google ) ) {
-			foreach ( $buffer as $item ) {
-				WDGRESTAPI_Lib_GoogleAPI::set_poll_values( $item->id, $item );
-			}
-		}
 		
 		return $buffer;
 	}

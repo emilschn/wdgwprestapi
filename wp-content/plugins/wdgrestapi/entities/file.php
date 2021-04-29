@@ -8,6 +8,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'project_certificate', 'project_estimated_budget', 'project_document', 'contract', 'amendment', 'picture-check', 'picture-contract', 'bill', 'business', 'mandate' );
 	
 	private $file_data;
+	private $file_to_move;
 
 	public function __construct( $id = FALSE ) {
 		parent::__construct( $id, WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
@@ -98,12 +99,23 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 		$this->file_data = base64_decode( $base64_file_data );
 	}
 
+	public function set_file_to_move( $file_path ) {
+		$this->file_to_move = $file_path;
+	}
+
 	public function save() {
 		if ( in_array( $this->loaded_data->entity_type, WDGRESTAPI_Entity_File::$file_entity_types ) && in_array( $this->loaded_data->file_type, WDGRESTAPI_Entity_File::$file_types ) ) {
-			$this->loaded_data->file_signature = md5( $this->file_data );
 			$path = $this->get_path();
 			$random_filename = $this->get_random_filename( $path, $this->loaded_data->file_extension );
-			file_put_contents( $path . $random_filename, $this->file_data );
+			if ( !empty( $this->file_to_move ) ) {
+				$this->loaded_data->file_signature = md5( $this->file_to_move );
+				rename( $this->file_to_move, $path . $random_filename );
+
+			} else {
+				file_put_contents( $path . $random_filename, $this->file_data );
+				$this->loaded_data->file_signature = md5( $this->file_data );
+			}
+
 			$current_datetime = new DateTime();
 			$this->loaded_data->file_name = $random_filename;
 			$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d H:i:s' );

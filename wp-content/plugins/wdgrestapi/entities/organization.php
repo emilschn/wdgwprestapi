@@ -23,7 +23,6 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	
 	public function save() {
 		parent::save();
-		WDGRESTAPI_Lib_GoogleAPI::set_organization_values( $this->loaded_data->id, $this->loaded_data );
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/organizations' );
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/projects' );
 	}
@@ -103,6 +102,29 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 			return WDGRESTAPI_Entity_Transaction::list_get_by_organization_id( $this->loaded_data->id, json_decode( $this->loaded_data->gateway_list ) );
 		}
 		return FALSE;
+	}
+
+	/**
+	 * Recherche un vIBAN existant
+	 * Si pas trouvé, en crée un et le retourne
+	 */
+	public function get_viban() {
+		$buffer = FALSE;
+		$wdgrestapi = WDGRESTAPI::instance();
+		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
+		$lw = WDGRESTAPI_Lib_Lemonway::instance();
+		$gateway_list_decoded = json_decode( $this->loaded_data->gateway_list );
+		if ( isset( $gateway_list_decoded->lemonway ) ) {
+			$lw_wallet_id = $gateway_list_decoded->lemonway;
+			$buffer = $lw->get_viban( $lw_wallet_id );
+			if ( empty( $buffer ) ) {
+				$create_result = $lw->create_viban( $lw_wallet_id );
+				$buffer = $create_result;
+				$buffer->DATA = $create_result->IBAN;
+				$buffer->SWIFT = $create_result->BIC;
+			}
+		}
+		return $buffer;
 	}
 	
 	/**
