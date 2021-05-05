@@ -508,7 +508,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'signup_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'royalties_notifications'=> array( 'type' => 'varchar', 'other' => '' ),
 		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' ),
-		'language'				=> array( 'type' => 'varchar', 'other' => '' )
+		'language'				=> array( 'type' => 'varchar', 'other' => '' ),
+		'email_is_validated'	=> array( 'type' => 'bool', 'other' => '' )
 	);
 	
 	// Mise à jour de la bdd
