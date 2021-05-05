@@ -7,7 +7,7 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 
 		WDGRESTAPI_Route::register_wdg('/organization/(?P<id>\d+)', WP_REST_Server::READABLE, array( $this, 'single_get'), array( 'id' => array( 'default' => 0 ) ));
 
-		WDGRESTAPI_Route::register_wdg('/organization/(?P<id>\d+)/investment', WP_REST_Server::READABLE, array( $this, 'single_get_investment'), array( 'id' => array( 'default' => 0 ) ));
+		WDGRESTAPI_Route::register_wdg('/organization/(?P<id>\d+)/investments', WP_REST_Server::READABLE, array( $this, 'single_get_investments'), array( 'id' => array( 'default' => 0 ) ));
 
 		WDGRESTAPI_Route::register_wdg('/organization/(?P<id>\d+)/investment-contracts', WP_REST_Server::READABLE, array( $this, 'single_get_investment_contracts'), array( 'id' => array( 'default' => 0 ) ));
 
@@ -86,7 +86,7 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 	 * @param WP_REST_Request $request
 	 * @return object
 	 */
-	public function single_get_investment(WP_REST_Request $request) {
+	public function single_get_investments(WP_REST_Request $request) {
 		$organization_id = $request->get_param( 'id' );
 		if ( !empty( $organization_id ) ) {
 			try {
@@ -98,17 +98,17 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 
 					return $rois_data;
 				} else {
-					$this->log( "WDGRESTAPI_Route_Organization::single_get_investment::" . $organization_id, "404 : Invalid organization ID" );
+					$this->log( "WDGRESTAPI_Route_Organization::single_get_investments::" . $organization_id, "404 : Invalid organization ID" );
 
 					return new WP_Error( '404', "Invalid organization ID" );
 				}
 			} catch ( Exception $e ) {
-				$this->log( "WDGRESTAPI_Route_Organization::single_get_investment::" . $organization_id, $e->getMessage() );
+				$this->log( "WDGRESTAPI_Route_Organization::single_get_investments::" . $organization_id, $e->getMessage() );
 
 				return new WP_Error( 'cant-get', $e->getMessage() );
 			}
 		} else {
-			$this->log( "WDGRESTAPI_Route_Organization::single_get_investment", "404 : Invalid organization ID (empty)" );
+			$this->log( "WDGRESTAPI_Route_Organization::single_get_investments", "404 : Invalid organization ID (empty)" );
 
 			return new WP_Error( '404', "Invalid organization ID (empty)" );
 		}
