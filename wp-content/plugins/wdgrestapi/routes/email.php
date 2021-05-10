@@ -14,13 +14,6 @@ class WDGRESTAPI_Route_Email extends WDGRESTAPI_Route {
 			array( $this, 'single_create'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
-		
-		WDGRESTAPI_Route::register_wdg(
-			'/sms/clean',
-			WP_REST_Server::READABLE,
-			array( $this, 'clean_sms_list'),
-			$this->get_endpoint_args_for_item_schema( WP_REST_Server::READABLE )
-		);
 	}
 	
 	public static function register() {
@@ -58,10 +51,6 @@ class WDGRESTAPI_Route_Email extends WDGRESTAPI_Route {
 		$reloaded_data = $email_item->get_loaded_data();
 		$this->log( "WDGRESTAPI_Route_Email::single_create", json_encode( $reloaded_data ) );
 		return $reloaded_data;
-	}
-
-	public function clean_sms_list() {
-		WDGRESTAPI_Entity_Email::clean_sms_list();
 	}
 	
 }
