@@ -223,6 +223,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 17 ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 18 ),
 		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 19 ),
+		'accountant'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'bank_owner'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 20 ),
 		'bank_address'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 21 ),
 		'bank_address2'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 22 ),
