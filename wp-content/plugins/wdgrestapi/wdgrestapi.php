@@ -7,7 +7,6 @@
  * Author URI: http://www.wedogood.co
 */
 
-
 /**
  * How-to:
  * 	$url = 'http://WP-URL/wp-json/';
@@ -20,17 +19,15 @@
  */
 
 // Vérifie si c'est un appel direct
-if ( ! function_exists( 'is_admin' ) ) {
+if ( !function_exists( 'is_admin' ) ) {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
 	exit();
 }
 
-
 class WDGRESTAPI {
 	private $version = '0.0.827';
 
-    
 	/**
 	 * Instanciation du singleton
 	 */
@@ -39,36 +36,33 @@ class WDGRESTAPI {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
+
 		return self::$_instance;
 	}
-	
+
 	public function __construct() {
 		$this->add_include_libs();
 		$this->add_include_entities();
 		$this->upgrade_db();
 		$this->add_include_routes();
 		$this->register_routes();
-		
-		
+
 		$this->add_include_admin( 'posts' );
 		WDGRESTAPI_Admin_Posts::add_actions();
 		$this->add_include_admin( 'users' );
 		WDGRESTAPI_Admin_Users::add_actions();
 	}
-	
-	
+
 	// Gestion des entités
 	public function add_include_libs() {
 		$this->add_include_lib( 'logs' );
 		$this->add_include_lib( 'geolocation' );
 		$this->add_include_lib( 'validator' );
-		$this->add_include_lib( 'transifex' );
 	}
-	public function add_include_lib( $include_name ) {
-		include_once( plugin_dir_path( __FILE__ ) . 'libs/' . $include_name . '.php');
+	public function add_include_lib($include_name) {
+		include_once plugin_dir_path( __FILE__ ) . 'libs/' . $include_name . '.php';
 	}
-	
-	
+
 	// Gestion des entités
 	public function add_include_entities() {
 		$this->add_include_entity( 'entity' );
@@ -95,20 +89,18 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'contract-model' );
 		$this->add_include_entity( 'contract' );
 		$this->add_include_entity( 'queued-action' );
-		$this->add_include_entity( 'sendinblue-template' );
 		$this->add_include_entity( 'transaction' );
-		
+
 		$this->add_include_entity( 'organization-user' );
 		$this->add_include_entity( 'project-user' );
 		$this->add_include_entity( 'project-organization' );
 		$this->add_include_entity( 'adjustment-file' );
 		$this->add_include_entity( 'adjustment-declaration' );
 	}
-	public function add_include_entity( $include_name ) {
-		include_once( plugin_dir_path( __FILE__ ) . 'entities/' . $include_name . '.php');
+	public function add_include_entity($include_name) {
+		include_once plugin_dir_path( __FILE__ ) . 'entities/' . $include_name . '.php';
 	}
-	
-	
+
 	// Gestion des routes
 	public function add_include_routes() {
 		$this->add_include_route( 'route' );
@@ -137,10 +129,9 @@ class WDGRESTAPI {
 		$this->add_include_route( 'project-user' );
 		$this->add_include_route( 'project-organization' );
 		$this->add_include_route( 'queued-action' );
-		$this->add_include_route( 'sendinblue-template' );
 	}
-	public function add_include_route( $include_name ) {
-		include_once( plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php');
+	public function add_include_route($include_name) {
+		include_once plugin_dir_path( __FILE__ ) . 'routes/' . $include_name . '.php';
 	}
 	public function register_routes() {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_StaticPage::register');
@@ -165,20 +156,17 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Contract::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_PollAnswer::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_QueuedAction::register');
-		add_action( 'rest_api_init', 'WDGRESTAPI_Route_SendinblueTemplate::register');
-		
+
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_OrganizationUser::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectUser::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ProjectOrganization::register');
 	}
-	
-	
+
 	// Gestion de l'affichage en admin
-	public function add_include_admin( $include_name ) {
-		include_once( plugin_dir_path( __FILE__ ) . 'admin/' . $include_name . '.php');
+	public function add_include_admin($include_name) {
+		include_once plugin_dir_path( __FILE__ ) . 'admin/' . $include_name . '.php';
 	}
-	
-	
+
 	// Mise à jour éventuelle de la bdd
 	public function upgrade_db() {
 		if (get_option('wdgwpapi_version') != $this->version) {
@@ -204,15 +192,14 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_ContractModel::upgrade_db();
 			WDGRESTAPI_Entity_Contract::upgrade_db();
 			WDGRESTAPI_Entity_QueuedAction::upgrade_db();
-			WDGRESTAPI_Entity_SendinblueTemplate::upgrade_db();
 			WDGRESTAPI_Entity_Transaction::upgrade_db();
-			
+
 			WDGRESTAPI_Entity_OrganizationUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectOrganization::upgrade_db();
 			WDGRESTAPI_Entity_AdjustmentFile::upgrade_db();
 			WDGRESTAPI_Entity_AdjustmentDeclaration::upgrade_db();
-			
+
 			update_option('wdgwpapi_version', $this->version);
 		}
 	}
