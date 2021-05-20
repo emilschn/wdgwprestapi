@@ -214,6 +214,8 @@ class SIBv3Helper {
 		if ( !empty( $attachment_url ) ) {
 			$attachment_url_object = new \SendinBlue\Client\Model\SendSmtpEmailAttachment();
 			$attachment_url_object->setUrl( $attachment_url );
+			$file_info = pathinfo( $attachment_url );
+			$attachment_url_object->setName( $file_info['basename'] );
 			$sendSmtpEmail->setAttachment( $attachment_url_object );
 		}
 
