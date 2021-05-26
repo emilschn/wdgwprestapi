@@ -212,9 +212,11 @@ class SIBv3Helper {
 			$sendSmtpEmail->setReplyTo( $reply_to_object );
 		}
 		if ( !empty( $attachment_url ) ) {
+			$list_attachments_object = array();
 			$attachment_url_object = new \SendinBlue\Client\Model\SendSmtpEmailAttachment();
 			$attachment_url_object->setUrl( $attachment_url );
-			$sendSmtpEmail->setAttachment( $attachment_url_object );
+			array_push( $list_attachments_object, $attachment_url_object );
+			$sendSmtpEmail->setAttachment( $list_attachments_object );
 		}
 
 		try {
