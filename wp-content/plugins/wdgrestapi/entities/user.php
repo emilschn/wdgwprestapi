@@ -5,7 +5,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	public function __construct($id = FALSE) {
 		parent::__construct( $id, self::$entity_type, self::$db_properties );
 
-		if ( empty( $this->email_is_validated ) ) {
+		if ( empty( $this->loaded_data->email_is_validated ) ) {
 			$this->loaded_data->email_is_validated = wp_generate_uuid4();
 			$this->save();
 		}
