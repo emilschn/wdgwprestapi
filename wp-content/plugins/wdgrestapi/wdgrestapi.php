@@ -26,7 +26,7 @@ if ( !function_exists( 'is_admin' ) ) {
 }
 
 class WDGRESTAPI {
-	private $version = '0.0.831';
+	private $version = '0.0.832';
 
 	/**
 	 * Instanciation du singleton
@@ -199,6 +199,7 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_Contract::upgrade_db();
 			WDGRESTAPI_Entity_QueuedAction::upgrade_db();
 			WDGRESTAPI_Entity_Transaction::upgrade_db();
+			WDGRESTAPI_Entity_Subscription::upgrade_db();
 
 			WDGRESTAPI_Entity_OrganizationUser::upgrade_db();
 			WDGRESTAPI_Entity_ProjectUser::upgrade_db();
