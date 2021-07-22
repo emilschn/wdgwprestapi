@@ -54,9 +54,11 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		if ( $with_organization ) {
 			$organizations_linked = WDGRESTAPI_Entity_ProjectOrganization::get_list_by_project_id( $buffer->id );
 			$orga_linked_id = 0;
-			foreach ( $organizations_linked as $project_orga_link ) {
-				if ( $project_orga_link->type == WDGRESTAPI_Entity_ProjectOrganization::$link_type_manager ) {
-					$orga_linked_id = $project_orga_link->id_organization;
+			if ($organizations_linked) {
+				foreach ($organizations_linked as $project_orga_link) {
+					if ($project_orga_link->type == WDGRESTAPI_Entity_ProjectOrganization::$link_type_manager) {
+						$orga_linked_id = $project_orga_link->id_organization;
+					}
 				}
 			}
 			$organization_data = FALSE;
