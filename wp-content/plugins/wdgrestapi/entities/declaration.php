@@ -190,7 +190,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		}
 		$turnover_total = 0;
 		foreach ( $turnover_list as $turnover_month ) {
-			$turnover_total += $turnover_month;
+			$turnover_total += intval( $turnover_month );
 		}
 		$buffer[ 'turnover_total' ] = $turnover_total;
 		// Statut d'affichage

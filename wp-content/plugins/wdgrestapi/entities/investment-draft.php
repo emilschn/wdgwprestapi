@@ -10,7 +10,7 @@ class WDGRESTAPI_Entity_InvestmentDraft extends WDGRESTAPI_Entity {
 		parent::__construct( $id, self::$entity_type, self::$db_properties );
 	}
 	
-	public function list_get( $authorized_client_id_string, $project_id ) {
+	public static function list_get( $authorized_client_id_string, $project_id ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		
