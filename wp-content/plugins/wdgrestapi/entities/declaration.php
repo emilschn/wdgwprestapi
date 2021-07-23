@@ -71,13 +71,15 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 	 * Retourne la liste de toutes les déclarations
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $start_date = FALSE, $end_date = FALSE, $type = FALSE  ) {
+	public static function list_get( $authorized_client_id_string, $start_date = FALSE, $end_date = FALSE, $type = FALSE, $status = FALSE  ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Declaration::$entity_type );
 		$query = "SELECT id, id_project, date_due, date_paid, date_transfer, amount, remaining_amount, transfered_previous_remaining_amount, percent_commission, percent_commission_without_tax, status, mean_payment, file_list, turnover, message, adjustment, employees_number, other_fundings FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		
 		if ( !empty( $start_date ) && !empty( $end_date ) && $type == 'due' ) {
 			$query .= " AND date_due >= '" . $start_date->format( 'Y-m-d' ) . "' AND date_due <= '" . $end_date->format( 'Y-m-d' ) . "' AND status = 'declaration'";
+		} else if ( !$status ){
+			$query .= " AND status = '" . $status . "'";
 		}
 		
 		return $wpdb->get_results( $query );
@@ -287,7 +289,8 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		'employees_number'		=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 15 ),
 		'other_fundings'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 16 ),
 		'transfer_delay'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
-		'declared_by'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 17 )
+		'declared_by'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 17 ),
+		'date_declaration'				=> array( 'type' => 'date', 'other' => 'DEFAULT \'0000-00-00\'', 'gs_col_index' => 18 ),
 	);
 	
 	// Mise à jour de la bdd
