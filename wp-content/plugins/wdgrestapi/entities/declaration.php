@@ -78,7 +78,7 @@ class WDGRESTAPI_Entity_Declaration extends WDGRESTAPI_Entity {
 		
 		if ( !empty( $start_date ) && !empty( $end_date ) && $type == 'due' ) {
 			$query .= " AND date_due >= '" . $start_date->format( 'Y-m-d' ) . "' AND date_due <= '" . $end_date->format( 'Y-m-d' ) . "' AND status = 'declaration'";
-		} else if ( !$status ){
+		} else if ( $status != FALSE ){
 			$query .= " AND status = '" . $status . "'";
 		}
 		
