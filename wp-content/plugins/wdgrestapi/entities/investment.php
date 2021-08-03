@@ -299,11 +299,17 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		} else {
 			global $wpdb;
 			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Investment::$entity_type );
+			$user_table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_User::$entity_type );
 			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id=" .$current_client->ID;
+			$query = "SELECT investment.*, user.email as email, user.name as firstname, user.surname as lastname, user.phone_number as phone_number,";
+			$query .= " CONCAT(user.address_number, ' ', user.address) as address, user.postalcode as postalcode, user.city as city";
+			$query .= " FROM " .$table_name. " investment";
+			$query .= " LEFT JOIN " .$user_table_name. " user ON user.id = investment.user_id";
+			$query .= " WHERE investment.client_user_id=" .$current_client->ID;
 			if ( !empty( $project_id ) ) {
-				$query .= " AND project=" .$project_id;
+				$query .= " AND investment.project=" .$project_id;
 			}
+			
 			$results = $wpdb->get_results( $query );
 		}
 		return $results;
