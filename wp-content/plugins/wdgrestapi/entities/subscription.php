@@ -53,7 +53,7 @@ class WDGRESTAPI_Entity_Subscription extends WDGRESTAPI_Entity {
 		'modality'			    => array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
         'start_date'			=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-        'end_date'			    => array( 'type' => 'datetime', 'other' => 'NOT NULL' )
+        'end_date'			    => array( 'type' => 'datetime')
 	);
 	
 	// Mise à jour de la bdd
