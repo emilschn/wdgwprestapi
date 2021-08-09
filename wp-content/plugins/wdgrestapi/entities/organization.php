@@ -1,15 +1,15 @@
 <?php
 class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	public static $entity_type = 'organization';
-	
-	public function __construct( $id = FALSE ) {
+
+	public function __construct($id = FALSE) {
 		parent::__construct( $id, WDGRESTAPI_Entity_Organization::$entity_type, WDGRESTAPI_Entity_Organization::$db_properties );
 	}
 
 	/**
 	 * Récupère un utilisateur à partir de son id WP
 	 */
-	public static function get_by_wpref( $wpref ) {
+	public static function get_by_wpref($wpref) {
 		global $wpdb;
 		if ( empty( $wpdb ) ) {
 			return FALSE;
@@ -18,9 +18,10 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		$query = 'SELECT * FROM ' .$table_name. ' WHERE wpref='.$wpref;
 		$result = $wpdb->get_row( $query );
 		$orga = new WDGRESTAPI_Entity_Organization( $result->id );
+
 		return $orga;
 	}
-	
+
 	public function save() {
 		parent::save();
 		WDGRESTAPI_Entity_Cache::delete_by_name_like( '/organizations' );
@@ -35,6 +36,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		$this->check_geolocation_data();
 		$buffer = parent::get_loaded_data();
 		$buffer = WDGRESTAPI_Entity_Organization::expand_data( $buffer );
+
 		return $buffer;
 	}
 
@@ -51,9 +53,8 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 //		WDGRESTAPI_Lib_Logs::log( 'check_geolocation_data > ' . $geolocation_addr_md5 . ' | ' . $current_geolocation_addr_md5 );
 
 		// Si la géolocalisation de l'organisation n'a pas été récupérée
-			// ou si le nouveau MD5 de l'adresse est différent de celui qui a déjà été enregistré
+		// ou si le nouveau MD5 de l'adresse est différent de celui qui a déjà été enregistré
 		if ( empty( $loaded_data->geolocation ) || $current_geolocation_addr_md5 != $geolocation_addr_md5 ) {
-
 			// Récupération des données de géolocalisation
 //			WDGRESTAPI_Lib_Logs::log( 'check_geolocation_data >> get_geolocation_data' );
 			$geolocation_data = WDGRESTAPI_Lib_Geolocation::get_geolocation_data( $geolocation_address );
@@ -64,33 +65,44 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 				$this->set_property( 'geolocation', $geolocation_data['lat'] . ',' . $geolocation_data['long'] );
 				$this->save();
 			}
-
 		}
 	}
-	
+
 	/**
 	* Définit le nom de l'organisation
 	 * @param string $new_name
 	*/
-	public function set_name( $new_name ) {
+	public function set_name($new_name) {
 		$this->loaded_data->name = $new_name;
 	}
-	
+
+	/**
+	 * Retourne la liste des investissements de cette organisation
+	 * @return array
+	 */
+	public function get_investments() {
+		$buffer = WDGRESTAPI_Entity_Investment::get_list_by_user( $this->loaded_data->id, TRUE );
+
+		return $buffer;
+	}
+
 	/**
 	 * Retourne la liste des contrats d'investissement de cette organisation
 	 * @return array
 	 */
 	public function get_investment_contracts() {
 		$buffer = WDGRESTAPI_Entity_InvestmentContract::list_get_by_investor( $this->loaded_data->id, 'organization' );
+
 		return $buffer;
 	}
-	
+
 	/**
 	 * Retourne la liste des ROIs de cette organisation
 	 * @return array
 	 */
 	public function get_rois() {
 		$buffer = WDGRESTAPI_Entity_ROI::list_get_by_recipient_id( $this->loaded_data->id, WDGRESTAPI_Entity_ROI::$recipient_type_orga );
+
 		return $buffer;
 	}
 
@@ -101,6 +113,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		if ( !empty( $this->loaded_data->gateway_list ) ) {
 			return WDGRESTAPI_Entity_Transaction::list_get_by_organization_id( $this->loaded_data->id, json_decode( $this->loaded_data->gateway_list ) );
 		}
+
 		return FALSE;
 	}
 
@@ -120,18 +133,21 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 			if ( empty( $buffer ) ) {
 				$create_result = $lw->create_viban( $lw_wallet_id );
 				$buffer = $create_result;
-				$buffer->DATA = $create_result->IBAN;
-				$buffer->SWIFT = $create_result->BIC;
+				if ( !empty( $create_result ) ) {
+					$buffer->DATA = $create_result->IBAN;
+					$buffer->SWIFT = $create_result->BIC;
+				}
 			}
 		}
+
 		return $buffer;
 	}
-	
+
 	/**
 	 * Retourne la liste de toutes les organisations
 	 * @return array
 	 */
-	public static function list_get( $authorized_client_id_string, $offset = 0, $limit = FALSE, $input_link_to_project = FALSE ) {
+	public static function list_get($authorized_client_id_string, $offset = 0, $limit = FALSE, $input_link_to_project = FALSE) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Organization::$entity_type );
 		if ( !empty( $input_link_to_project ) ) {
@@ -140,11 +156,11 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		} else {
 			$query = "SELECT * FROM " .$table_name. " WHERE client_user_id IN " .$authorized_client_id_string;
 		}
-		
+
 		// Gestion offset et limite
 		if ( $offset > 0 || !empty( $limit ) ) {
 			$query .= " LIMIT ";
-			
+
 			if ( $offset > 0 ) {
 				$query .= $offset . ", ";
 				if ( empty( $limit ) ) {
@@ -155,32 +171,33 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 				$query .= $limit;
 			}
 		}
-		
+
 		$results = $wpdb->get_results( $query );
+
 		return $results;
 	}
-	
-	public static function expand_data( $item ) {
+
+	public static function expand_data($item) {
 		$item->mandate_file_url = '';
 		$mandate_file = WDGRESTAPI_Entity_File::get_single( self::$entity_type, $item->id, 'mandate' );
 		if ( !empty( $mandate_file ) ) {
 			$item_loaded_data = $mandate_file->get_loaded_data();
 			$item->mandate_file_url = $item_loaded_data->url;
 		}
+
 		return $item;
 	}
-	
-	
-/*******************************************************************************
- * GESTION BDD
- ******************************************************************************/
-	
+
+	/*******************************************************************************
+	 * GESTION BDD
+	 ******************************************************************************/
+
 	/**
 	 * Requete de transfert SQL :
 	 * INSERT INTO `wp_entity_organization` (`id`, `wpref`, `name`, `creation_date`, `strong_authentication`, `type`, `legalform`, `idnumber`, `rcs`, `capital`, `address`, `postalcode`, `city`, `country`, `ape`, `bank_owner`, `bank_address`, `bank_iban`, `bank_bic`, `website_url`, `twitter_url`, `facebook_url`, `linkedin_url`, `viadeo_url`) VALUES
 (6, 0, 'BLI', '2014-12-16', 0, 'society', 'BLI', 'BLI', 'BLI', 400, 'BLI', 300, 'BLI', 'BH', 'BLI', '', '', '', '', '---', '---', '---', '---', '---');
 	 */
-	
+
 	// Pour les types, voir WDGRESTAPI_Entity::get_mysqltype_from_wdgtype
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
@@ -208,6 +225,7 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 17 ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 18 ),
 		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 19 ),
+		'accountant'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'bank_owner'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 20 ),
 		'bank_address'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 21 ),
 		'bank_address2'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 22 ),
@@ -229,10 +247,9 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'mandate_info'			=> array( 'type' => 'varchar', 'other' => '' )
 	);
-	
+
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
 		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_Organization::$entity_type, WDGRESTAPI_Entity_Organization::$db_properties );
 	}
-	
 }
