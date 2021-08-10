@@ -50,8 +50,6 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	public function send() {
 		switch ( $this->loaded_data->tool ) {
 			case 'sendinblue':
-				$buffer = $this->send_sendinblue_mail();
-				break;
 			case 'sendinblue-v3':
 				$buffer = $this->send_sendinblue_mail_v3();
 				break;
@@ -59,65 +57,6 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 				$buffer = $this->send_sendinblue_sms();
 				break;
 		}
-
-		return $buffer;
-	}
-
-	/**
-	 * Envoi de mail via SendInBlue v2
-	 */
-	private function send_sendinblue_mail() {
-		include_once plugin_dir_path( __FILE__ ) . '../libs/sendinblue/mailin.php';
-		$mailin = new Mailin( 'https://api.sendinblue.com/v2.0', WDG_SENDINBLUE_API_KEY, 8000 );
-
-		// Détermination de la langue d'affichage en fonction du recipient
-		// Par défaut, on envoie le template français
-		$template_id = $this->loaded_data->template;
-
-		$recipients = str_replace( ',', '|', $this->loaded_data->recipient );
-		$options = json_decode( $this->loaded_data->options );
-		$replyto = ( empty( $options->replyto ) ) ? 'bonjour@wedogood.co' : $options->replyto;
-		$data = array(
-			'id'		=> $template_id,
-			'to'		=> 'admin@wedogood.co',
-			'bcc'		=> $recipients,
-			'replyto'	=> $replyto,
-			'attr'		=> $options
-		);
-
-		$is_personal = ( isset( $options->personal ) && !empty( $options->personal ) );
-		$is_admin_skipped = ( isset( $options->skip_admin ) && !empty( $options->skip_admin ) );
-
-		// Est-ce qu'on envoie directement à l'utilisateur ?
-		if ( $is_personal ) {
-			$data[ 'to' ] = $data[ 'bcc' ];
-			$data[ 'bcc' ] = 'admin@wedogood.co';
-
-		// Pour certains templates, on n'envoie pas de copie à admin, on envoie directement à l'utilisateur
-		} else {
-			if ( $is_admin_skipped ) {
-				$data[ 'to' ] = $data[ 'bcc' ];
-				$data[ 'bcc' ] = '';
-			}
-		}
-
-		// Possibilité d'ajouter une pièce jointe
-		if ( isset( $options->url_attachment ) && !empty( $options->url_attachment ) ) {
-			$data[ 'attachment_url' ] = $options->url_attachment;
-		}
-
-		$buffer = 'error';
-		try {
-			$sendinblue_result = $mailin->send_transactional_template( $data );
-			if ( $sendinblue_result[ 'code' ] == 'success' ) {
-				$buffer = 'success';
-			}
-			$this->loaded_data->result = json_encode( $sendinblue_result );
-		} catch ( Exception $e ) {
-			$this->loaded_data->result = 'Error : ' . $e->getMessage();
-		}
-
-		$this->save();
 
 		return $buffer;
 	}

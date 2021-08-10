@@ -126,7 +126,6 @@ class WDGRESTAPI {
 		$this->add_include_route( 'poll-answer' );
 		$this->add_include_route( 'contract-model' );
 		$this->add_include_route( 'contract' );
-		$this->add_include_route( 'mail-template' );
 		$this->add_include_route( 'organization-user' );
 		$this->add_include_route( 'project-user' );
 		$this->add_include_route( 'project-organization' );
@@ -152,7 +151,6 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Adjustment::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ROI::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ROITax::register');
-		add_action( 'rest_api_init', 'WDGRESTAPI_Route_MailTemplate::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Email::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Bill::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_File::register');
