@@ -60,7 +60,7 @@ class WDGRESTAPI_Route_Subscription extends WDGRESTAPI_Route {
 				$subscription_item = new WDGRESTAPI_Entity_subscription( $subscription_id );
 				$loaded_data_temp = $subscription_item->get_loaded_data();
 				
-				if ( !empty( $loaded_data_temp ) && $this->is_data_for_current_client( $loaded_data_temp ) ) {
+				if ( !empty( $loaded_data_temp ) ) {
 					return $loaded_data_temp;
 					
 				} else {
