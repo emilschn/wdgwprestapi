@@ -78,10 +78,12 @@ class WDGRESTAPI_Route_Declaration extends WDGRESTAPI_Route {
 			$input_start_date = filter_input( INPUT_GET, 'start_date' );
 			$input_end_date = filter_input( INPUT_GET, 'end_date' );
 			$input_type = filter_input( INPUT_GET, 'type' );
+			$input_status = filter_input( INPUT_GET, 'status' );
 			$start_date = ( !empty( $input_start_date ) ) ? new DateTime( $input_start_date ) : FALSE;
 			$end_date = ( !empty( $input_end_date ) ) ? new DateTime( $input_end_date ) : FALSE;
 			$type = ( !empty( $input_type ) ) ? $input_type : FALSE;
-			return WDGRESTAPI_Entity_Declaration::list_get( $this->get_current_client_autorized_ids_string(), $start_date, $end_date, $type );
+			$status = ( !empty( $input_status ) ) ? $input_status : FALSE;
+			return WDGRESTAPI_Entity_Declaration::list_get( $this->get_current_client_autorized_ids_string(), $start_date, $end_date, $type, $status );
 
 		} catch ( Exception $e ) {
 			$this->log( "WDGRESTAPI_Route_Declaration::list_get", $e->getMessage() );
