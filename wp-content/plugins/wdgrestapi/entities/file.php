@@ -5,13 +5,13 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	
 	public static $file_entity_types = array( 'user', 'organization', 'project', 'project-draft', 'declaration', 'investment', 'investment-draft' );
 	
-	public static $file_types = array( 'kyc_id', 'kyc_home', 'kyc_rib', 'kyc_kbis', 'kyc_status', 'campaign_bill', 'project_certificate', 'project_estimated_budget', 'project_document', 'contract', 'amendment', 'picture-check', 'picture-contract', 'bill', 'business', 'mandate' );
+	public static $file_types = array( 'campaign_bill', 'project_certificate', 'project_estimated_budget', 'project_document', 'contract', 'amendment', 'picture-check', 'picture-contract', 'bill', 'business', 'mandate' );
 	
 	private $file_data;
 	private $file_to_move;
 
 	public function __construct( $id = FALSE ) {
-		parent::__construct( $id, WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
+		parent::__construct( $id, self::$entity_type, self::$db_properties );
 	}
 	
 	/**
@@ -104,7 +104,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	}
 
 	public function save() {
-		if ( in_array( $this->loaded_data->entity_type, WDGRESTAPI_Entity_File::$file_entity_types ) && in_array( $this->loaded_data->file_type, WDGRESTAPI_Entity_File::$file_types ) ) {
+		if ( in_array( $this->loaded_data->entity_type, self::$file_entity_types ) && in_array( $this->loaded_data->file_type, self::$file_types ) ) {
 			$path = $this->get_path();
 			$random_filename = $this->get_random_filename( $path, $this->loaded_data->file_extension );
 			if ( !empty( $this->file_to_move ) ) {
@@ -173,7 +173,7 @@ class WDGRESTAPI_Entity_File extends WDGRESTAPI_Entity {
 	
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_File::$entity_type, WDGRESTAPI_Entity_File::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
 	
 }
