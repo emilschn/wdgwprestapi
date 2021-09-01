@@ -4,6 +4,11 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 
 	public function __construct($id = FALSE) {
 		parent::__construct( $id, self::$entity_type, self::$db_properties );
+
+		if ( empty( $this->loaded_data->email_is_validated ) ) {
+			$this->loaded_data->email_is_validated = wp_generate_uuid4();
+			$this->save();
+		}
 	}
 
 	/**
@@ -510,7 +515,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'signup_date'			=> array( 'type' => 'date', 'other' => '' ),
 		'royalties_notifications'=> array( 'type' => 'varchar', 'other' => '' ),
 		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' ),
-		'language'				=> array( 'type' => 'varchar', 'other' => '' )
+		'language'				=> array( 'type' => 'varchar', 'other' => '' ),
+		'email_is_validated'	=> array( 'type' => 'varchar', 'other' => '' )
 	);
 
 	// Mise à jour de la bdd
