@@ -3,6 +3,31 @@ class WDGRESTAPI_Lib_Lemonway {
 	private static $_instance = null;
 	private static $_cache;
 
+	/**
+	0	Identity Card (both sides in one file)
+	1	Proof of address
+	2	Proof of Bank Information (IBAN or other)
+	3	Passport (European Community)
+	4	Passport (outside the European Community) 
+	5	Residence permit (both sides in one file)
+	7	Official company registration document (Kbis extract or equivalent)
+	11	Driving licence (both sides in one file)
+	12	Status
+	13	Selfie
+	21	SDD mandate
+	Espaces libres : 6, 8-10, 14-20
+	 */
+	private static $document_type_id = 0;
+	private static $document_type_proof_address = 1;
+	private static $document_type_iban = 2;
+	private static $document_type_passport_europe_community = 3;
+	private static $document_type_passport_out_europe = 4;
+	private static $document_type_residence_permit = 5;
+	private static $document_type_company_official_document = 7;
+	private static $document_type_driving_licence = 11;
+	private static $document_type_company_status = 12;
+	private static $document_type_selfie = 13;
+
 	private static $iban_type_virtual = 2;
 	private static $iban_status_disabled = 8;
 	private static $iban_status_rejected = 9;
@@ -215,6 +240,107 @@ class WDGRESTAPI_Lib_Lemonway {
 			$result = FALSE;
 		}
 		return $result;
+	}
+
+	/**
+	 * Envoi d'un justificatif de porte-monnaie
+	 * @param String $wallet_id
+	 * @param String $filename
+	 * @param String $lw_doc_id
+	 * @param String $bytearray
+	 * @return boolean or string
+	 */
+	public function wallet_upload_file( $wallet_id, $filename, $lw_document_id, $bytearray ) {
+		if ( !isset( $wallet_id ) ) {
+			return FALSE;
+		}
+
+		$param_list = array(
+			'wallet'	=> $wallet_id,
+			'fileName'	=> $filename,
+			'type'		=> $lw_document_id,
+			'buffer'	=> $bytearray
+		);
+
+		$result = $this->call('UploadFile', $param_list);
+		if ( !empty( $result ) ) {
+			if ( isset( $result->E ) ) {
+				$result = FALSE;
+			} else {
+				$result = $result;
+			}
+		} else {
+			$result = FALSE;
+		}
+		return $result;
+	}
+
+	/**
+	 * Récupère le type de doc LW à partir d'une chaine interne
+	 * Liste des chaines internes : 'id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving', 'kbis', 'status', 'capital-allocation', 'person2-doc1', 'person2-doc2', 'person3-doc1', 'person3-doc2'
+	 */
+	public static function get_lw_document_id_from_document_type ( $document_type, $index ) {
+		switch ( $document_type ) {
+			case 'id':
+				if ( $index == 1 ) {
+					return self::$document_type_id;
+				} else {
+					return 6; // Espace libre
+				}
+				break;
+			case 'passport':
+				if ( $index == 1 ) {
+					return self::$document_type_passport_europe_community;
+				} else {
+					return 8; // Espace libre
+				}
+				break;
+			case 'tax':
+			case 'welfare':
+			case 'family':
+			case 'birth':
+				if ( $index == 1 ) {
+					return 9; // Espace libre
+				} else {
+					return 10; // Espace libre
+				}
+				break;
+			case 'driving':
+				if ( $index == 1 ) {
+					return self::$document_type_driving_licence;
+				} else {
+					return 10; // Espace libre
+				}
+				break;
+			case 'kbis':
+				return self::$document_type_company_official_document;
+				break;
+			case 'status':
+				return self::$document_type_company_status;
+				break;
+			case 'capital-allocation':
+				return 14; // Espace libre
+				break;
+			case 'person2-doc1':
+				return 15; // Espace libre
+				break;
+			case 'person2-doc2':
+				return 16; // Espace libre
+				break;
+			case 'person3-doc1':
+				return 17; // Espace libre
+				break;
+			case 'person3-doc2':
+				return 18; // Espace libre
+				break;
+			case 'person4-doc1':
+				return 19; // Espace libre
+				break;
+			case 'person4-doc2':
+				return 20; // Espace libre
+				break;
+		}
+		return 20;
 	}
 
 /**

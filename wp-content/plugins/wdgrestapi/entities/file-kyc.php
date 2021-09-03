@@ -122,9 +122,14 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 
 			// TODO : optimiser le fichier
 
-			// TODO : envoyer à LW dans le bon slot
+			// TODO : WIP -- envoyer à LW dans le bon slot
 			$this->loaded_data->gateway = 'lemonway';
 			$this->loaded_data->gateway_id = 0;
+			/* $wdgrestapi = WDGRESTAPI::instance();
+			$wdgrestapi->add_include_lib( 'gateways/lemonway' );
+			$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, $this->loaded_data->doc_index );
+			$lw = WDGRESTAPI_Lib_Lemonway::instance();
+			$this->loaded_data->gateway_id = $lw->wallet_upload_file(  ); */
 
 			// Enregistrement des informations de base de données
 			$this->loaded_data->file_name = $random_filename;
