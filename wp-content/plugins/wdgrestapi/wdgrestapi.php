@@ -26,7 +26,7 @@ if ( !function_exists( 'is_admin' ) ) {
 }
 
 class WDGRESTAPI {
-	private $version = '0.0.830';
+	private $version = '0.0.831';
 
 	/**
 	 * Instanciation du singleton
@@ -85,6 +85,7 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'roi' );
 		$this->add_include_entity( 'roi-tax' );
 		$this->add_include_entity( 'file' );
+		$this->add_include_entity( 'file-kyc' );
 		$this->add_include_entity( 'poll-answer' );
 		$this->add_include_entity( 'contract-model' );
 		$this->add_include_entity( 'contract' );
@@ -121,6 +122,7 @@ class WDGRESTAPI {
 		$this->add_include_route( 'roi' );
 		$this->add_include_route( 'roi-tax' );
 		$this->add_include_route( 'file' );
+		$this->add_include_route( 'file-kyc' );
 		$this->add_include_route( 'poll-answer' );
 		$this->add_include_route( 'contract-model' );
 		$this->add_include_route( 'contract' );
@@ -150,6 +152,7 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Email::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Bill::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_File::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_FileKYC::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_ContractModel::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Contract::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_PollAnswer::register');
@@ -186,6 +189,7 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_ROI::upgrade_db();
 			WDGRESTAPI_Entity_ROITax::upgrade_db();
 			WDGRESTAPI_Entity_File::upgrade_db();
+			WDGRESTAPI_Entity_FileKYC::upgrade_db();
 			WDGRESTAPI_Entity_PollAnswer::upgrade_db();
 			WDGRESTAPI_Entity_ContractModel::upgrade_db();
 			WDGRESTAPI_Entity_Contract::upgrade_db();

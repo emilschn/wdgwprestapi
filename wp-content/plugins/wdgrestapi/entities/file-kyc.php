@@ -1,7 +1,7 @@
 <?php
 class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	
-	public static $entity_type = 'file-kyc';
+	public static $entity_type = 'file_kyc';
 	
 	public static $file_entity_types = array( 'user', 'organization' );
 	
@@ -108,7 +108,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 * Surcharge la fonction de sauvegarde pour renommer le fichier de la bonne façon
 	 */
 	public function save() {
-		if ( in_array( $this->loaded_data->entity_type, self::$file_entity_types ) && in_array( $this->loaded_data->doc_type, self::$document_types ) ) {
+		if ( in_array( $this->loaded_data->doc_type, self::$document_types ) ) {
 			// Si c'est une mise à jour, il faut supprimer l'existant
 			$this->try_remove_current_file();
 
@@ -121,6 +121,10 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$this->loaded_data->file_signature = md5( $this->file_data );
 
 			// TODO : optimiser le fichier
+
+			// TODO : envoyer à LW dans le bon slot
+			$this->loaded_data->gateway = 'lemonway';
+			$this->loaded_data->gateway_id = 0;
 
 			// Enregistrement des informations de base de données
 			$this->loaded_data->file_name = $random_filename;
@@ -172,7 +176,11 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 * Créer un nom de fichier aléatoire
 	 */
 	private function get_random_filename( $path, $ext ) {
-		$buffer = $this->loaded_data->id. '-';
+		if ( !empty( $this->loaded_data->user_id ) ) {
+			$buffer = $this->loaded_data->user_id. '-';
+		} else {
+			$buffer = $this->loaded_data->organization_id. '-';
+		}
 		
 		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		$size = strlen( $chars );
@@ -197,7 +205,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		'user_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
-		'organization_id'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'organization_id'		=> array( 'type' => 'id', 'other' => '' ),
 		'doc_type'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'doc_index'				=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'file_extension'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
@@ -205,6 +213,8 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		'file_signature'		=> array( 'type' => 'longtext', 'other' => '' ),
 		'update_date'			=> array( 'type' => 'datetime', 'other' => '' ),
 		'status'				=> array( 'type' => 'varchar', 'other' => '' ),
+		'gateway'				=> array( 'type' => 'varchar', 'other' => '' ),
+		'gateway_id'			=> array( 'type' => 'id', 'other' => '' ),
 		'metadata'				=> array( 'type' => 'longtext', 'other' => '' )
 	);
 	
