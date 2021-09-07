@@ -144,6 +144,17 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	}
 
 	/**
+	 * Retourne l'identifiant de wallet selon le gateway
+	 */
+	public function get_wallet_id( $gateway ) {
+		$gateway_list_decoded = json_decode( $this->loaded_data->gateway_list );
+		if ( $gateway == 'lemonway' && isset( $gateway_list_decoded->lemonway ) ) {
+			return $gateway_list_decoded->lemonway;
+		}
+		return FALSE;
+	}
+
+	/**
 	 * Retourne la liste de toutes les organisations
 	 * @return array
 	 */

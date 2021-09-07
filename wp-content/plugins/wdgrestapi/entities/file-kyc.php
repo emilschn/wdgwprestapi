@@ -120,24 +120,51 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			file_put_contents( $path . $random_filename, $this->file_data );
 			$this->loaded_data->file_signature = md5( $this->file_data );
 
-			// TODO : optimiser le fichier
-
-			// TODO : WIP -- envoyer à LW dans le bon slot
-			$this->loaded_data->gateway = 'lemonway';
-			$this->loaded_data->gateway_id = 0;
-			/* $wdgrestapi = WDGRESTAPI::instance();
-			$wdgrestapi->add_include_lib( 'gateways/lemonway' );
-			$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, $this->loaded_data->doc_index );
-			$lw = WDGRESTAPI_Lib_Lemonway::instance();
-			$this->loaded_data->gateway_id = $lw->wallet_upload_file(  ); */
-
 			// Enregistrement des informations de base de données
 			$this->loaded_data->file_name = $random_filename;
 			$this->loaded_data->status = 'uploaded';
+			$this->loaded_data->gateway = 'lemonway';
+			$this->loaded_data->gateway_id = 0;
 			parent::save();
+
+			// Ajout d'une tâche décalée d'envoi à LW
+			$new_queued_action = new WDGRESTAPI_Entity_QueuedAction();
+			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+			$new_queued_action->set_property( 'client_user_id', $current_client->ID );
+			$new_queued_action->set_property( 'priority', 'high' );
+			$new_queued_action->set_property( 'action', 'document_kyc_send_to_lemonway' );
+			$new_queued_action->set_property( 'entity_id', $this->loaded_data->id );
+			$new_queued_action->save();
 			
 		} else {
 			return FALSE;
+		}
+	}
+
+	/**
+	 * Envoie le fichier vers LW après l'avoir optimisé
+	 */
+	public function send_to_lw() {
+		// TODO : optimiser le fichier
+
+		// Envoi à LW dans le bon slot
+		$wdgrestapi = WDGRESTAPI::instance();
+		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
+		$lw = WDGRESTAPI_Lib_Lemonway::instance();
+		$this->loaded_data->gateway = 'lemonway';
+		$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, $this->loaded_data->doc_index );
+		$user = new WDGRESTAPI_Entity_User( $this->loaded_data->user_id );
+		$wallet_id = $user->get_wallet_id( 'gateway' );
+		if ( !empty( $wallet_id ) ) {
+			$this->loaded_data->gateway_id = $lw->wallet_upload_file( $wallet_id, $this->loaded_data->file_name, $lw_document_id, $this->file_data );
+		}
+
+		if ( !empty( $this->loaded_data->organization_id ) ) {
+			$organization = new WDGRESTAPI_Entity_Organization( $this->loaded_data->organization_id );
+			$wallet_id = $organization->get_wallet_id( 'gateway' );
+			if ( !empty( $wallet_id ) ) {
+				$this->loaded_data->gateway_id = $lw->wallet_upload_file( $wallet_id, $this->loaded_data->file_name, $lw_document_id, $this->file_data );
+			}
 		}
 	}
 
