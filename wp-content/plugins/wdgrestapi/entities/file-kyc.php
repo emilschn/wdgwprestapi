@@ -151,21 +151,29 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		$wdgrestapi = WDGRESTAPI::instance();
 		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
 		$lw = WDGRESTAPI_Lib_Lemonway::instance();
-		$this->loaded_data->gateway = 'lemonway';
 		$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, $this->loaded_data->doc_index );
-		$user = new WDGRESTAPI_Entity_User( $this->loaded_data->user_id );
-		$wallet_id = $user->get_wallet_id( 'gateway' );
-		if ( !empty( $wallet_id ) ) {
-			$this->loaded_data->gateway_id = $lw->wallet_upload_file( $wallet_id, $this->loaded_data->file_name, $lw_document_id, $this->file_data );
+		$lw_file_data = file_get_contents( $this->get_relative_path() . $this->loaded_data->file_name );
+
+		if ( !empty( $this->loaded_data->user_id ) ) {
+			$user = new WDGRESTAPI_Entity_User( $this->loaded_data->user_id );
+			$user_wallet_id = $user->get_wallet_id( 'lemonway' );
+			if ( !empty( $user_wallet_id ) ) {
+				$this->loaded_data->gateway_id = $lw->wallet_upload_file( $user_wallet_id, $this->loaded_data->file_name, $lw_document_id, $lw_file_data );
+			}
 		}
 
 		if ( !empty( $this->loaded_data->organization_id ) ) {
 			$organization = new WDGRESTAPI_Entity_Organization( $this->loaded_data->organization_id );
-			$wallet_id = $organization->get_wallet_id( 'gateway' );
-			if ( !empty( $wallet_id ) ) {
-				$this->loaded_data->gateway_id = $lw->wallet_upload_file( $wallet_id, $this->loaded_data->file_name, $lw_document_id, $this->file_data );
+			$organization_wallet_id = $organization->get_wallet_id( 'lemonway' );
+			if ( !empty( $organization_wallet_id ) ) {
+				$this->loaded_data->gateway_id = $lw->wallet_upload_file( $organization_wallet_id, $this->loaded_data->file_name, $lw_document_id, $lw_file_data );
 			}
 		}
+
+		parent::save();
+
+		// TODO : gérer les retours
+		return 'sent';
 	}
 
 	/**

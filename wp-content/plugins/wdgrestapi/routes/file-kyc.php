@@ -9,6 +9,12 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
+			'/file-kyc/(?P<id>\d+)/send-to-lemonway',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_send_to_lemonway')
+		);
+		
+		WDGRESTAPI_Route::register_wdg(
 			'/file-kyc',
 			WP_REST_Server::CREATABLE,
 			array( $this, 'single_create'),
@@ -56,6 +62,38 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_FileKYC::single_get", "404 : Invalid file kyc id (empty)" );
+			return new WP_Error( '404', "Invalid file kyc id (empty)" );
+		}
+	}
+
+	/**
+	 * Envoie un fichier spécifique à Lemonway
+	 * @param WP_REST_Request $request
+	 * @return \WP_Error
+	 */
+	public function single_send_to_lemonway( WP_REST_Request $request ) {
+		$file_kyc_id = $request->get_param( 'id' );
+		if ( !empty( $file_kyc_id ) ) {
+			try {
+				$file_kyc_item = new WDGRESTAPI_Entity_FileKYC( $file_kyc_id );
+				$send_result = $file_kyc_item->send_to_lw();
+				
+				if ( !empty( $send_result ) ) {
+					return $send_result;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_FileKYC::single_send_to_lemonway::" . $file_kyc_id, "404 : Invalid file kyc id" );
+					return new WP_Error( '404', "Invalid file kyc id" );
+					
+				}
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_FileKYC::single_send_to_lemonway::" . $file_kyc_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_FileKYC::single_send_to_lemonway", "404 : Invalid file kyc id (empty)" );
 			return new WP_Error( '404', "Invalid file kyc id (empty)" );
 		}
 	}

@@ -11,11 +11,12 @@ class WDGRESTAPI_Lib_Lemonway {
 	4	Passport (outside the European Community) 
 	5	Residence permit (both sides in one file)
 	7	Official company registration document (Kbis extract or equivalent)
+	8-10 N'existent pas !
 	11	Driving licence (both sides in one file)
 	12	Status
 	13	Selfie
 	21	SDD mandate
-	Espaces libres : 6, 8-10, 14-20
+	Espaces libres : 6, 14-20
 	 */
 	private static $document_type_id = 0;
 	private static $document_type_proof_address = 1;
@@ -98,7 +99,19 @@ class WDGRESTAPI_Lib_Lemonway {
 			$params = json_decode( json_encode( $params ), FALSE );
 		}
 
-		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_Lemonway::call > ' .$method_name. ' | ' .print_r( $params, true ) );
+		// Trace de la requete en supprimant des données trop lourds ou sensibles
+		$trace_params = $params;
+		if ( isset( $trace_params[ 'iban' ] ) ) {
+			$trace_params[ 'iban' ] = 'UNTRACKED';
+		}
+		if ( isset( $trace_params[ 'bic' ] ) ) {
+			$trace_params[ 'bic' ] = 'UNTRACKED';
+		}
+		if ( isset( $trace_params[ 'buffer' ] ) ) {
+			$trace_params[ 'buffer' ] = 'UNTRACKED';
+		}
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_Lemonway::call > ' .$method_name. ' | ' .print_r( $trace_params, true ) );
+
 		try {
 			$call_result = $this->soap_client->$method_name( $params );
 
@@ -267,7 +280,7 @@ class WDGRESTAPI_Lib_Lemonway {
 			if ( isset( $result->E ) ) {
 				$result = FALSE;
 			} else {
-				$result = $result;
+				$result = $result->UPLOAD->ID;
 			}
 		} else {
 			$result = FALSE;
@@ -285,14 +298,14 @@ class WDGRESTAPI_Lib_Lemonway {
 				if ( $index == 1 ) {
 					return self::$document_type_id;
 				} else {
-					return 6; // Espace libre
+					return self::$document_type_proof_address;
 				}
 				break;
 			case 'passport':
 				if ( $index == 1 ) {
 					return self::$document_type_passport_europe_community;
 				} else {
-					return 8; // Espace libre
+					return self::$document_type_passport_out_europe;
 				}
 				break;
 			case 'tax':
@@ -300,16 +313,16 @@ class WDGRESTAPI_Lib_Lemonway {
 			case 'family':
 			case 'birth':
 				if ( $index == 1 ) {
-					return 9; // Espace libre
+					return 6; // Espace libre
 				} else {
-					return 10; // Espace libre
+					return self::$document_type_selfie;
 				}
 				break;
 			case 'driving':
 				if ( $index == 1 ) {
 					return self::$document_type_driving_licence;
 				} else {
-					return 10; // Espace libre
+					return self::$document_type_selfie;
 				}
 				break;
 			case 'kbis':
