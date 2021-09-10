@@ -3,6 +3,12 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 	
 	public function __construct() {
 		WDGRESTAPI_Route::register_wdg(
+			'/files-kyc/',
+			WP_REST_Server::READABLE,
+			array( $this, 'list_get')
+		);
+
+		WDGRESTAPI_Route::register_wdg(
 			'/file-kyc/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get')
@@ -32,6 +38,22 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 	public static function register() {
 		$route_file_kyc = new WDGRESTAPI_Route_FileKYC();
 		return $route_file_kyc;
+	}
+
+	/**
+	 * Retourne une liste de fichiers en fonction de certains paramètres
+	 */
+	public function list_get( WP_REST_Request $request ) {
+		try {
+			$input_entity_type = filter_input( INPUT_GET, 'entity_type' );
+			$input_user_id = filter_input( INPUT_GET, 'user_id' );
+			$input_organization_id = filter_input( INPUT_GET, 'organization_id' );
+			return WDGRESTAPI_Entity_FileKYC::get_list( $input_entity_type, $input_user_id, $input_organization_id );
+
+		} catch ( Exception $e ) {
+			$this->log( "WDGRESTAPI_Route_FileKYC::list_get", $e->getMessage() );
+			return new WP_Error( 'cant-get', $e->getMessage() );
+		}
 	}
 	
 	/**
@@ -149,7 +171,8 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->set_posted_properties( $file_kyc_item, WDGRESTAPI_Entity_FileKYC::$db_properties );
 				$file_kyc_data = filter_input( INPUT_POST, 'data' );
-				$result = $file_kyc_item->save( $file_kyc_data );
+				$file_kyc_item->set_file_data( $file_kyc_data );
+				$result = $file_kyc_item->save();
 				if ( $result ) {
 					$reloaded_data = $file_kyc_item->get_loaded_data();
 					$this->log( "WDGRESTAPI_Route_FileKYC::single_edit::" . $file_kyc_id, json_encode( $reloaded_data ) );

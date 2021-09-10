@@ -56,33 +56,23 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	/**
 	 * Récupère la liste des documents relatifs à certains paramètres
 	 */
-	public static function get_list( $entity_type = '', $entity_id = '', $doc_type = '' ) {
+	public static function get_list( $entity_type, $user_id, $organization_id ) {
 		$buffer = array();
 		
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 		
 		$query = "SELECT f.id FROM " .$table_name. " f";
-		if ( !empty( $entity_type ) || !empty( $doc_type ) ) {
+		if ( !empty( $entity_type ) ) {
 			$query .= " WHERE ";
-			$query_where = "";
 			
 			if ( !empty( $entity_type ) ) {
 				if ( $entity_type === 'organization' ) {
-					$query_where = "f.organization_id=" .$entity_id;
+					$query = "f.organization_id=" .$organization_id;
 				} else {
-					$query_where = "f.user_id=" .$entity_id;
+					$query = "f.user_id=" .$user_id;
 				}
 			}
-			
-			if ( !empty( $doc_type ) ) {
-				if ( !empty( $query_where ) ) {
-					$query_where .= " AND ";
-				}
-				$query_where .= "f.doc_type='" .$doc_type. "'";
-			}
-			
-			$query .= $query_where;
 		}
 		
 		$loaded_data = $wpdb->get_results( $query );
@@ -109,21 +99,26 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 */
 	public function save() {
 		if ( in_array( $this->loaded_data->doc_type, self::$document_types ) ) {
-			// Si c'est une mise à jour, il faut supprimer l'existant
-			$this->try_remove_current_file();
+			// Si on passe en statut 'removed', il faut supprimer l'existant
+			if ( $this->loaded_data->status == 'removed' ) {
+				$this->try_remove_current_file();
+				$this->loaded_data->file_signature = '';
+			}
 
 			// Enregistrement du fichier à partir des données binaires
-			$current_datetime = new DateTime();
-			$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d H:i:s' );
-			$path = $this->make_path();
-			$random_filename = $this->get_random_filename( $path, $this->loaded_data->file_extension );
-			file_put_contents( $path . $random_filename, $this->file_data );
-			$this->loaded_data->file_signature = md5( $this->file_data );
+			if ( !empty( $this->file_data ) ) {
+				$path = $this->make_path();
+				$random_filename = $this->get_random_filename( $path, $this->loaded_data->file_extension );
+				file_put_contents( $path . $random_filename, $this->file_data );
+				$this->loaded_data->file_signature = md5( $this->file_data );
+				$this->loaded_data->status = 'uploaded';
+				$this->loaded_data->gateway = 'lemonway';
+				$this->loaded_data->file_name = $random_filename;
+			}
 
 			// Enregistrement des informations de base de données
-			$this->loaded_data->file_name = $random_filename;
-			$this->loaded_data->status = 'uploaded';
-			$this->loaded_data->gateway = 'lemonway';
+			$current_datetime = new DateTime();
+			$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d H:i:s' );
 			$this->loaded_data->gateway_id = 0;
 			parent::save();
 
