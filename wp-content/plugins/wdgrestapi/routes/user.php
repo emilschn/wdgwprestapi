@@ -255,26 +255,18 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 				$reloaded_data = $user_item->get_loaded_data();
 				$this->log( "WDGRESTAPI_Route_User::single_edit::" . $user_id, json_encode( $reloaded_data ) );
 
-				//TODO : on regarde si dans l'API on a un identifiant de wallet, si non, on le créé
+				// on regarde si dans l'API on a un identifiant de wallet, si non, on le créé
 				$gateway_list_decoded = json_decode( $loaded_data->gateway_list );
 				if ( !isset( $gateway_list_decoded->lemonway ) ) {
 					$lw = WDGRESTAPI_Lib_LemonwayWalletEditionHelper::instance();
-					// $db_lw_id = 'USERW'.$loaded_data->wpref;
-					$lw->wallet_register($user_item);
-					// if ( defined( 'YP_LW_USERID_PREFIX' ) ) {
-					// 	$db_lw_id = YP_LW_USERID_PREFIX . $db_lw_id;
-					// }
-					// return LemonwayLib::wallet_register($db_lw_id, $this->get_email(), $this->get_lemonway_title(), html_entity_decode( $this->get_firstname() ), html_entity_decode( $this->get_lastname() ), $this->get_country( 'iso3' ), $this->get_lemonway_phone_number(), $this->get_lemonway_birthdate(), $this->get_nationality( 'iso3' ), LemonwayLib::$wallet_type_payer);
-		
-
+					$wallet_registered = $lw->wallet_register($user_item);
 				} elseif ( $loaded_data->email !== $reloaded_data->email) {
-					//TODO : si le wallet était existant et qu'on change l'email de cet utilisateur, on met à jour le wallet pour définir le nouvel email
-					//LemonwayLib::wallet_update($WDGOrganization->get_lemonway_id(), '', '', '', '', '', '', '', '', get_permalink( $campaign_id ));
-				
+					// si le wallet était existant et qu'on change l'email de cet utilisateur, on met à jour le wallet pour définir le nouvel email
+					$lw = WDGRESTAPI_Lib_LemonwayWalletEditionHelper::instance();
+					$wallet_updated = $lw->wallet_update($user_item->get_wallet_id( 'lemonway' ), $reloaded_data->email , '', '', '', '', '', '', '');
 				}
-
-
-
+				// on recharge de nouveau pour avoir le bon gateway
+				$reloaded_data = $user_item->get_loaded_data();
 
 				return $reloaded_data;
 				
