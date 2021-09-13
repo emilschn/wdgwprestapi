@@ -57,6 +57,7 @@ class WDGRESTAPI {
 	public function add_include_libs() {
 		$this->add_include_lib( 'logs' );
 		$this->add_include_lib( 'geolocation' );
+		$this->add_include_lib( 'country_list' );
 		$this->add_include_lib( 'validator' );
 	}
 	public function add_include_lib($include_name) {

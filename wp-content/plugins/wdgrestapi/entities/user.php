@@ -336,6 +336,22 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	}
 
 	/**
+	 * Enregistre l'identifiant de wallet selon le gateway
+	 */
+	public function set_wallet_id( $gateway, $id) {
+		$gateway_list_decoded = json_decode( $this->loaded_data->gateway_list );
+		if ( empty( $gateway_list_decoded ) ) {
+			$gateway_list_decoded = array();
+		}
+		$gateway_list_decoded[ $gateway] = $id;
+		
+		parent::set_property( 'gateway_list', json_encode( $gateway_list_decoded ) );
+		$this->save();
+		return json_encode( $gateway_list_decoded );
+
+	}
+
+	/**
 	 * Récupération des données de royalties concernant un utilisateur
 	 * @return string
 	 */

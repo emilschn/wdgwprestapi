@@ -44,7 +44,6 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 	 * @param type $payer_or_beneficiary : Statut payer/beneficiary
 	 * @return type
 	 */
-	// public function wallet_register($new_wallet_id, $client_mail, $client_title, $client_first_name, $client_last_name, $country = '', $phone_number = '', $birthdate = '', $nationality = '', $payer_or_beneficiary = '') {
 	public function wallet_register($user_item) {
 		$loaded_data = $user_item->get_loaded_data();
 		if ( !$user_item->get_wallet_id() ){
@@ -52,7 +51,6 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 		} else {
 			$new_wallet_id = $this->format_lemonway_id($loaded_data->wpref);
 		}
-		
 		
 		$param_list = array(
 			'wallet'			=> $new_wallet_id,
@@ -72,7 +70,8 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 
 		if ($result !== FALSE) {
 			$result = $result->WALLET->LWID;
-			// TODO : mettre à jour le wallet_id pour l'utilisateur
+			// on met à jour le wallet_id pour l'utilisateur
+			$user_item->set_wallet_id('lemonway', $result );
 		}
 
 		return $result;
@@ -127,7 +126,6 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 		}
 
 		$result = $this->lw->call('UpdateWalletDetails', $param_list);
-		$this->remove_cached_data( $wallet_id );
 
 		return $result;
 	}
@@ -185,7 +183,6 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 		return $birthday_datetime->format( 'd/m/Y' );
 	}
 
-	// TODO : iso3
 	public function get_country($country ) {
 		$buffer = $country;
 		// if ( empty( $buffer ) || $buffer == '---' ) {
@@ -196,7 +193,6 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 			$buffer = substr( $buffer, 0, -1 );
 		}
 
-		// TODO : vérifier comment récupérer ces listes
 		// Le pays est saisi, il faut tenter de le convertir
 		global $country_list, $country_list_iso2_to_iso3, $country_translation;
 		// D'abord, on le met en majuscule
