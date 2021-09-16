@@ -94,10 +94,6 @@ class WDGRESTAPI_Lib_Lemonway {
 		foreach ( $params_override as $key => $value ) {
 			$params[ $key ] = $value;
 		}
-		
-		if ( !isset( $params[ 'buffer' ] ) ) {
-			$params = json_decode( json_encode( $params ), FALSE );
-		}
 
 		// Trace de la requete en supprimant des données trop lourds ou sensibles
 		$trace_params = $params;
@@ -111,6 +107,10 @@ class WDGRESTAPI_Lib_Lemonway {
 			$trace_params[ 'buffer' ] = 'UNTRACKED';
 		}
 		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_Lemonway::call > ' .$method_name. ' | ' .print_r( $trace_params, true ) );
+
+		if ( !isset( $params[ 'buffer' ] ) ) {
+			$params = json_decode( json_encode( $params ), FALSE );
+		}
 
 		try {
 			$call_result = $this->soap_client->$method_name( $params );
@@ -129,6 +129,7 @@ class WDGRESTAPI_Lib_Lemonway {
 
 		//Annalyse du résultat
 		if ( $this->has_errors( $result_obj ) ) {
+			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_Lemonway::call > ResultError > ' . $this->last_error['Code'] . ' : ' . $this->last_error['Msg'] );
 			return FALSE;
 
 		} else {

@@ -16,6 +16,8 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 	public static $wallet_type_beneficiary = '2';
 
 	public function __construct() {
+		$wdgrestapi = WDGRESTAPI::instance();
+		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
 		$this->lw = WDGRESTAPI_Lib_Lemonway::instance();		
 	}
 
@@ -32,22 +34,13 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 
 	/**
 	 * Création d'un porte-monnaie
-	 * @param type $new_wallet_id : Identifiant du porte-monnaie sur la plateforme
-	 * @param type $client_mail
-	 * @param type $client_title : Civilité (1 char)
-	 * @param type $client_first_name
-	 * @param type $client_last_name
-	 * @param type $country : Pays au format ISO-3
-	 * @param type $phone_number : Facultatif ; format MSISDN (code pays sans + ni 00)
-	 * @param type $birthdate : Format JJ/MM/AAAA
-	 * @param type $nationality : Pays au format ISO-3
-	 * @param type $payer_or_beneficiary : Statut payer/beneficiary
+	 * @param WDGRESTAPI_Entity_User $user_item : L'entité utilisateur concernée
 	 * @return type
 	 */
-	public function wallet_register($user_item) {
+	public function wallet_register(WDGRESTAPI_Entity_User $user_item) {
 		$loaded_data = $user_item->get_loaded_data();
-		if ( !$user_item->get_wallet_id() ){
-			$new_wallet_id = $user_item->get_wallet_id();
+		if ( $user_item->get_wallet_id( 'lemonway' ) ){
+			$new_wallet_id = $user_item->get_wallet_id( 'lemonway' );
 		} else {
 			$new_wallet_id = $this->format_lemonway_id($loaded_data->wpref);
 		}
@@ -101,7 +94,7 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 			$param_list['newEmail'] = $client_mail;
 		}
 		if ( !empty( $client_title ) ) {
-			$param_list['newTitle'] = $client_title;
+			$param_list['newTitle'] = $this->get_lemonway_title( $client_title );
 		}
 		if ( !empty( $client_first_name ) ) {
 			$param_list['newFirstName'] = $client_first_name;
@@ -110,16 +103,16 @@ class WDGRESTAPI_Lib_LemonwayWalletEditionHelper {
 			$param_list['newLastName'] = $client_last_name;
 		}
 		if ( !empty( $country ) ) {
-			$param_list['newCtry'] = $country;
+			$param_list['newCtry'] = $this->get_country( $country );
 		}
 		if ( !empty( $phone_number ) ) {
-			$param_list['newPhoneNumber'] = $phone_number;
+			$param_list['newPhoneNumber'] = $this->get_lemonway_phone_number( $phone_number );
 		}
 		if ( !empty( $birthdate ) ) {
-			$param_list['newBirthDate'] = $birthdate;
+			$param_list['newBirthDate'] = $this->get_lemonway_birthdate( $birthdate );
 		}
 		if ( !empty( $nationality ) ) {
-			$param_list['newNationality'] = $nationality;
+			$param_list['newNationality'] = $this->get_country( $nationality );
 		}
 		if ( !empty( $company_website ) ) {
 			$param_list['newCompanyWebsite'] = $company_website;
