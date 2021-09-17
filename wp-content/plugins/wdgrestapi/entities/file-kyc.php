@@ -68,9 +68,9 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			
 			if ( !empty( $entity_type ) ) {
 				if ( $entity_type === 'organization' ) {
-					$query = "f.organization_id=" .$organization_id;
+					$query .= "f.organization_id=" .$organization_id;
 				} else {
-					$query = "f.user_id=" .$user_id;
+					$query .= "f.user_id=" .$user_id;
 				}
 			}
 		}
