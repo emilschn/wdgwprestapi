@@ -14,6 +14,28 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	}
 	
 	/**
+	 * Retourne un élément FileKYC en fonction de son gateway_id
+	 * @param int $gateway_id
+	 * @return WDGRESTAPI_Entity_File
+	 */
+	public static function get_single_by_gateway_id( $gateway_id ) {
+		if ( empty( $gateway_id ) ) {
+			return FALSE;
+		}
+
+		$buffer = FALSE;
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = "SELECT id FROM " .$table_name. " WHERE gateway_id=" . $gateway_id . "' ORDER BY id desc";
+		$loaded_data = $wpdb->get_row( $query );
+		if ( !empty( $loaded_data->id ) ) {
+			$buffer = new WDGRESTAPI_Entity_FileKYC( $loaded_data->id );
+		}
+		
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne un élément FileKYC en fonction de ses paramètres
 	 * @param string $entity_type
 	 * @param int $entity_id
@@ -40,7 +62,6 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		
 		return $buffer;
 	}
-	
 	/**
 	 * Surcharge la fonction parente pour ajouter l'URL
 	 */
@@ -98,6 +119,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 * Surcharge la fonction de sauvegarde pour renommer le fichier de la bonne façon
 	 */
 	public function save() {
+		// à chaque modification sur le fichier kyc, on envoie les infos à LW
 		if ( in_array( $this->loaded_data->doc_type, self::$document_types ) ) {
 			// Si on passe en statut 'removed', il faut supprimer l'existant
 			if ( $this->loaded_data->status == 'removed' ) {

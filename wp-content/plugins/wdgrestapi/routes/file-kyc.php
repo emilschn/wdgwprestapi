@@ -15,6 +15,13 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
+			'/file-kyc/gateway_id/(?P<id>[a-z0-9]+)',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_by_gateway_id'),
+			array( 'token' => array( 'default' => 0 ) )
+		);
+
+		WDGRESTAPI_Route::register_wdg(
 			'/file-kyc/(?P<id>\d+)/send-to-lemonway',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_send_to_lemonway')
@@ -85,6 +92,39 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 		} else {
 			$this->log( "WDGRESTAPI_Route_FileKYC::single_get", "404 : Invalid file kyc id (empty)" );
 			return new WP_Error( '404', "Invalid file kyc id (empty)" );
+		}
+	}
+	
+	/**
+	 * Retourne un fichier KYC grâce à son gateway_id
+	 * @param WP_REST_Request $request
+	 * @return \WDGRESTAPI_Entity_FileKYC
+	 */
+	public function single_get_by_gateway_id( WP_REST_Request $request ) {
+		$gateway_id = $request->get_param( 'id' );
+		if ( !empty( $gateway_id ) ) {
+			try {
+				$file_kyc_item = WDGRESTAPI_Entity_FileKYC::get_single_by_gateway_id( $gateway_id );
+				$loaded_data = $file_kyc_item->get_loaded_data();
+				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$this->log( "WDGRESTAPI_Route_FileKYC::single_get_by_gateway_id::" . $gateway_id, json_encode( $loaded_data ) );
+					return $loaded_data;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_FileKYC::single_get_by_gateway_id::" . $gateway_id, "404 : Invalid file kyc gateway id" );
+					return new WP_Error( '404', "Invalid file kyc gateway id" );
+					
+				}
+			
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_FileKYC::single_get_by_gateway_id::" . $gateway_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_FileKYC::single_get_by_gateway_id", "404 : Invalid file kyc gateway id (empty)" );
+			return new WP_Error( '404', "Invalid file kyc gateway id (empty)" );
 		}
 	}
 
