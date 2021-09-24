@@ -144,6 +144,16 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	}
 
 	/**
+	 * Retourne la liste des abonnements liées à cet organisation
+	 * @return array
+	 */
+	public function get_subscription_by_subscriber_id() {
+		$buffer = WDGRESTAPI_Entity_Subscription::get_subscription_by_subscriber_id( $this->loaded_data->id, 'organization' );
+
+		return $buffer;
+	}
+	
+	/**
 	 * Retourne la liste de toutes les organisations
 	 * @return array
 	 */
