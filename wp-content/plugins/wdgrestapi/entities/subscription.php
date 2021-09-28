@@ -4,7 +4,7 @@ class WDGRESTAPI_Entity_Subscription extends WDGRESTAPI_Entity {
 	public static $entity_type = 'subscription';
 	
 	public function __construct( $id = FALSE ) {
-		parent::__construct( $id, WDGRESTAPI_Entity_Subscription::$entity_type, WDGRESTAPI_Entity_Subscription::$db_properties );
+		parent::__construct( $id, self::$entity_type, self::$db_properties );
 	}
 
 	/**
@@ -58,7 +58,7 @@ class WDGRESTAPI_Entity_Subscription extends WDGRESTAPI_Entity {
 	
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_Subscription::$entity_type, WDGRESTAPI_Entity_Subscription::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
 	
 }

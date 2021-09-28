@@ -127,7 +127,7 @@ class WDGRESTAPI_Route_Subscription extends WDGRESTAPI_Route {
 			$subscription_item = new WDGRESTAPI_Entity_subscription( $subscription_id );
 			$loaded_data = $subscription_item->get_loaded_data();
 			
-			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+			if ( !empty( $loaded_data ) ) {
 				$this->set_posted_properties( $subscription_item, WDGRESTAPI_Entity_subscription::$db_properties );
 				$subscription_item->save();
 				$reloaded_data = $subscription_item->get_loaded_data();
