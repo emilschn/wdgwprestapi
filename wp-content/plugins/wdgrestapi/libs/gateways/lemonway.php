@@ -20,14 +20,22 @@ class WDGRESTAPI_Lib_Lemonway {
 	 */
 	private static $document_type_id = 0;
 	private static $document_type_proof_address = 1;
-	private static $document_type_iban = 2;
+	private static $document_type_bank = 2;
 	private static $document_type_passport_europe_community = 3;
 	private static $document_type_passport_out_europe = 4;
 	private static $document_type_residence_permit = 5;
+	private static $document_type_second_id = 6;
 	private static $document_type_company_official_document = 7;
 	private static $document_type_driving_licence = 11;
 	private static $document_type_company_status = 12;
 	private static $document_type_selfie = 13;
+	private static $document_type_person2_doc1 = 14;
+	private static $document_type_person2_doc2 = 15;
+	private static $document_type_person3_doc1 = 16;
+	private static $document_type_person3_doc2 = 17;
+	private static $document_type_person4_doc1 = 18;
+	private static $document_type_person4_doc2 = 19;
+	private static $document_type_capital_allocation = 20;
 
 	private static $iban_type_virtual = 2;
 	private static $iban_status_disabled = 8;
@@ -291,7 +299,7 @@ class WDGRESTAPI_Lib_Lemonway {
 
 	/**
 	 * Récupère le type de doc LW à partir d'une chaine interne
-	 * Liste des chaines internes : 'id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving', 'kbis', 'status', 'capital-allocation', 'person2-doc1', 'person2-doc2', 'person3-doc1', 'person3-doc2'
+	 * Liste des chaines internes : 'id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving', 'kbis', 'status', 'capital-allocation', 'person2-doc1', 'person2-doc2', 'person3-doc1', 'person3-doc2', 'person4-doc1', 'person4-doc2', 'bank'
 	 */
 	public static function get_lw_document_id_from_document_type ( $document_type, $index ) {
 		switch ( $document_type ) {
@@ -314,7 +322,7 @@ class WDGRESTAPI_Lib_Lemonway {
 			case 'family':
 			case 'birth':
 				if ( $index == 1 ) {
-					return 6; // Espace libre
+					return self::$document_type_second_id;
 				} else {
 					return self::$document_type_selfie;
 				}
@@ -332,27 +340,31 @@ class WDGRESTAPI_Lib_Lemonway {
 			case 'status':
 				return self::$document_type_company_status;
 				break;
-			case 'capital-allocation':
-				return 14; // Espace libre
-				break;
 			case 'person2-doc1':
-				return 15; // Espace libre
+				return self::$document_type_person2_doc1;
 				break;
 			case 'person2-doc2':
-				return 16; // Espace libre
+				return self::$document_type_person2_doc2;
 				break;
 			case 'person3-doc1':
-				return 17; // Espace libre
+				return self::$document_type_person3_doc1;
 				break;
 			case 'person3-doc2':
-				return 18; // Espace libre
+				return self::$document_type_person3_doc2;
 				break;
 			case 'person4-doc1':
-				return 19; // Espace libre
+				return self::$document_type_person4_doc1;
 				break;
 			case 'person4-doc2':
-				return 20; // Espace libre
+				return self::$document_type_person4_doc2;
 				break;
+			case 'capital-allocation':
+				return self::$document_type_capital_allocation;
+				break;
+			case 'bank':
+				return self::$document_type_bank;
+				break;
+
 		}
 		return 20;
 	}

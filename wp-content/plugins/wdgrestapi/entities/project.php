@@ -281,11 +281,6 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$item->organization_quickbooks_id = 'TODO';
 		$item->organization_iban = $project_organization_data->iban;
 		$item->organization_bic = $project_organization_data->bic;
-		$item->organization_document_kbis = 'TODO';
-		$item->organization_document_rib = 'TODO';
-		$item->organization_document_status = 'TODO';
-		$item->organization_document_id = 'TODO';
-		$item->organization_document_home = 'TODO';
 		
 		return $item;
 	}
