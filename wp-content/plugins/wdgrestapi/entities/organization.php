@@ -147,8 +147,8 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 	 * Retourne la liste des abonnements liées à cet organisation
 	 * @return array
 	 */
-	public function get_subscription_by_subscriber_id() {
-		$buffer = WDGRESTAPI_Entity_Subscription::get_subscription_by_subscriber_id( $this->loaded_data->id, 'organization' );
+	public function get_subscriptions_by_subscriber_id() {
+		$buffer = WDGRESTAPI_Entity_Subscription::get_subscriptions_by_subscriber_id( $this->loaded_data->id, 'organization' );
 
 		return $buffer;
 	}
@@ -194,6 +194,8 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 			$item_loaded_data = $mandate_file->get_loaded_data();
 			$item->mandate_file_url = $item_loaded_data->url;
 		}
+
+		$item->subscriptions = WDGRESTAPI_Entity_Subscription::get_subscriptions_by_subscriber_id( $item->id, 'organization' );
 
 		return $item;
 	}

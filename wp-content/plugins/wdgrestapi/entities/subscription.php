@@ -12,12 +12,12 @@ class WDGRESTAPI_Entity_Subscription extends WDGRESTAPI_Entity {
 	 * @param int $id_subscriber
 	 * @return array
 	 */
-	public static function get_subscription_by_subscriber_id($id_subscriber, $type_subscriber) {
+	public static function get_subscriptions_by_subscriber_id($id_subscriber, $type_subscriber) {
 		$buffer = array();
 
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
-		$query = 'SELECT id_subsription, type FROM ' . $table_name. ' WHERE id_subscriber = ' . $id_subscriber. ' AND type_subscriber = \''. $type_subscriber . '\'';
+		$query = 'SELECT id, status, id_project, amount_type, amount, payment_method, modality, start_date FROM ' . $table_name. ' WHERE id_subscriber = ' . $id_subscriber. ' AND type_subscriber = \''. $type_subscriber . '\'';
 		$buffer = $wpdb->get_results( $query );
 		
 		return $buffer;

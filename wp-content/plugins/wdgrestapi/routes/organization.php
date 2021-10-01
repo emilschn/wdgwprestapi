@@ -272,7 +272,7 @@ class WDGRESTAPI_Route_Organization extends WDGRESTAPI_Route {
 				$loaded_data = $organization_item->get_loaded_data();
 
 				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
-					$loaded_data = $organization_item->get_subscription_by_subscriber_id();
+					$loaded_data = $organization_item->get_subscriptions_by_subscriber_id();
 
 					return $loaded_data;
 				} else {

@@ -91,6 +91,9 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 					));
 			}
 			$buffer->organizations = $organization_list;
+
+			// Récupération des abonnements liés
+			$buffer->subscriptions = WDGRESTAPI_Entity_Subscription::get_subscriptions_by_subscriber_id( $this->loaded_data->id, 'user' );
 		}
 
 		return $buffer;
@@ -328,8 +331,8 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	/**
 	 * Retourne la liste des investissement liées à cet utilisateur
 	 */
-	public function get_subscription_by_subscriber_id() {
-		$buffer = WDGRESTAPI_Entity_Subscription::get_subscription_by_subscriber_id( $this->loaded_data->id, 'user' );
+	public function get_subscriptions_by_subscriber_id() {
+		$buffer = WDGRESTAPI_Entity_Subscription::get_subscriptions_by_subscriber_id( $this->loaded_data->id, 'user' );
 
 		return $buffer;
 	}
