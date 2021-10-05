@@ -40,7 +40,8 @@ class WDGRESTAPI_Route_Subscription extends WDGRESTAPI_Route {
 	 */
 	public function list_get() {
 		try {
-			return WDGRESTAPI_Entity_Subscription::get_active_subscriptions( $this->get_current_client_autorized_ids_string() );
+			$status = filter_input( INPUT_GET, 'status' );
+			return WDGRESTAPI_Entity_Subscription::get_subscriptions( $status );
 		} catch ( Exception $e ) {
 			$this->log( "WDGRESTAPI_Route_Subscription::list_get", $e->getMessage() );
 
