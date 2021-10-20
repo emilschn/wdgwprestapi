@@ -416,32 +416,32 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
  ******************************************************************************/
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
-		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
+		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'wpref'					=> array( 'type' => 'id', 'other' => '' ),
 		'token'					=> array( 'type' => 'uid', 'other' => 'NOT NULL' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
 		
-		'user_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 3 ),
+		'user_id'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'user_wpref'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'email'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'gender'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'firstname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'lastname'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
-		'nationality'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 11 ),
+		'nationality'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'birthday_day'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_month'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_year'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'birthday_city'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'age'					=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 8 ),
+		'age'					=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		
 		'address'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 9 ),
+		'postalcode'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'city'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 10 ),
+		'country'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'phone_number'			=> array( 'type' => 'varchar', 'other' => '' ),
 		
-		'is_legal_entity'			=> array( 'type' => 'bool', 'other' => 'NOT NULL', 'gs_col_index' => 4 ),
+		'is_legal_entity'			=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		'legal_entity_form'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'legal_entity_id'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'legal_entity_rcs'			=> array( 'type' => 'varchar', 'other' => '' ),
@@ -451,15 +451,16 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'legal_entity_city'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'legal_entity_nationality'	=> array( 'type' => 'varchar', 'other' => '' ),
 		
-		'project'				=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
-		'amount'				=> array( 'type' => 'int', 'other' => 'NOT NULL', 'gs_col_index' => 6 ),
+		'project'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'id_subscription'		=> array( 'type' => 'id', 'other' => '' ),
+		'amount'				=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'cents_with_royalties'	=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'redirect_url_ok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'redirect_url_nok'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'notification_url'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'contract_url'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
-		'invest_datetime'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL', 'gs_col_index' => 5 ),
+		'invest_datetime'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
 		'is_preinvestment'		=> array( 'type' => 'bool', 'other' => 'NOT NULL' ),
 		
 		'mean_payment'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
@@ -471,7 +472,7 @@ class WDGRESTAPI_Entity_Investment extends WDGRESTAPI_Entity {
 		'signature_key'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'signature_status'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		
-		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 7 ),
+		'status'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'token_expiration'		=> array( 'type' => 'datetime', 'other' => 'NOT NULL' )
 	);
 	
