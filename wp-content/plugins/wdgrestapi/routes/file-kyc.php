@@ -54,7 +54,7 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 		try {
 			$input_entity_type = filter_input( INPUT_GET, 'entity_type' );
 			$input_user_id = filter_input( INPUT_GET, 'user_id' );
-			$input_organization_id = filter_input( INPUT_GET, 'organization_id' );
+			$input_organization_id = filter_input( INPUT_GET, 'organization_id' );			
 			return WDGRESTAPI_Entity_FileKYC::get_list( $input_entity_type, $input_user_id, $input_organization_id );
 
 		} catch ( Exception $e ) {
@@ -211,7 +211,9 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->set_posted_properties( $file_kyc_item, WDGRESTAPI_Entity_FileKYC::$db_properties );
 				$file_kyc_data = filter_input( INPUT_POST, 'data' );
-				$file_kyc_item->set_file_data( $file_kyc_data );
+				if ( isset($file_kyc_data) ){
+					$file_kyc_item->set_file_data( $file_kyc_data );
+				}			
 				$result = $file_kyc_item->save();
 				if ( $result ) {
 					$reloaded_data = $file_kyc_item->get_loaded_data();

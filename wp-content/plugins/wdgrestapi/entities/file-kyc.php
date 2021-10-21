@@ -90,9 +90,9 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$query .= " WHERE ";
 			
 			if ( !empty( $entity_type ) ) {
-				if ( $entity_type === 'organization' ) {
+				if ( $entity_type === 'organization' && !empty( $organization_id ) ) {
 					$query .= "f.organization_id=" .$organization_id;
-				} else {
+				} else if ( !empty( $user_id ) ){
 					$query .= "f.user_id=" .$user_id;
 				}
 			}
@@ -142,17 +142,22 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				$this->loaded_data->gateway = 'lemonway';
 				$this->loaded_data->file_name = $random_filename;
 
-				if ( intval( filesize( home_url( '/wp-content/plugins/wdgrestapi/' .$this->get_path(). '/' .$this->loaded_data->file_name ) ) < 10 )  ){
+
+				$file_size = strlen( base64_decode( $this->file_data ) );
+				if ( $file_size < 10 ) {
+					WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save error UPLOAD');
 					return 'UPLOAD';
 				}
-				if ( ( filesize( home_url( '/wp-content/plugins/wdgrestapi/' .$this->get_path(). '/' .$this->loaded_data->file_name ) ) / 1024) / 1024 > 6  ){
+				if ( ( $file_size / 1024) / 1024 > 6 ) {
+					WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save error SIZE');
 					return 'SIZE';
 				}
+				// on ne met à jour l'update_date que si on modifie le fichier (pour le trouver dans le bon dossier)
+				$current_datetime = new DateTime();
+				$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d H:i:s' );
 			}
 
 			// Enregistrement des informations de base de données
-			$current_datetime = new DateTime();
-			$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d H:i:s' );
 			$this->loaded_data->gateway_user_id = 0;
 			$this->loaded_data->gateway_organization_id = 0;
 			parent::save();
@@ -167,6 +172,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$new_queued_action->save();
 			
 		} else {
+			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save FALSE');
 			return FALSE;
 		}
 	}
