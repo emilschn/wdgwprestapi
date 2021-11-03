@@ -211,7 +211,7 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->set_posted_properties( $file_kyc_item, WDGRESTAPI_Entity_FileKYC::$db_properties );
 				$file_kyc_data = filter_input( INPUT_POST, 'data' );
-				if ( isset($file_kyc_data) ){
+				if ( !empty($file_kyc_data) ){
 					$file_kyc_item->set_file_data( $file_kyc_data );
 				}			
 				$result = $file_kyc_item->save();
