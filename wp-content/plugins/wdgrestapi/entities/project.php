@@ -281,11 +281,6 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$item->organization_quickbooks_id = 'TODO';
 		$item->organization_iban = $project_organization_data->iban;
 		$item->organization_bic = $project_organization_data->bic;
-		$item->organization_document_kbis = 'TODO';
-		$item->organization_document_rib = 'TODO';
-		$item->organization_document_status = 'TODO';
-		$item->organization_document_id = 'TODO';
-		$item->organization_document_home = 'TODO';
 		
 		return $item;
 	}
@@ -531,7 +526,7 @@ WHERE status=\''. self::$status_vote .'\' OR status=\''. self::$status_collecte 
 		'goal_maximum'			=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'yield_for_investors'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'maximum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
-		'maximum_profit_precision'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'maximum_profit_precision'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'minimum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'contract_start_date'	=> array( 'type' => 'date', 'other' => '' ),
 		'contract_start_date_is_undefined'	=> array( 'type' => 'bool', 'other' => '' ),

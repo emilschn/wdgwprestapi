@@ -254,12 +254,30 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		if ( !empty( $user_id ) ) {
 			$user_item = new WDGRESTAPI_Entity_User( $user_id );
 			$loaded_data = $user_item->get_loaded_data();
-			
+			$cloned_data = clone $loaded_data;
+
 			if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 				$this->set_posted_properties( $user_item, WDGRESTAPI_Entity_User::$db_properties );
 				$user_item->save();
 				$reloaded_data = $user_item->get_loaded_data();
 				$this->log( "WDGRESTAPI_Route_User::single_edit::" . $user_id, json_encode( $reloaded_data ) );
+
+				// on regarde si dans l'API on a un identifiant de wallet, si non, on le créé
+				$gateway_list_decoded = json_decode( $loaded_data->gateway_list );
+				$wdgrestapi = WDGRESTAPI::instance();
+				$wdgrestapi->add_include_lib( 'gateways/lemonwayWalletEditionHelper' );
+				if ( empty($gateway_list_decoded) || !isset( $gateway_list_decoded->lemonway ) ) {
+					$lw = WDGRESTAPI_Lib_LemonwayWalletEditionHelper::instance();
+					$wallet_registered = $lw->wallet_register($user_item);
+				} elseif ( $cloned_data->email !== $reloaded_data->email || $cloned_data->gender !== $reloaded_data->gender || $cloned_data->name !== $reloaded_data->name || $cloned_data->surname !== $reloaded_data->surname || $cloned_data->country !== $reloaded_data->country || $cloned_data->phone_number !== $reloaded_data->phone_number || $cloned_data->birthday_date !== $reloaded_data->birthday_date || $cloned_data->nationality !== $reloaded_data->nationality || $cloned_data->company_website !== $reloaded_data->company_website) {
+					// si le wallet était existant et qu'on change l'email de cet utilisateur, ou son genre, ou sa date de naissance, ou sa nationalité...
+					// on met à jour le wallet
+					$lw = WDGRESTAPI_Lib_LemonwayWalletEditionHelper::instance();
+					$wallet_updated = $lw->wallet_update($user_item->get_wallet_id( 'lemonway' ), $reloaded_data->email, $reloaded_data->gender, $reloaded_data->name, $reloaded_data->surname, $reloaded_data->country, $reloaded_data->phone_number, $reloaded_data->birthday_date, $reloaded_data->nationality, $reloaded_data->company_website);
+				}
+				// on recharge de nouveau pour avoir le bon gateway
+				$reloaded_data = $user_item->get_loaded_data();
+
 				return $reloaded_data;
 				
 			} else {

@@ -329,6 +329,32 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	}
 
 	/**
+	 * Retourne l'identifiant de wallet selon le gateway
+	 */
+	public function get_wallet_id( $gateway ) {
+		$gateway_list_decoded = json_decode( $this->loaded_data->gateway_list );
+		if ( $gateway == 'lemonway' && isset( $gateway_list_decoded->lemonway ) ) {
+			return $gateway_list_decoded->lemonway;
+		}
+		return FALSE;
+	}
+
+	/**
+	 * Enregistre l'identifiant de wallet selon le gateway
+	 */
+	public function set_wallet_id( $gateway, $id) {
+		$gateway_list_decoded = json_decode( $this->loaded_data->gateway_list );
+		if ( empty( $gateway_list_decoded ) ) {
+			$gateway_list_decoded = array();
+		}
+		$gateway_list_decoded[ $gateway] = $id;
+		
+		parent::set_property( 'gateway_list', json_encode( $gateway_list_decoded ) );
+		$this->save();
+		return json_encode( $gateway_list_decoded );
+	}
+
+	/**
 	 * Retourne la liste des investissement liées à cet utilisateur
 	 */
 	public function get_subscriptions_by_subscriber_id() {
