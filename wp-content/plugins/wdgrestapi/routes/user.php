@@ -69,6 +69,12 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			array( $this, 'single_get_activities'),
 			array( 'token' => array( 'default' => 0 ) )
 		);
+
+		WDGRESTAPI_Route::register_wdg(
+			'/user/(?P<id>\d+)/subscriptions', 
+			WP_REST_Server::READABLE, 
+			array( $this, 'single_get_subscriptions'), 
+			array( 'token' => array( 'default' => 0 ) ));
 		
 		WDGRESTAPI_Route::register_wdg(
 			'/user/(?P<id>\d+)/virtual-iban',
@@ -521,6 +527,42 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_User::single_get_virtual_iban", "404 : Invalid user ID (empty)" );
+			return new WP_Error( '404', "Invalid user ID (empty)" );
+		}
+	}
+
+	/**
+	 * Retourne les abonnements liées à un utilisateur (par l'ID de l'utilisateur)
+	 * @param WP_REST_Request $request
+	 * @return object
+	 */
+	public function single_get_subscriptions( WP_REST_Request $request ) {
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
+		if ( !empty( $user_id ) ) {
+			try {
+				$user_item = new WDGRESTAPI_Entity_User( $user_id );
+				$loaded_data = $user_item->get_loaded_data();
+				
+				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
+					$loaded_data = $user_item->get_subscriptions_by_subscriber_id();
+
+					return $loaded_data;
+				} else {
+					$this->log( "WDGRESTAPI_Route_User::single_get_subscriptions::" . $user_id, "404 : Invalid user ID" );
+
+					return new WP_Error( '404', "Invalid user ID" );
+				}
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get_subscriptions::" . $user_id, $e->getMessage() );
+
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+		} else {
+			$this->log( "WDGRESTAPI_Route_User::single_get_subscriptions", "404 : Invalid user ID (empty)" );
+
 			return new WP_Error( '404', "Invalid user ID (empty)" );
 		}
 	}
