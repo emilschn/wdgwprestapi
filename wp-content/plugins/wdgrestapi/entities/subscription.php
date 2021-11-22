@@ -20,7 +20,7 @@ class WDGRESTAPI_Entity_Subscription extends WDGRESTAPI_Entity {
 			$buffer = $wpdb->get_results( $query );
 			return $buffer;
 		} else {
-			return '';
+			return [];
 		}
 	}
 
