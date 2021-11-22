@@ -189,12 +189,12 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 
 	public static function expand_data($item) {
 		$item->mandate_file_url = '';
-		$mandate_file = WDGRESTAPI_Entity_File::get_single( self::$entity_type, self::$loaded_data->id, 'mandate' );
+		$mandate_file = WDGRESTAPI_Entity_File::get_single( self::$entity_type, $item->id, 'mandate' );
 		if ( !empty( $mandate_file ) ) {
 			$item_loaded_data = $mandate_file->get_loaded_data();
 			$item->mandate_file_url = $item_loaded_data->url;
 		}
-		$item->subscriptions = WDGRESTAPI_Entity_Subscription::get_subscriptions_by_subscriber_id( self::$loaded_data->id, 'organization' );
+		$item->subscriptions = WDGRESTAPI_Entity_Subscription::get_subscriptions_by_subscriber_id( $item->id, 'organization' );
 
 		return $item;
 	}
