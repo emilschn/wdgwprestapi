@@ -73,16 +73,17 @@ class WDGRESTAPI_Entity_Adjustment extends WDGRESTAPI_Entity {
  ******************************************************************************/
 	public static $db_properties = array(
 		'unique_key'			=> 'id',
-		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT', 'gs_col_index' => 1 ),
+		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'client_user_id'		=> array( 'type' => 'id', 'other' => 'DEFAULT 1 NOT NULL' ),
-		'id_project'			=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
-		'id_declaration'		=> array( 'type' => 'id', 'other' => 'NOT NULL', 'gs_col_index' => 2 ),
-		'date_created'			=> array( 'type' => 'datetime', 'other' => 'NOT NULL', 'gs_col_index' => 3 ),
-		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL', 'gs_col_index' => 4 ),
-		'turnover_difference'	=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 5 ),
-		'amount'				=> array( 'type' => 'float', 'other' => 'NOT NULL', 'gs_col_index' => 6 ),
-		'message_organization'	=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 7 ),
-		'message_investors'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL', 'gs_col_index' => 8 )
+		'id_project'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'id_declaration'		=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
+		'date_created'			=> array( 'type' => 'datetime', 'other' => 'NOT NULL' ),
+		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'turnover_checked'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'turnover_difference'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'amount'				=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
+		'message_organization'	=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
+		'message_investors'		=> array( 'type' => 'longtext', 'other' => 'NOT NULL' )
 	);
 	
 	// Mise à jour de la bdd
