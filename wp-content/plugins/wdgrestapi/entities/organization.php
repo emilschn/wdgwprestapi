@@ -205,7 +205,6 @@ class WDGRESTAPI_Entity_Organization extends WDGRESTAPI_Entity {
 			$item_loaded_data = $mandate_file->get_loaded_data();
 			$item->mandate_file_url = $item_loaded_data->url;
 		}
-
 		$item->subscriptions = WDGRESTAPI_Entity_Subscription::get_subscriptions_by_subscriber_id( $item->id, 'organization' );
 
 		return $item;
