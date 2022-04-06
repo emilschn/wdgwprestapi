@@ -88,6 +88,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		$query = "SELECT f.id FROM " .$table_name. " f";
 		if ( !empty( $entity_type ) ) {
 			$query .= " WHERE ";
+			$query .= " f.status = 'uploaded' AND ";
 			
 			if ( !empty( $entity_type ) ) {
 				if ( $entity_type === 'organization' && !empty( $organization_id ) ) {
@@ -143,7 +144,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				$this->loaded_data->file_name = $random_filename;
 
 
-				$file_size = strlen( base64_decode( $this->file_data ) );
+				$file_size = strlen( $this->file_data );
 				if ( $file_size < 10 ) {
 					WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save error UPLOAD');
 					return 'UPLOAD';
