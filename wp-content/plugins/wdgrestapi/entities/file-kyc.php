@@ -182,9 +182,12 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 * Envoie le fichier vers LW après l'avoir optimisé
 	 */
 	public function send_to_lw() {
-		// TODO : optimiser le fichier
+		if ( $this->loaded_data->status != 'uploaded' ) {
+			return FALSE;
+		}
 
-		// TODO : enrgistrer en base si le wallet est authentifié ou pas ?
+		// TODO : optimiser le fichier
+		// TODO : enregistrer en base si le wallet est authentifié ou pas ?
 		// TODO : gérer les retours (erreurs)
 		$buffer = 'sent';
 		// Envoi à LW dans le bon slots
@@ -203,7 +206,6 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			} else {
 				$buffer = 'already_authentified';
 			}
-
 		}
 
 		if ( !empty( $this->loaded_data->organization_id ) ) {
@@ -211,7 +213,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$organization_wallet_id = $organization->get_wallet_id( 'lemonway' );
 			if ( !empty( $organization_wallet_id ) && ( $this->loaded_data->doc_type == 'bank' || $lw->get_wallet_details( $organization_wallet_id )->STATUS != 6 )  ) {
 				$this->loaded_data->gateway_organization_id = $lw->wallet_upload_file( $organization_wallet_id, $this->loaded_data->file_name, $lw_document_id, $lw_file_data );
-			}else {
+			} else {
 				$buffer = 'already_authentified';
 			}
 		}
