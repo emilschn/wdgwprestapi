@@ -83,6 +83,13 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			array( 'token' => array( 'default' => 0 ) )
 		);
 		
+		WDGRESTAPI_Route::register_wdg(
+			'/user/(?P<id>\d+)/conformity',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_conformity'),
+			array( 'token' => array( 'default' => 0 ) )
+		);
+		
 		WDGRESTAPI_Route::register_external(
 			'/user/(?P<email>[a-zA-Z0-9\-\@\.]+)',
 			WP_REST_Server::EDITABLE,
@@ -527,6 +534,37 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 			
 		} else {
 			$this->log( "WDGRESTAPI_Route_User::single_get_virtual_iban", "404 : Invalid user ID (empty)" );
+			return new WP_Error( '404', "Invalid user ID (empty)" );
+		}
+	}
+
+	public function single_get_conformity( WP_REST_Request $request ) {
+		$user_id = FALSE;
+		if ( !empty( $request ) ) {
+			$user_id = $request->get_param( 'id' );
+		}
+		if ( !empty( $user_id ) ) {
+			try {
+				$user_conformity_item = WDGRESTAPI_Entity_UserConformity::get_by_user_id( $user_id );
+				$loaded_data = $user_conformity_item->get_loaded_data();
+				WDGRESTAPI_Lib_Logs::log( "WDGRESTAPI_Route_User::single_get_conformity " . $user_id . " >> ". json_encode( $loaded_data ) );
+				
+				if ( !empty( $loaded_data ) ) {
+					return $user_conformity_item;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_User::single_get_conformity::" . $user_id, "404 : Invalid user ID" );
+					return new WP_Error( '404', "Invalid user ID" );
+					
+				}
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_User::single_get_conformity::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_User::single_get_conformity", "404 : Invalid user ID (empty)" );
 			return new WP_Error( '404', "Invalid user ID (empty)" );
 		}
 	}
