@@ -550,7 +550,7 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 				WDGRESTAPI_Lib_Logs::log( "WDGRESTAPI_Route_User::single_get_conformity " . $user_id . " >> ". json_encode( $loaded_data ) );
 				
 				if ( !empty( $loaded_data ) ) {
-					return $user_conformity_item;
+					return $loaded_data;
 					
 				} else {
 					$this->log( "WDGRESTAPI_Route_User::single_get_conformity::" . $user_id, "404 : Invalid user ID" );

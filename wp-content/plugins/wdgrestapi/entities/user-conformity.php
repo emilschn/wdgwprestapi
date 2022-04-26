@@ -21,6 +21,17 @@ class WDGRESTAPI_Entity_UserConformity extends WDGRESTAPI_Entity {
 		if ( empty( $user_id ) ) {
 			return FALSE;
 		}
+		
+		global $wpdb;
+		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+		$query = "SELECT id FROM " .$table_name. " WHERE user_id = " .$user_id. " LIMIT 1";
+		$results = $wpdb->get_results( $query );
+
+		$buffer = FALSE;
+		if ( !empty( $results ) && !empty( $results[0] ) && !empty( $results[0]->id ) ) {
+			$buffer = new WDGRESTAPI_Entity_UserConformity( $results[0]->id );
+		}
+		return $buffer;
 	}
 
 	/*******************************************************************************

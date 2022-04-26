@@ -34,7 +34,6 @@ class WDGRESTAPI_Route_UserConformity extends WDGRESTAPI_Route {
 
 		$reloaded_data = $user_conformity_item->get_loaded_data();
 		$this->log( "WDGRESTAPI_Route_UserConformity::single_create", json_encode( $reloaded_data ) );
-		WDGRESTAPI_Lib_Logs::log( "WDGRESTAPI_Route_UserConformity::single_create " . json_encode( $reloaded_data ) );
 		return $reloaded_data;
 	}
 	
