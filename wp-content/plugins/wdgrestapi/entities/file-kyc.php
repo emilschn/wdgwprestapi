@@ -69,9 +69,11 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 */
 	public function get_loaded_data() {
 		$buffer = parent::get_loaded_data();
-		$buffer->url = '';
-		if ( !empty( $this->loaded_data->file_name ) ) {
-			$buffer->url = home_url( '/wp-content/plugins/wdgrestapi/' .$this->get_path(). '/' .$this->loaded_data->file_name );
+		if ( !empty( $buffer ) ) {
+			$buffer->url = '';
+			if ( !empty( $this->loaded_data->file_name ) ) {
+				$buffer->url = home_url( '/wp-content/plugins/wdgrestapi/' .$this->get_path(). '/' .$this->loaded_data->file_name );
+			}
 		}
 		return $buffer;
 	}
