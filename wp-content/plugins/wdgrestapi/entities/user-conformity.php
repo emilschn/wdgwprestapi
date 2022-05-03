@@ -43,6 +43,7 @@ class WDGRESTAPI_Entity_UserConformity extends WDGRESTAPI_Entity {
 		'id'							=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'user_id'						=> array( 'type' => 'id' ),
 		'last_update'					=> array( 'type' => 'date' ),
+		'version'						=> array( 'type' => 'int' ),
 		'financial_details'				=> array( 'type' => 'longtext' ),
 		'financial_result_in_cents'		=> array( 'type' => 'int' ),
 		'knowledge_details'				=> array( 'type' => 'longtext' ),
