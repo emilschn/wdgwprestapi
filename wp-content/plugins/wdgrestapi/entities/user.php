@@ -550,11 +550,12 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'language'				=> array( 'type' => 'varchar', 'other' => '' ),
 		'email_is_validated'	=> array( 'type' => 'varchar', 'other' => '' ),
+		'risk_validation_time'	=> array( 'type' => 'datetime', 'other' => '' ),
 		'source'				=> array( 'type' => 'varchar', 'other' => '' )
 	);
 
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_User::$entity_type, WDGRESTAPI_Entity_User::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
 }
