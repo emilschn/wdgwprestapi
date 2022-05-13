@@ -69,9 +69,11 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 */
 	public function get_loaded_data() {
 		$buffer = parent::get_loaded_data();
-		$buffer->url = '';
-		if ( !empty( $this->loaded_data->file_name ) ) {
-			$buffer->url = home_url( '/wp-content/plugins/wdgrestapi/' .$this->get_path(). '/' .$this->loaded_data->file_name );
+		if ( !empty( $buffer ) ) {
+			$buffer->url = '';
+			if ( !empty( $this->loaded_data->file_name ) ) {
+				$buffer->url = home_url( '/wp-content/plugins/wdgrestapi/' .$this->get_path(). '/' .$this->loaded_data->file_name );
+			}
 		}
 		return $buffer;
 	}
@@ -88,6 +90,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		$query = "SELECT f.id FROM " .$table_name. " f";
 		if ( !empty( $entity_type ) ) {
 			$query .= " WHERE ";
+			$query .= " f.status = 'uploaded' AND ";
 			
 			if ( !empty( $entity_type ) ) {
 				if ( $entity_type === 'organization' && !empty( $organization_id ) ) {
@@ -143,7 +146,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				$this->loaded_data->file_name = $random_filename;
 
 
-				$file_size = strlen( base64_decode( $this->file_data ) );
+				$file_size = strlen( $this->file_data );
 				if ( $file_size < 10 ) {
 					WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save error UPLOAD');
 					return 'UPLOAD';
@@ -181,9 +184,12 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 * Envoie le fichier vers LW après l'avoir optimisé
 	 */
 	public function send_to_lw() {
-		// TODO : optimiser le fichier
+		if ( $this->loaded_data->status != 'uploaded' ) {
+			return FALSE;
+		}
 
-		// TODO : enrgistrer en base si le wallet est authentifié ou pas ?
+		// TODO : optimiser le fichier
+		// TODO : enregistrer en base si le wallet est authentifié ou pas ?
 		// TODO : gérer les retours (erreurs)
 		$buffer = 'sent';
 		// Envoi à LW dans le bon slots
@@ -202,7 +208,6 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			} else {
 				$buffer = 'already_authentified';
 			}
-
 		}
 
 		if ( !empty( $this->loaded_data->organization_id ) ) {
@@ -210,7 +215,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$organization_wallet_id = $organization->get_wallet_id( 'lemonway' );
 			if ( !empty( $organization_wallet_id ) && ( $this->loaded_data->doc_type == 'bank' || $lw->get_wallet_details( $organization_wallet_id )->STATUS != 6 )  ) {
 				$this->loaded_data->gateway_organization_id = $lw->wallet_upload_file( $organization_wallet_id, $this->loaded_data->file_name, $lw_document_id, $lw_file_data );
-			}else {
+			} else {
 				$buffer = 'already_authentified';
 			}
 		}

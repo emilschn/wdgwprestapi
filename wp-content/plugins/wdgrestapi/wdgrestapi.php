@@ -26,7 +26,7 @@ if ( !function_exists( 'is_admin' ) ) {
 }
 
 class WDGRESTAPI {
-	private $version = '0.0.8374';
+	private $version = '0.0.8382';
   
 	/**
 	 * Instanciation du singleton
@@ -74,6 +74,7 @@ class WDGRESTAPI {
 		$this->add_include_entity( 'bill' );
 		$this->add_include_entity( 'organization' );
 		$this->add_include_entity( 'user' );
+		$this->add_include_entity( 'user-conformity' );
 		$this->add_include_entity( 'project' );
 		$this->add_include_entity( 'project-draft' );
 		$this->add_include_entity( 'investment' );
@@ -113,6 +114,7 @@ class WDGRESTAPI {
 		$this->add_include_route( 'bill' );
 		$this->add_include_route( 'organization' );
 		$this->add_include_route( 'user' );
+		$this->add_include_route( 'user-conformity' );
 		$this->add_include_route( 'project' );
 		$this->add_include_route( 'project-draft' );
 		$this->add_include_route( 'investment' );
@@ -143,6 +145,7 @@ class WDGRESTAPI {
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_StaticPage::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Organization::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_User::register');
+		add_action( 'rest_api_init', 'WDGRESTAPI_Route_UserConformity::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Project::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Project_Draft::register');
 		add_action( 'rest_api_init', 'WDGRESTAPI_Route_Investment::register');
@@ -184,6 +187,7 @@ class WDGRESTAPI {
 			WDGRESTAPI_Entity_Email::upgrade_db();
 			WDGRESTAPI_Entity_Organization::upgrade_db();
 			WDGRESTAPI_Entity_User::upgrade_db();
+			WDGRESTAPI_Entity_UserConformity::upgrade_db();
 			WDGRESTAPI_Entity_Project::upgrade_db();
 			WDGRESTAPI_Entity_Project_Draft::upgrade_db();
 			WDGRESTAPI_Entity_Investment::upgrade_db();

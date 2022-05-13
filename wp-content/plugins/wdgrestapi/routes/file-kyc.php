@@ -105,7 +105,9 @@ class WDGRESTAPI_Route_FileKYC extends WDGRESTAPI_Route {
 		if ( !empty( $gateway_id ) ) {
 			try {
 				$file_kyc_item = WDGRESTAPI_Entity_FileKYC::get_single_by_gateway_id( $gateway_id );
-				$loaded_data = $file_kyc_item->get_loaded_data();
+				if ( !empty( $file_kyc_item ) ) {
+					$loaded_data = $file_kyc_item->get_loaded_data();
+				}
 				
 				if ( !empty( $loaded_data ) && $this->is_data_for_current_client( $loaded_data ) ) {
 					$this->log( "WDGRESTAPI_Route_FileKYC::single_get_by_gateway_id::" . $gateway_id, json_encode( $loaded_data ) );

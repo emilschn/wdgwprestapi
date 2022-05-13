@@ -527,7 +527,7 @@ WHERE status=\''. self::$status_vote .'\' OR status=\''. self::$status_collecte 
 		'yield_for_investors'	=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'maximum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
 		'maximum_profit_precision'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'minimum_profit'		=> array( 'type' => 'int', 'other' => 'NOT NULL' ),
+		'minimum_profit'		=> array( 'type' => 'float', 'other' => 'NOT NULL' ),
 		'contract_start_date'	=> array( 'type' => 'date', 'other' => '' ),
 		'contract_start_date_is_undefined'	=> array( 'type' => 'bool', 'other' => '' ),
 		'declarations_start_date'	=> array( 'type' => 'date', 'other' => '' ),

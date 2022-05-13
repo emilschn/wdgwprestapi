@@ -12,7 +12,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	public static function list_get($id_template, $recipient_email) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
-		$query = "SELECT * FROM " .$table_name. " WHERE template = " .$id_template. " AND recipient='" .$recipient_email. "' ORDER BY id desc";
+		$query = "SELECT id, date, recipient, template FROM " .$table_name. " WHERE template = " .$id_template. " AND recipient='" .$recipient_email. "' ORDER BY id desc";
 		$results = $wpdb->get_results( $query );
 
 		return $results;
@@ -24,7 +24,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 	public static function list_get_by_project($project_id) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
-		$query = "SELECT * FROM " .$table_name. " WHERE id_project = " .$project_id;
+		$query = "SELECT id, date, recipient, template FROM " .$table_name. " WHERE id_project = " .$project_id;
 		$results = $wpdb->get_results( $query );
 
 		return $results;

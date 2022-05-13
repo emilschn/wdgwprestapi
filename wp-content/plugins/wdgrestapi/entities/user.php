@@ -543,12 +543,6 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'document_home'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'document_rib'			=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'authentification_mode'	=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
-		'picture_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'website_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'twitter_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'facebook_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'linkedin_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
-		'viadeo_url'			=> array( 'type' => 'longtext', 'other' => 'NOT NULL' ),
 		'activation_key'		=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'password'				=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
 		'signup_date'			=> array( 'type' => 'date', 'other' => '' ),
@@ -556,11 +550,12 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 		'gateway_list'			=> array( 'type' => 'varchar', 'other' => '' ),
 		'language'				=> array( 'type' => 'varchar', 'other' => '' ),
 		'email_is_validated'	=> array( 'type' => 'varchar', 'other' => '' ),
+		'risk_validation_time'	=> array( 'type' => 'datetime', 'other' => '' ),
 		'source'				=> array( 'type' => 'varchar', 'other' => '' )
 	);
 
 	// Mise à jour de la bdd
 	public static function upgrade_db() {
-		return WDGRESTAPI_Entity::upgrade_entity_db( WDGRESTAPI_Entity_User::$entity_type, WDGRESTAPI_Entity_User::$db_properties );
+		return WDGRESTAPI_Entity::upgrade_entity_db( self::$entity_type, self::$db_properties );
 	}
 }
