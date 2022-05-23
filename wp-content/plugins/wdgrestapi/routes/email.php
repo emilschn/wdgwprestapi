@@ -14,6 +14,12 @@ class WDGRESTAPI_Route_Email extends WDGRESTAPI_Route {
 			array( $this, 'single_create'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE )
 		);
+		
+		WDGRESTAPI_Route::register_wdg(
+			'/email(?P<id>\d+)/send',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_send')
+		);
 	}
 	
 	public static function register() {
@@ -53,4 +59,30 @@ class WDGRESTAPI_Route_Email extends WDGRESTAPI_Route {
 		return $reloaded_data;
 	}
 	
+	public function single_send( WP_REST_Request $request ) {
+		$email_id = $request->get_param( 'id' );
+		if ( !empty( $email_id ) ) {
+			try {
+				$email_item = new WDGRESTAPI_Entity_Email( $email_id );
+				$send_result = $email_item->send();
+				
+				if ( !empty( $send_result ) ) {
+					return $send_result;
+					
+				} else {
+					$this->log( "WDGRESTAPI_Route_Email::single_send::" . $email_id, "404 : Invalid email id" );
+					return new WP_Error( '404', "Invalid email id" );
+					
+				}
+				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_Email::single_send::" . $email_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_Email::single_send", "404 : Invalid email id (empty)" );
+			return new WP_Error( '404', "Invalid email id (empty)" );
+		}
+	}
 }
