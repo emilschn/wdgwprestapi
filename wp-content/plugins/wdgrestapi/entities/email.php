@@ -86,9 +86,9 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 				}
 			}
 		} else {
-			$list_recipients_bcc = $this->loaded_data->recipient;
+			$list_recipients_bcc = explode( ',', $this->loaded_data->recipient );
 		}
-		
+
 		$list_recipients_cc = array();
 		$replyto = ( empty( $options->replyto ) ) ? 'bonjour@wedogood.co' : $options->replyto;
 		$sender_name = ( empty( $options->sender_name ) ) ? 'WE DO GOOD' : $options->sender_name;
