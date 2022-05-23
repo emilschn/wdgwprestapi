@@ -16,7 +16,7 @@ class WDGRESTAPI_Route_Email extends WDGRESTAPI_Route {
 		);
 		
 		WDGRESTAPI_Route::register_wdg(
-			'/email(?P<id>\d+)/send',
+			'/email/(?P<id>\d+)/send',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_send')
 		);
