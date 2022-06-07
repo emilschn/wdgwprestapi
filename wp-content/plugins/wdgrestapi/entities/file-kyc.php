@@ -140,6 +140,9 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				if (!$written ){
 					return 'SERVER';
 				}
+
+				$this->compress_file( $path . $random_filename );
+
 				$this->loaded_data->file_signature = md5( $this->file_data );
 				$this->loaded_data->status = 'uploaded';
 				$this->loaded_data->gateway = 'lemonway';
@@ -151,7 +154,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 					WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save error UPLOAD');
 					return 'UPLOAD';
 				}
-				if ( ( $file_size / 1024) / 1024 > 6 ) {
+				if ( ( $file_size / 1024) / 1024 > 8 ) {
 					WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save error SIZE');
 					return 'SIZE';
 				}
@@ -177,6 +180,29 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		} else {
 			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save FALSE');
 			return FALSE;
+		}
+	}
+
+	private function compress_file( $file_path ) {
+		$quality = 80;
+		$info = getimagesize( $file_path );
+
+		switch ( $info['mime'] ) {
+			case 'image/jpeg':
+				$image = imagecreatefromjpeg( $file_path );
+				break;
+
+			case 'image/gif':
+				$image = imagecreatefromgif( $file_path );
+				break;
+
+			case 'image/png':
+				$image = imagecreatefrompng( $file_path );
+				break;
+		}
+
+		if ( $image ) {
+			imagejpeg( $image, $file_path, $quality );
 		}
 	}
 
