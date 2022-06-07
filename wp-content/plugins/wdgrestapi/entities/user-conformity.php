@@ -47,7 +47,9 @@ class WDGRESTAPI_Entity_UserConformity extends WDGRESTAPI_Entity {
 		'financial_details'				=> array( 'type' => 'longtext' ),
 		'financial_result_in_cents'		=> array( 'type' => 'int' ),
 		'knowledge_details'				=> array( 'type' => 'longtext' ),
-		'knowledge_result'				=> array( 'type' => 'varchar' )
+		'knowledge_result'				=> array( 'type' => 'varchar' ),
+		'profession_details'			=> array( 'type' => 'longtext' ),
+		'objectives_details'			=> array( 'type' => 'longtext' )
 	);
 
 	// Mise à jour de la bdd
