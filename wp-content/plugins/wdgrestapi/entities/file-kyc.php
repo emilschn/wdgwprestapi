@@ -203,6 +203,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 
 		if ( $image ) {
 			imagejpeg( $image, $file_path, $quality );
+			$this->file_data = file_get_contents( $file_path );
 		}
 	}
 
