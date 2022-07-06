@@ -5,7 +5,9 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	
 	public static $file_entity_types = array( 'user', 'organization' );
 	
-	public static $document_types = array( 'id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving', 'kbis', 'status', 'capital-allocation', 'person2-doc1', 'person2-doc2', 'person3-doc1', 'person3-doc2', 'person4-doc1', 'person4-doc2', 'bank' );
+	public static $document_types = array( 'id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving', 'criminal_record', 'kbis', 'status', 'capital-allocation', 'person2-doc1', 'person2-doc2', 'person3-doc1', 'person3-doc2', 'person4-doc1', 'person4-doc2', 'bank' );
+
+	public static $avoid_send_to_lw = array( 'criminal_record' );
 
 	public static $authorized_format_list = array('pdf', 'jpg', 'jpeg', 'bmp', 'gif', 'tif', 'tiff', 'png');
 
@@ -212,6 +214,11 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 */
 	public function send_to_lw() {
 		if ( $this->loaded_data->status != 'uploaded' ) {
+			return FALSE;
+		}
+
+		// Si on ne doit pas transmettre ce type de doc à LW, on stoppe la procédure
+		if ( in_array( $this->loaded_data->doc_type, self::$avoid_send_to_lw ) ) {
 			return FALSE;
 		}
 
