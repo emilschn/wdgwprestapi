@@ -48,11 +48,12 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 					array_push( 
 						$user_list,
 						array( 
-							"id"		=> $loaded_data->id,
-							"wpref"		=> $loaded_data->wpref,
-							"name"		=> $loaded_data->name,
-							"surname"	=> $loaded_data->surname,
-							"type"		=> $link_item->type
+							"id"			=> $loaded_data->id,
+							"wpref"			=> $loaded_data->wpref,
+							"name"			=> $loaded_data->name,
+							"surname"		=> $loaded_data->surname,
+							"type"			=> $link_item->type,
+							"notifications"	=> $link_item->notifications
 						)
 					);
 				}
@@ -105,12 +106,24 @@ class WDGRESTAPI_Route_ProjectUser extends WDGRESTAPI_Route {
 	
 	public function link_user( WP_REST_Request $request ) {
 		$project_id = $request->get_param( 'id' );
-		$projectuser_item = new WDGRESTAPI_Entity_ProjectUser();
-		$this->set_posted_properties( $projectuser_item, WDGRESTAPI_Entity_ProjectUser::$db_properties );
-		$projectuser_item->set_property( 'id_project', $project_id );
-		//TODO : vérifier que l'utilisateur et le projet existent ?
-		$projectuser_item->save();
-		$reloaded_data = $projectuser_item->get_loaded_data();
+		
+		// Si on a envoyé le paramètre 'update', c'est une MAJ de la liaison
+		$posted_update = filter_input( INPUT_POST, 'update' );
+		if ( $posted_update === '1' ) {
+			$posted_user_id = filter_input( INPUT_POST, 'id_user' );
+			$posted_notifications = filter_input( INPUT_POST, 'notifications' );
+			$reloaded_data = WDGRESTAPI_Entity_ProjectUser::update_link( $project_id, $posted_user_id, $posted_notifications );
+
+		// Sinon c'est un ajout
+		} else {
+			$projectuser_item = new WDGRESTAPI_Entity_ProjectUser();
+			$this->set_posted_properties( $projectuser_item, WDGRESTAPI_Entity_ProjectUser::$db_properties );
+			$projectuser_item->set_property( 'id_project', $project_id );
+			//TODO : vérifier que l'utilisateur et le projet existent ?
+			$projectuser_item->save();
+			$reloaded_data = $projectuser_item->get_loaded_data();
+		}
+
 		$this->log( "WDGRESTAPI_Route_ProjectUser::link_user::" . $project_id, json_encode( $reloaded_data ) );
 		return $reloaded_data;
 	}
