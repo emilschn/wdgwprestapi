@@ -68,7 +68,8 @@ class WDGRESTAPI_Entity_ProjectUser extends WDGRESTAPI_Entity {
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'id_project'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'id_user'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
-		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' )
+		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'notifications'			=> array( 'type' => 'bool', 'other' => 'DEFAULT 1 NOT NULL' )
 	);
 	
 	// Mise à jour de la bdd
