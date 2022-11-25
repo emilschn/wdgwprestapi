@@ -187,6 +187,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 
 	private function compress_file( $file_path ) {
 		$quality = 80;
+		// TODO : si besoin d'optimiser les performances, essayer de ne télécharger que le début du fichier
 		$info = getimagesize( $file_path );
 
 		switch ( $info['mime'] ) {
@@ -232,6 +233,17 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		$lw = WDGRESTAPI_Lib_Lemonway::instance();
 		$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, $this->loaded_data->doc_index );
 		$lw_file_data = file_get_contents( $this->get_relative_path() . $this->loaded_data->file_name );
+
+
+		// s'il s'agit de documents d'identité 
+		// TODO : utiliser des constante statiques
+		if( $this->loaded_data->doc_type == 'id' || $this->loaded_data->doc_type == 'passport' ){
+			// TODO : si on a un recto et un verso
+
+			// TODO : on fusionne en 1 seul pdf avant d'envoyer à LW
+			WDGRESTAPI_Lib_MergeKycFile::mergeKycFile();
+		}
+
 
 		if ( !empty( $this->loaded_data->user_id ) ) {
 			$user = new WDGRESTAPI_Entity_User( $this->loaded_data->user_id );
