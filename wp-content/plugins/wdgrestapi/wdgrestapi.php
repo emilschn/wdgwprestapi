@@ -59,6 +59,7 @@ class WDGRESTAPI {
 		$this->add_include_lib( 'geolocation' );
 		$this->add_include_lib( 'country_list' );
 		$this->add_include_lib( 'validator' );
+		$this->add_include_lib( 'merge_file_kyc' );
 	}
 	public function add_include_lib($include_name) {
 		include_once plugin_dir_path( __FILE__ ) . 'libs/' . $include_name . '.php';

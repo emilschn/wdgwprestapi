@@ -44,9 +44,10 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	 * @param string $entity_type
 	 * @param int $entity_id
 	 * @param string $doc_type
+	 * @param string $doc_index
 	 * @return WDGRESTAPI_Entity_File
 	 */
-	public static function get_single( $entity_type, $entity_id, $doc_type ) {
+	public static function get_single( $entity_type, $entity_id, $doc_type, $doc_index = 1 ) {
 		if ( empty( $entity_type ) || empty( $entity_id ) || empty( $doc_type ) ) {
 			return FALSE;
 		}
@@ -58,7 +59,9 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		if ( $entity_type === 'organization' ) {
 			$entity_id_query = "organization_id=" .$entity_id;
 		}
-		$query = "SELECT id FROM " .$table_name. " WHERE " .$entity_id_query. " AND doc_type='" .$doc_type. "' ORDER BY id desc";
+		$query = "SELECT id FROM " .$table_name. " WHERE " .$entity_id_query. " AND doc_type='" .$doc_type . "' AND doc_index='" .$doc_index. "' ORDER BY id desc";
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::get_single > $query = ' . $query, FALSE );
+					
 		$loaded_data = $wpdb->get_row( $query );
 		if ( !empty( $loaded_data->id ) ) {
 			$buffer = new WDGRESTAPI_Entity_FileKYC( $loaded_data->id );
@@ -66,6 +69,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		
 		return $buffer;
 	}
+
 	/**
 	 * Surcharge la fonction parente pour ajouter l'URL
 	 */
@@ -227,25 +231,68 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		// TODO : enregistrer en base si le wallet est authentifié ou pas ?
 		// TODO : gérer les retours (erreurs)
 		$buffer = 'sent';
-		// Envoi à LW dans le bon slots
+		// Envoi à LW dans le bon slot
 		$wdgrestapi = WDGRESTAPI::instance();
 		$wdgrestapi->add_include_lib( 'gateways/lemonway' );
 		$lw = WDGRESTAPI_Lib_Lemonway::instance();
 		$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, $this->loaded_data->doc_index );
 		$lw_file_data = file_get_contents( $this->get_relative_path() . $this->loaded_data->file_name );
 
-
-		// s'il s'agit de documents d'identité 
-		// TODO : utiliser des constante statiques
-		if( $this->loaded_data->doc_type == 'id' || $this->loaded_data->doc_type == 'passport' ){
-			// TODO : si on a un recto et un verso
-
-			// TODO : on fusionne en 1 seul pdf avant d'envoyer à LW
-			WDGRESTAPI_Lib_MergeKycFile::mergeKycFile();
-		}
-
-
 		if ( !empty( $this->loaded_data->user_id ) ) {
+			// si c'est un utilisateur
+			// et s'il s'agit de documents d'identité 
+			$id_documents_array = array('id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving');			
+
+			if( in_array( $this->loaded_data->doc_type , $id_documents_array) ){
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->id = ' . $this->loaded_data->id, $this->current_entity_type );
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->doc_type = ' . $this->loaded_data->doc_type, $this->current_entity_type );
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->doc_index = ' . $this->loaded_data->doc_index, $this->current_entity_type );
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->file_name = ' . $this->loaded_data->file_name, $this->current_entity_type );
+			
+				// si c'est un verso
+				if( $this->loaded_data->doc_index == 2){
+
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > c est un verso ' , $this->current_entity_type );
+			
+
+					$verso = $this->get_relative_path() . $this->loaded_data->file_name;
+					// on essaie de récupérer le recto 
+					$recto_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 1);					
+					// WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $recto_kyc = ' . $recto_kyc, $this->current_entity_type );
+					if( isset($recto_kyc) && $recto_kyc !== FALSE ) {
+						$recto = $this->get_relative_path() . $recto_kyc->loaded_data->file_name;
+					}
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $recto = ' . $recto, $this->current_entity_type );
+			
+
+				} else {
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > c est un recto ' , $this->current_entity_type );
+					// si c'est un recto, on essaie de récupérer le verso
+					$recto = $this->get_relative_path() . $this->loaded_data->file_name;
+					$verso_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 2);	
+					// WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $verso_kyc = ' . $verso_kyc, $this->current_entity_type );
+							
+					if( isset($verso_kyc) && $verso_kyc !== FALSE ) {
+						$verso = $this->get_relative_path() . $verso_kyc->loaded_data->file_name;
+					}
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $verso = ' . $verso, $this->current_entity_type );
+			
+				}
+				// si on a bel et bien un recto et un verso
+				if( !empty($recto) && !empty($verso) ) {
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > il y a un recto et un verso ' , $this->current_entity_type );
+					// génère un nouveau nom de fichier pour le fichier concaténé
+					// TODO : gestion d'erreur
+					$path = $this->make_path();
+					$random_filename = $this->get_random_filename( $path, 'pdf' );
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $random_filename = ' . $random_filename, $this->current_entity_type );
+					// on fusionne les 2 documents en un seul
+					WDGRESTAPI_Lib_MergeKycFile::mergeKycFile($recto, $verso, $this->get_relative_path() . $random_filename);
+					// et c'est ce document qu'on envoie à LW dans le bon slot (quitte à écraser le recto ou verso envoyé précédemment)
+					$lw_file_data = file_get_contents( $this->get_relative_path() . $random_filename );
+				}
+			}
+
 			$user = new WDGRESTAPI_Entity_User( $this->loaded_data->user_id );
 			$user_wallet_id = $user->get_wallet_id( 'lemonway' );
 			// si c'est un rib, on envoie toujours à LW, sinon, on n'envoie que si pas authentifié

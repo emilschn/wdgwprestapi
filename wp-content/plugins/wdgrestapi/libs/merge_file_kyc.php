@@ -119,7 +119,7 @@ class PDF extends FPDF {
     function resizeToFit($imgFilename) {
 		// en fonction de l'extension
 		$file_name_exploded = explode( '.', $imgFilename );
-		$extension = end( $file_name_exploded );
+		$extension = strtolower( end( $file_name_exploded ) );
 		switch ( $extension ) {
 			case 'jpg':
 			case 'jpeg':
@@ -170,6 +170,8 @@ class PDF extends FPDF {
 	}
 
     function AddCenteredResizedImage($img) {
+		WDGRESTAPI_Lib_Logs::log( 'PDF::AddCenteredResizedImage > $img = ' . $img, FALSE );
+		
         list($width, $height) = $this->resizeToFit($img);
 
 		$imgDeinterlace =  $this->PrepareImage($img);
@@ -201,12 +203,11 @@ class ConcatPdf extends Fpdi
         foreach($this->files AS $file) {
 
 			$file_name_exploded = explode( '.', $file );
-			$extension = end( $file_name_exploded );
+			$extension = strtolower( end( $file_name_exploded ) );
+			WDGRESTAPI_Lib_Logs::log( 'ConcatPdf::concat > $file = ' . $file, FALSE );
 
 			// si le fichier n'est pas un pdf, on le transforme en pdf
 			if ( $extension != 'pdf') {
-				// TODO : placer le pdf temporaire quelquepart
-				$fileToConcat = 'temp.pdf';
 
 				$imageToPdf = new PDF('L','mm','A4');
 				$imageToPdf->AddPage();
@@ -228,29 +229,23 @@ class ConcatPdf extends Fpdi
     }
 }
 
-// $recto = 'wp-content\plugins\wdgrestapi\files\kyc\2021-09-14\160-dX0iPk0LVjzwcz3.jpg';
-// $verso = 'wp-content\plugins\wdgrestapi\files\kyc\2021-10-21\3709-5pEp0GEAiVwuS5o.jpg';
-// $recto = 'wp-content\plugins\wdgrestapi\files\kyc\2021-10-20\49-7EiXNe2rYyLS94K.pdf';
-// $verso = 'wp-content\plugins\wdgrestapi\files\kyc\2021-10-19\A7A4444C-0AE2-421E-A6A5-115DA7D7303D.pdf';
-// $verso = 'wp-content\plugins\wdgrestapi\files\kyc\2021-10-21\ragondin.pdf';
-// $recto = 'wp-content\plugins\wdgrestapi\files\kyc\2021-09-14\haveyoutried.gif';
-// $recto = 'wp-content\plugins\wdgrestapi\files\kyc\2021-09-30\0-PzlOCPrFgSEXDMN.jpg';
-// $verso = 'wp-content\plugins\wdgrestapi\files\investment-draft\picture-contract\136-v9o5EaXb0U80XC6.png';
-
-
-
-
-
 class WDGRESTAPI_Lib_MergeKycFile {
 
-	public static function mergeKycFile( $recto, $verso ) {
+	public static function mergeKycFile( $recto, $verso, $random_filename ) {
 
 		$recto_name_exploded = explode( '.', $recto );
-		$recto_extension = end( $recto_name_exploded );
+		$recto_extension = strtolower( end( $recto_name_exploded ) );
 		
 		$verso_name_exploded = explode( '.', $verso );
-		$verso_extension = end( $verso_name_exploded );
-		
+		$verso_extension = strtolower( end( $verso_name_exploded ) );
+
+
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $recto = ' . $recto, FALSE );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $verso = ' . $verso, FALSE );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $random_filename = ' . $random_filename, FALSE );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $recto_extension = ' . $recto_extension, FALSE );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $verso_extension = ' . $verso_extension, FALSE );
+					
 		if ($recto_extension != 'pdf' && $verso_extension  != 'pdf'){
 			// les deux fichiers sont des images
 			$pdf = new PDF('L','mm','A4');
@@ -259,15 +254,16 @@ class WDGRESTAPI_Lib_MergeKycFile {
 			$pdf->AddCenteredResizedImage($recto );
 			$pdf->AddPage();
 			$pdf->AddCenteredResizedImage($verso );
-			// TODO : changer l'output pour enregistrer un fichier et renvoyer son chemin
-			$pdf->Output();
+			$pdf->Output('F', $random_filename);
 		} else {
 			// au moins un des fichiers est un pdf
 			$pdf = new ConcatPdf();
 			$pdf->setFiles(array($recto, $verso));
 			$pdf->concat();	
-			// TODO : changer l'output pour enregistrer un fichier et renvoyer son chemin
-			$pdf->Output('I', 'Justificatif_identite.pdf');
+			$pdf->Output('F', $random_filename);
 		}
+		
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > END ' , FALSE );
+		
 	}
 }
