@@ -238,71 +238,107 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, $this->loaded_data->doc_index );
 		$lw_file_data = file_get_contents( $this->get_relative_path() . $this->loaded_data->file_name );
 
+		// si c'est un utilisateur
 		if ( !empty( $this->loaded_data->user_id ) ) {
-			// si c'est un utilisateur
-			// et s'il s'agit de documents d'identité 
-			$id_documents_array = array('id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving');			
-
-			if( in_array( $this->loaded_data->doc_type , $id_documents_array) ){
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->id = ' . $this->loaded_data->id, $this->current_entity_type );
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->doc_type = ' . $this->loaded_data->doc_type, $this->current_entity_type );
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->doc_index = ' . $this->loaded_data->doc_index, $this->current_entity_type );
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->file_name = ' . $this->loaded_data->file_name, $this->current_entity_type );
-			
-				// si c'est un verso
-				if( $this->loaded_data->doc_index == 2){
-
-					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > c est un verso ' , $this->current_entity_type );
-			
-
-					$verso = $this->get_relative_path() . $this->loaded_data->file_name;
-					// on essaie de récupérer le recto 
-					$recto_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 1);					
-					// WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $recto_kyc = ' . $recto_kyc, $this->current_entity_type );
-					if( isset($recto_kyc) && $recto_kyc !== FALSE ) {
-						$recto = $this->get_relative_path() . $recto_kyc->loaded_data->file_name;
-					}
-					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $recto = ' . $recto, $this->current_entity_type );
-			
-
-				} else {
-					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > c est un recto ' , $this->current_entity_type );
-					// si c'est un recto, on essaie de récupérer le verso
-					$recto = $this->get_relative_path() . $this->loaded_data->file_name;
-					$verso_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 2);	
-					// WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $verso_kyc = ' . $verso_kyc, $this->current_entity_type );
-							
-					if( isset($verso_kyc) && $verso_kyc !== FALSE ) {
-						$verso = $this->get_relative_path() . $verso_kyc->loaded_data->file_name;
-					}
-					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $verso = ' . $verso, $this->current_entity_type );
-			
-				}
-				// si on a bel et bien un recto et un verso
-				if( !empty($recto) && !empty($verso) ) {
-					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > il y a un recto et un verso ' , $this->current_entity_type );
-					// génère un nouveau nom de fichier pour le fichier concaténé
-					// TODO : gestion d'erreur
-					$path = $this->make_path();
-					$random_filename = $this->get_random_filename( $path, 'pdf' );
-					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $random_filename = ' . $random_filename, $this->current_entity_type );
-					// on fusionne les 2 documents en un seul
-					WDGRESTAPI_Lib_MergeKycFile::mergeKycFile($recto, $verso, $this->get_relative_path() . $random_filename);
-					// et c'est ce document qu'on envoie à LW dans le bon slot (quitte à écraser le recto ou verso envoyé précédemment)
-					$lw_file_data = file_get_contents( $this->get_relative_path() . $random_filename );
-				}
-			}
-
 			$user = new WDGRESTAPI_Entity_User( $this->loaded_data->user_id );
 			$user_wallet_id = $user->get_wallet_id( 'lemonway' );
-			// si c'est un rib, on envoie toujours à LW, sinon, on n'envoie que si pas authentifié
-			if ( !empty( $user_wallet_id ) && ( $this->loaded_data->doc_type == 'bank' || $lw->get_wallet_details( $user_wallet_id )->STATUS != 6 ) ) {
+			
+			if ( empty( $user_wallet_id ) ) {
+				$buffer = 'empty_wallet';
+			} else if ( $this->loaded_data->doc_type == 'bank' ){
+				// si c'est un rib, on envoie toujours à LW
 				$this->loaded_data->gateway_user_id = $lw->wallet_upload_file( $user_wallet_id, $this->loaded_data->file_name, $lw_document_id, $lw_file_data );
-			} else {
+			} else if( $lw->get_wallet_details( $user_wallet_id )->STATUS == 6 ){
+				// sinon, on n'envoie que si pas authentifié
 				$buffer = 'already_authentified';
+			} else {
+				// s'il s'agit de documents d'identité , il peut y avoir une fusion des recto et verso à faire
+				$id_documents_array = array('id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving');			
+	
+				if( in_array( $this->loaded_data->doc_type , $id_documents_array) ){
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->id = ' . $this->loaded_data->id, $this->current_entity_type );
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->doc_type = ' . $this->loaded_data->doc_type, $this->current_entity_type );
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->doc_index = ' . $this->loaded_data->doc_index, $this->current_entity_type );
+					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $this->loaded_data->file_name = ' . $this->loaded_data->file_name, $this->current_entity_type );
+					
+					// on essaie de savoir si pour ce fichier on a un recto et un verso
+					if( $this->loaded_data->doc_index == 2){
+						// si c'est un verso on essaie de récupérer le recto 
+						$verso = $this->get_relative_path() . $this->loaded_data->file_name;
+						$recto_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 1);					
+						if( isset($recto_kyc) && $recto_kyc !== FALSE ) {
+							$recto = $this->get_relative_path() . $recto_kyc->loaded_data->file_name;
+							WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > on recupère le $recto = ' . $recto, $this->current_entity_type );
+						}
+					} else {
+						// si c'est un recto, on essaie de récupérer le verso
+						$recto = $this->get_relative_path() . $this->loaded_data->file_name;
+						$verso_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 2);	
+						if( isset($verso_kyc) && $verso_kyc !== FALSE ) {
+							$verso = $this->get_relative_path() . $verso_kyc->loaded_data->file_name;
+							WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > on a récupéré le $verso = ' . $verso, $this->current_entity_type );
+						}			
+					}
+	
+					// si on a bel et bien un recto et un verso
+					if( !empty($recto) && !empty($verso) ) {
+						WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > il y a un recto et un verso ' , $this->current_entity_type );
+	
+						// on regarde si on a déjà un fichier fusionné en base (doc_index 0)					
+						$merge_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 0);	
+	
+						if( isset($merge_kyc) && $merge_kyc !== FALSE ) {
+							// si on en a déjà un, c'est celui là qu'on envoie
+							$lw_file_data = file_get_contents( $this->get_relative_path() . $merge_kyc->loaded_data->file_name );
+							// TODO : comment savoir si ce fichier a déjà été envoyé avec succès à LW ? (présence d'un gateway_user_id ?)
+							// TODO : comment être sûr qu'il n'y a pas besoin de le regénérer ? (si un des deux fichiers le composant a été modifié par exemple, update_date sur un des deux fichiers ?)
+							// vaut-il mieux le regénérer et le renvoyer dans tous les cas ? C'est ce que j'avais fait au début, mais on est sûrs de le merger et de l'envoyer à LW au moins 2 fois inutilement
+						} else{
+							// génère un nouveau nom de fichier pour le fichier concaténé
+							$path = $this->make_path();
+							$random_filename = $this->get_random_filename( $path, 'pdf' );
+							WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $random_filename = ' . $random_filename, $this->current_entity_type );
+							// on fusionne les 2 documents en un seul
+							$merge_success = WDGRESTAPI_Lib_MergeKycFile::mergeKycFile($recto, $verso, $this->get_relative_path() . $random_filename);
+							
+							if ( $merge_success ) {
+								// et c'est ce document qu'on envoie à LW dans le bon slot (quitte à écraser le recto envoyé précédemment)		
+								$lw_file_data = file_get_contents( $this->get_relative_path() . $random_filename );
+								$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, 1 );
+								$gateway_user_id = $lw->wallet_upload_file( $user_wallet_id, $this->loaded_data->file_name, $lw_document_id, $lw_file_data );
+								// on enregistre ce document en base avec un doc_index 0
+								$merge_kyc = new WDGRESTAPI_Entity_FileKYC();
+								$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+								$merge_kyc->set_property( 'client_user_id', $current_client->ID );
+								$merge_kyc->set_property( 'user_id', $this->loaded_data->user_id );
+								$merge_kyc->set_property( 'doc_type', $this->loaded_data->doc_type );
+								$merge_kyc->set_property( 'doc_index', 0 );// doc_index à 0 pour indiquer que c'est un fichier mergé
+								$merge_kyc->set_property( 'file_extension', 'pdf' );
+								$merge_kyc->set_property( 'file_name', $random_filename );
+								$merge_kyc->set_property( 'file_signature', md5( $lw_file_data ) );
+								$merge_kyc->set_property( 'status', 'merged' );// on met un nouveau status pour indiquer que c'est un fichier mergé ?
+								$merge_kyc->set_property( 'gateway', 'lemonway' );
+								$merge_kyc->set_property( 'gateway_user_id', $gateway_user_id );
+								$merge_kyc->set_property( 'metadata', '' );
+								$merge_kyc->save();
+
+							} else {
+								WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::send_to_lw > $merge_success = ' . $merge_success, $this->current_entity_type );
+								// TODO : que faire s'il y a eu un pb de merge (hormis de loguer) ?
+								$buffer = $merge_success;
+							}
+						}
+					} else {
+						// on n'a (pour l'instant) qu'un fichier pour cette pièce d'identité, c'esst peut-être déjà un recto-verso, on l'envoi
+						$this->loaded_data->gateway_user_id = $lw->wallet_upload_file( $user_wallet_id, $this->loaded_data->file_name, $lw_document_id, $lw_file_data );
+					}
+				} else {
+					$buffer = 'unknown_document';
+				}
 			}
 		}
 
+		// si c'est une organisation
 		if ( !empty( $this->loaded_data->organization_id ) ) {
 			$organization = new WDGRESTAPI_Entity_Organization( $this->loaded_data->organization_id );
 			$organization_wallet_id = $organization->get_wallet_id( 'lemonway' );

@@ -186,6 +186,10 @@ class PDF extends FPDF {
             $height
         );
     }
+	
+	public function error($msg) {
+		throw new Exception($msg); 
+	}
 }
 
 
@@ -208,7 +212,7 @@ class ConcatPdf extends Fpdi
 
 			// si le fichier n'est pas un pdf, on le transforme en pdf
 			if ( $extension != 'pdf') {
-
+				$fileToConcat = $file_name_exploded[0] . 'pdf';
 				$imageToPdf = new PDF('L','mm','A4');
 				$imageToPdf->AddPage();
 				$imageToPdf->AddCenteredResizedImage($file );
@@ -227,6 +231,10 @@ class ConcatPdf extends Fpdi
             }
         }
     }
+	
+	public function error($msg) {
+		throw new Exception($msg); 
+	}
 }
 
 class WDGRESTAPI_Lib_MergeKycFile {
@@ -247,23 +255,30 @@ class WDGRESTAPI_Lib_MergeKycFile {
 		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $verso_extension = ' . $verso_extension, FALSE );
 					
 		if ($recto_extension != 'pdf' && $verso_extension  != 'pdf'){
-			// les deux fichiers sont des images
-			$pdf = new PDF('L','mm','A4');
-			$pdf->SetTitle('Justificatif_identite.pdf');
-			$pdf->AddPage();
-			$pdf->AddCenteredResizedImage($recto );
-			$pdf->AddPage();
-			$pdf->AddCenteredResizedImage($verso );
-			$pdf->Output('F', $random_filename);
+			// les deux fichiers sont des images	
+			try {
+				$pdf = new PDF('L','mm','A4');
+				$pdf->SetTitle('Justificatif_identite.pdf');
+				$pdf->AddPage();
+				$pdf->AddCenteredResizedImage($recto );
+				$pdf->AddPage();
+				$pdf->AddCenteredResizedImage($verso );
+				$pdf->Output('F', $random_filename);
+				return TRUE;
+			} catch(Exception $e) {
+				return $e->getMessage;
+			}
 		} else {
-			// au moins un des fichiers est un pdf
-			$pdf = new ConcatPdf();
-			$pdf->setFiles(array($recto, $verso));
-			$pdf->concat();	
-			$pdf->Output('F', $random_filename);
-		}
-		
-		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > END ' , FALSE );
-		
+			// au moins un des fichiers est un pdf			
+			try {
+				$pdf = new ConcatPdf();
+				$pdf->setFiles(array($recto, $verso));
+				$pdf->concat();	
+				$pdf->Output('F', $random_filename);
+				return TRUE;
+			} catch(Exception $e) {
+				return $e->getMessage;
+			}
+		}		
 	}
 }
