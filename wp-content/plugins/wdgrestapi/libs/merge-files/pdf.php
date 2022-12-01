@@ -1,46 +1,34 @@
 <?php
 
-use setasign\Fpdi\Fpdi;
+require_once('wp-content\plugins\wdgrestapi\libs\fpdf\fpdf.php');
 
+class WDGRESTAPI_Lib_PDF extends FPDF {
 
-require('wp-content\plugins\wdgrestapi\libs\fpdf\fpdf.php');
-require('wp-content\plugins\wdgrestapi\libs\fpdi\src\autoload.php');
-
-
-class PDF extends FPDF {
-
-    const DPI = 150;
-    const MM_IN_INCH = 25.4;
-    const A4_HEIGHT = 297;
-    const A4_WIDTH = 210;
+    public const DPI = 150;
+    public const MM_IN_INCH = 25.4;
+    public const A4_HEIGHT = 297;
+    public const A4_WIDTH = 210;
     // tweak these values (in pixels)
-    const MAX_WIDTH = 1650;
-    const MAX_HEIGHT = 1150;
+    protected const MAX_WIDTH = 1650;
+    protected const MAX_HEIGHT = 1150;
 
-	/*
-	
+	/* 	PORTRAIT MODE
 
-	PORTRAIT MODE
+		// tweak these values (in pixels)
+		const MAX_WIDTH = 1150;
+		const MAX_HEIGHT = 1650;
 
-	const DPI = 150;
-	const MM_IN_INCH = 25.4;
-	const A4_HEIGHT = 210;
-	const A4_WIDTH = 297;
-	// tweak these values (in pixels)
-	const MAX_WIDTH = 1150;
-	const MAX_HEIGHT = 1650;
+		$pdf->AddPage("P");
 
-	$pdf->AddPage("P");
-
-	A4 @ 300 dpi - 3507x2480 pix
-	A4 @ 200 dpi - 2338 x 1653 pix
-	A4 @ 150 dpi - 1753x1240 pix
-	A4 @ 72 dpi - 841x595 pix
+		A4 @ 300 dpi - 3507x2480 pix
+		A4 @ 200 dpi - 2338 x 1653 pix
+		A4 @ 150 dpi - 1753x1240 pix
+		A4 @ 72 dpi - 841x595 pix
 
 	*/
 
 	// Retrieve PNG width and height without downloading/reading entire image.
-	function getpngsize( $img_loc ) {
+	public static function getPngSize( $img_loc ) {
 		$handle = fopen( $img_loc, "rb" ) or die( "Invalid file stream." );
 
 		if ( ! feof( $handle ) ) {
@@ -69,7 +57,7 @@ class PDF extends FPDF {
 
 
 	// Retrieve JPEG width and height without downloading/reading entire image.
-	function getjpegsize($img_loc) {
+	public static function getJpegSize($img_loc) {
 		$handle = fopen($img_loc, "rb") or die("Invalid file stream.");
 		$new_block = NULL;
 		if(!feof($handle)) {
@@ -112,25 +100,36 @@ class PDF extends FPDF {
 	}
 
 
-    function pixelsToMM($val) {
+    protected function pixelsToMM($val) {
         return $val * self::MM_IN_INCH / self::DPI;
     }
 
-    function resizeToFit($imgFilename) {
+    protected function resizeToFit($imgFilename) {
 		// en fonction de l'extension
 		$file_name_exploded = explode( '.', $imgFilename );
 		$extension = strtolower( end( $file_name_exploded ) );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_PDF::resizeToFit > $imgFilename = ' . $imgFilename, FALSE );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_PDF::resizeToFit > $extension = ' . $extension, FALSE );
 		switch ( $extension ) {
 			case 'jpg':
 			case 'jpeg':
-				list($width, $height) = $this->getjpegsize($imgFilename);
+				list($width, $height) = self::getJpegSize($imgFilename);
 				break;
 			case 'png':
-				list($width, $height) = $this->getpngsize($imgFilename);
+				list($width, $height) = self::getPngSize($imgFilename);
 				break;
 			case 'gif':
+			default :
 				list($width,$height) = getimagesize( $imgFilename );
 				break;
+		}
+
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_PDF::resizeToFit > $width = ' . $width, FALSE );
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_PDF::resizeToFit > $height = ' . $height, FALSE );
+		if ( !isset($width) || $width == 0) {
+			list($width,$height) = getimagesize( $imgFilename );
+			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_PDF::resizeToFit > recalcul $width = ' . $width, FALSE );
+			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_PDF::resizeToFit > recalcul $height = ' . $height, FALSE );
 		}
 
         $widthScale = self::MAX_WIDTH / $width;
@@ -144,7 +143,7 @@ class PDF extends FPDF {
         );
     }
 
-	function PrepareImage($file)
+	protected function prepareImage($file)
 	{
 		$imagetype = exif_imagetype($file);
 		switch ($imagetype) {
@@ -169,12 +168,12 @@ class PDF extends FPDF {
 		return $path;
 	}
 
-    function AddCenteredResizedImage($img) {
-		WDGRESTAPI_Lib_Logs::log( 'PDF::AddCenteredResizedImage > $img = ' . $img, FALSE );
+    public function AddCenteredResizedImage($img) {
+		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_PDF::AddCenteredResizedImage > $img = ' . $img, FALSE );
 		
         list($width, $height) = $this->resizeToFit($img);
 
-		$imgDeinterlace =  $this->PrepareImage($img);
+		$imgDeinterlace =  $this->prepareImage($img);
 
         // you will probably want to swap the width/height
         // around depending on the page's orientation
@@ -187,98 +186,7 @@ class PDF extends FPDF {
         );
     }
 	
-	public function error($msg) {
+	public function Error($msg) {
 		throw new Exception($msg); 
-	}
-}
-
-
-class ConcatPdf extends Fpdi
-{
-    public $files = array();
-
-    public function setFiles($files)
-    {
-        $this->files = $files;
-    }
-
-    public function concat()
-    {
-        foreach($this->files AS $file) {
-
-			$file_name_exploded = explode( '.', $file );
-			$extension = strtolower( end( $file_name_exploded ) );
-			WDGRESTAPI_Lib_Logs::log( 'ConcatPdf::concat > $file = ' . $file, FALSE );
-
-			// si le fichier n'est pas un pdf, on le transforme en pdf
-			if ( $extension != 'pdf') {
-				$fileToConcat = $file_name_exploded[0] . 'pdf';
-				$imageToPdf = new PDF('L','mm','A4');
-				$imageToPdf->AddPage();
-				$imageToPdf->AddCenteredResizedImage($file );
-				$imageToPdf->Output('F', $fileToConcat);
-
-			} else {
-				$fileToConcat = $file;
-			}
-			// on ajoute toutes les pages de tous les pdf
-            $pageCount = $this->setSourceFile($fileToConcat);
-            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-                $pageId = $this->ImportPage($pageNo);
-                $s = $this->getTemplatesize($pageId);
-                $this->AddPage($s['orientation'], $s);
-                $this->useImportedPage($pageId);
-            }
-        }
-    }
-	
-	public function error($msg) {
-		throw new Exception($msg); 
-	}
-}
-
-class WDGRESTAPI_Lib_MergeKycFile {
-
-	public static function mergeKycFile( $recto, $verso, $random_filename ) {
-
-		$recto_name_exploded = explode( '.', $recto );
-		$recto_extension = strtolower( end( $recto_name_exploded ) );
-		
-		$verso_name_exploded = explode( '.', $verso );
-		$verso_extension = strtolower( end( $verso_name_exploded ) );
-
-
-		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $recto = ' . $recto, FALSE );
-		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $verso = ' . $verso, FALSE );
-		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $random_filename = ' . $random_filename, FALSE );
-		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $recto_extension = ' . $recto_extension, FALSE );
-		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeKycFile::mergeKycFile > $verso_extension = ' . $verso_extension, FALSE );
-					
-		if ($recto_extension != 'pdf' && $verso_extension  != 'pdf'){
-			// les deux fichiers sont des images	
-			try {
-				$pdf = new PDF('L','mm','A4');
-				$pdf->SetTitle('Justificatif_identite.pdf');
-				$pdf->AddPage();
-				$pdf->AddCenteredResizedImage($recto );
-				$pdf->AddPage();
-				$pdf->AddCenteredResizedImage($verso );
-				$pdf->Output('F', $random_filename);
-				return TRUE;
-			} catch(Exception $e) {
-				return $e->getMessage;
-			}
-		} else {
-			// au moins un des fichiers est un pdf			
-			try {
-				$pdf = new ConcatPdf();
-				$pdf->setFiles(array($recto, $verso));
-				$pdf->concat();	
-				$pdf->Output('F', $random_filename);
-				return TRUE;
-			} catch(Exception $e) {
-				return $e->getMessage;
-			}
-		}		
 	}
 }

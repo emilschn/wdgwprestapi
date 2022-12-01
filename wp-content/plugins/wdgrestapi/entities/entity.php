@@ -167,7 +167,7 @@ class WDGRESTAPI_Entity {
 				$this->loaded_data->id = $wpdb->insert_id;
 			}
 			if ( $wpdb->last_query !== '' ) {
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > update > $wpdb->last_query = ' . $wpdb->last_query, $this->current_entity_type );
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > insert > $wpdb->last_query = ' . $wpdb->last_query, $this->current_entity_type );
 			}
 			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity::save > insert > $result = ' . print_r( $result, TRUE ), $this->current_entity_type );
 			if ( $wpdb->last_error !== '' ) {
