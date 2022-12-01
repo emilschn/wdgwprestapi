@@ -14,7 +14,7 @@ class WDGRESTAPI_Entity_ProjectUser extends WDGRESTAPI_Entity {
 	public static function get_list_by_project_id( $id_project ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ProjectUser::$entity_type );
-		$query = "SELECT id_user, type FROM " . $table_name;
+		$query = "SELECT id_user, type, notifications FROM " . $table_name;
 		$query .= " WHERE id_project=" . $id_project;
 		$results = $wpdb->get_results( $query );
 		return $results;
@@ -28,7 +28,7 @@ class WDGRESTAPI_Entity_ProjectUser extends WDGRESTAPI_Entity {
 	public static function get_list_by_user_id( $id_user ) {
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ProjectUser::$entity_type );
-		$query = "SELECT id_project, type FROM " . $table_name;
+		$query = "SELECT id_project, type, notifications FROM " . $table_name;
 		$query .= " WHERE id_user=" . $id_user;
 		$results = $wpdb->get_results( $query );
 		return $results;
@@ -43,7 +43,7 @@ class WDGRESTAPI_Entity_ProjectUser extends WDGRESTAPI_Entity {
 	public static function remove( $id_project, $id_user, $type ) {
 		if ( !empty( $id_project ) && !empty( $id_user ) && !empty( $type ) ) {
 			global $wpdb;
-			$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_ProjectUser::$entity_type );
+			$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
 			$wpdb->delete(
 				$table_name,
 				array(
@@ -55,6 +55,23 @@ class WDGRESTAPI_Entity_ProjectUser extends WDGRESTAPI_Entity {
 		}
 	}
 
+	public static function update_link( $id_project, $id_user, $notifications ) {
+		if ( !empty( $id_project ) && !empty( $id_user ) ) {
+			global $wpdb;
+			$table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
+			return $wpdb->update(
+				$table_name,
+				array(
+					'notifications'	=> $notifications
+				),
+				array(
+					'id_project'	=> $id_project,
+					'id_user'		=> $id_user
+				)
+			);
+		}
+		return false;
+	}
 
 
 
@@ -68,7 +85,8 @@ class WDGRESTAPI_Entity_ProjectUser extends WDGRESTAPI_Entity {
 		'id'					=> array( 'type' => 'id', 'other' => 'NOT NULL AUTO_INCREMENT' ),
 		'id_project'			=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
 		'id_user'				=> array( 'type' => 'id', 'other' => 'NOT NULL' ),
-		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' )
+		'type'					=> array( 'type' => 'varchar', 'other' => 'NOT NULL' ),
+		'notifications'			=> array( 'type' => 'bool', 'other' => 'DEFAULT 1 NOT NULL' )
 	);
 	
 	// Mise à jour de la bdd

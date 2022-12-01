@@ -5,7 +5,9 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	
 	public static $file_entity_types = array( 'user', 'organization' );
 	
-	public static $document_types = array( 'id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving', 'kbis', 'status', 'capital-allocation', 'person2-doc1', 'person2-doc2', 'person3-doc1', 'person3-doc2', 'person4-doc1', 'person4-doc2', 'bank' );
+	public static $document_types = array( 'id', 'passport', 'tax', 'welfare', 'family', 'birth', 'driving', 'criminal_record', 'kbis', 'status', 'capital-allocation', 'person2-doc1', 'person2-doc2', 'person3-doc1', 'person3-doc2', 'person4-doc1', 'person4-doc2', 'bank' );
+
+	public static $avoid_send_to_lw = array( 'criminal_record' );
 
 	public static $authorized_format_list = array('pdf', 'jpg', 'jpeg', 'bmp', 'gif', 'tif', 'tiff', 'png');
 
@@ -140,6 +142,9 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				if (!$written ){
 					return 'SERVER';
 				}
+
+				$this->compress_file( $path . $random_filename );
+
 				$this->loaded_data->file_signature = md5( $this->file_data );
 				$this->loaded_data->status = 'uploaded';
 				$this->loaded_data->gateway = 'lemonway';
@@ -151,7 +156,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 					WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save error UPLOAD');
 					return 'UPLOAD';
 				}
-				if ( ( $file_size / 1024) / 1024 > 6 ) {
+				if ( ( $file_size / 1024) / 1024 > 8 ) {
 					WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save error SIZE');
 					return 'SIZE';
 				}
@@ -180,11 +185,40 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		}
 	}
 
+	private function compress_file( $file_path ) {
+		$quality = 80;
+		$info = getimagesize( $file_path );
+
+		switch ( $info['mime'] ) {
+			case 'image/jpeg':
+				$image = imagecreatefromjpeg( $file_path );
+				break;
+
+			case 'image/gif':
+				$image = imagecreatefromgif( $file_path );
+				break;
+
+			case 'image/png':
+				$image = imagecreatefrompng( $file_path );
+				break;
+		}
+
+		if ( $image ) {
+			imagejpeg( $image, $file_path, $quality );
+			$this->file_data = file_get_contents( $file_path );
+		}
+	}
+
 	/**
 	 * Envoie le fichier vers LW après l'avoir optimisé
 	 */
 	public function send_to_lw() {
 		if ( $this->loaded_data->status != 'uploaded' ) {
+			return FALSE;
+		}
+
+		// Si on ne doit pas transmettre ce type de doc à LW, on stoppe la procédure
+		if ( in_array( $this->loaded_data->doc_type, self::$avoid_send_to_lw ) ) {
 			return FALSE;
 		}
 

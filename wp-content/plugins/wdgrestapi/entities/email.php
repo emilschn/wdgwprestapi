@@ -76,7 +76,19 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 
 		// Séparation des destinataires pour transmettre à SiB
 		$list_recipients = array( 'admin@wedogood.co' );
-		$list_recipients_bcc = explode( ',', $this->loaded_data->recipient );
+		
+		if ( strpos( $this->loaded_data->recipient, ', ') !== FALSE ) {
+			$list_recipients_bcc_temp = explode( ',', $this->loaded_data->recipient );
+			$list_recipients_bcc = array();
+			foreach ( $list_recipients_bcc_temp as $recipient ) {
+				if ( strpos( $recipient, '@ ') !== FALSE ) {
+					array_push( $list_recipients_bcc, $recipient );
+				}
+			}
+		} else {
+			$list_recipients_bcc = explode( ',', $this->loaded_data->recipient );
+		}
+
 		$list_recipients_cc = array();
 		$replyto = ( empty( $options->replyto ) ) ? 'bonjour@wedogood.co' : $options->replyto;
 		$sender_name = ( empty( $options->sender_name ) ) ? 'WE DO GOOD' : $options->sender_name;

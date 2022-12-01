@@ -546,6 +546,9 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route {
 		if ( !empty( $user_id ) ) {
 			try {
 				$user_conformity_item = WDGRESTAPI_Entity_UserConformity::get_by_user_id( $user_id );
+				if ( empty( $user_conformity_item ) ) {
+					return array();
+				}
 				$loaded_data = $user_conformity_item->get_loaded_data();
 				WDGRESTAPI_Lib_Logs::log( "WDGRESTAPI_Route_User::single_get_conformity " . $user_id . " >> ". json_encode( $loaded_data ) );
 				
