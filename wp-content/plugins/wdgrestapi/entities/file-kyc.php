@@ -96,7 +96,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 		$query = "SELECT f.id FROM " .$table_name. " f";
 		if ( !empty( $entity_type ) ) {
 			$query .= " WHERE ";
-			$query .= " f.status = 'uploaded'";
+			$query .= " f.status IN ('uploaded', 'merged') ";
 			
 			if ( !empty( $entity_type ) ) {
 				if ( $entity_type === 'organization' && !empty( $organization_id ) ) {
@@ -106,7 +106,6 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				}
 			}
 		}
-		
 		$loaded_data = $wpdb->get_results( $query );
 		
 		if ( !empty( $loaded_data ) ) {
@@ -167,6 +166,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				// on ne met à jour l'update_date que si on modifie le fichier (pour le trouver dans le bon dossier)
 				$current_datetime = new DateTime();
 				$this->loaded_data->update_date = $current_datetime->format( 'Y-m-d H:i:s' );
+				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save change update_date '. $this->loaded_data->update_date . ' de '.$this->loaded_data->file_name);
 			}
 
 			// Enregistrement des informations de base de données
@@ -340,6 +340,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > pas besoin de refaire le fichier, il correspond bien aux recto et verso actuels ' , $this->current_entity_type );
 					$needMergeFile = FALSE;
 					$mergeFileName = $merge_kyc->loaded_data->file_name;
+					$mergeDateTime = $merge_kyc->loaded_data->update_date;	
 				}
 
 				if( isset($merge_kyc->loaded_data->gateway_user_id) && $merge_kyc->loaded_data->gateway_user_id != 0){
@@ -357,7 +358,10 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				$mergeFileName = $this->get_random_filename( $path, 'pdf' );
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on a besoin de concaténer 2 fichiers $mergeFileName = ' . $mergeFileName, $this->current_entity_type );
 				// on fusionne les 2 documents en un seul
-				$merge_success = WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles($recto, $verso, $this->get_relative_path() . $mergeFileName);				
+				$merge_success = WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles($recto, $verso, $this->get_relative_path() . $mergeFileName);	
+				
+				$current_datetime = new DateTime();
+				$mergeDateTime = $current_datetime->format( 'Y-m-d H:i:s' );		
 				// s'il y a eu un pb de concaténation
 				if ( $merge_success != TRUE ) {					
 					if( isset($merge_kyc) && $merge_kyc !== FALSE ) {
@@ -396,8 +400,9 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				$merge_kyc->set_property( 'file_name', $mergeFileName );
 				$merge_kyc->set_property( 'file_signature', md5( $lw_file_data ) );
 				// on ne met à jour l'update_date que si on modifie le fichier (pour le trouver dans le bon dossier)
-				$current_datetime = new DateTime();
-				$merge_kyc->set_property( 'update_date', $current_datetime->format( 'Y-m-d H:i:s' ) );
+				$merge_kyc->set_property( 'update_date', $mergeDateTime );
+				
+				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::merge_files_if_needed change update_date '. $this->loaded_data->update_date . ' de '.$this->loaded_data->file_name);
 				// on enregistre le file_signature des recto et verso en metadata du fichier mergé
 				$metadata = array();
 				$metadata[ 'recto_file_signature' ] = $recto_kyc->loaded_data->file_signature;
