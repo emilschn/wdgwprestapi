@@ -18,12 +18,16 @@ class WDGRESTAPI_Lib_MergeFiles {
 		WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles > $verso_extension = ' . $verso_extension, FALSE );
 					
 		
-		$wdgrestapi = WDGRESTAPI::instance();
+		try {
+			$wdgrestapi = WDGRESTAPI::instance();
+		} catch(Exception $e) {
+			return $e->getMessage;
+		}
 		if ($recto_extension != 'pdf' && $verso_extension  != 'pdf'){
-			$wdgrestapi->add_include_lib( 'merge-files/pdf' );
-			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles > les deux fichiers sont des images ' , FALSE );
 			// les deux fichiers sont des images	
 			try {
+				$wdgrestapi->add_include_lib( 'merge-files/pdf' );
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles > les deux fichiers sont des images ' , FALSE );
 				$pdf = new WDGRESTAPI_Lib_PDF('L','mm','A4');
 				$pdf->SetTitle('Justificatif_identite.pdf');
 				$pdf->AddPage();
@@ -36,10 +40,10 @@ class WDGRESTAPI_Lib_MergeFiles {
 				return $e->getMessage;
 			}
 		} else {
-			$wdgrestapi->add_include_lib( 'merge-files/concatPdf' );
-			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles > au moins un des fichiers est un pdf	' , FALSE );
 			// au moins un des fichiers est un pdf			
 			try {
+				$wdgrestapi->add_include_lib( 'merge-files/concatPdf' );
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles > au moins un des fichiers est un pdf	' , FALSE );
 				$pdf = new WDGRESTAPI_Lib_ConcatPdf();
 				$pdf->setFiles(array($recto, $verso));
 				$pdf->concatFiles();	

@@ -2,9 +2,12 @@
 
 use setasign\Fpdi\Fpdi;
 
-require_once('wp-content\plugins\wdgrestapi\libs\fpdf\fpdf.php');
-require_once('wp-content\plugins\wdgrestapi\libs\fpdi\src\autoload.php');
-
+if (!class_exists('FPDF')) {
+	require_once dirname(__FILE__) . '/../fpdf/fpdf.php';
+}
+if (!class_exists('Fpdi')) {
+	require_once dirname(__FILE__) . '/../fpdi/src/autoload.php';
+}
 
 class WDGRESTAPI_Lib_ConcatPdf extends Fpdi
 {
