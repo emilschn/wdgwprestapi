@@ -1,6 +1,8 @@
 <?php
 
-require_once('wp-content\plugins\wdgrestapi\libs\fpdf\fpdf.php');
+if (!class_exists('FPDF')) {
+	require_once dirname(__FILE__) . '/../fpdf/fpdf.php';
+}
 
 class WDGRESTAPI_Lib_PDF extends FPDF {
 

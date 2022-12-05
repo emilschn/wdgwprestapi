@@ -84,7 +84,7 @@ class WDGRESTAPI_Lib_Lemonway {
 	 * @param type $method_name
 	 * @param type $params
 	 * @param type $params_override
-	 * @return boolean
+	 * @return mixed
 	 */
 	public function call( $method_name, $params, $params_override = array() ) {
 		if ( defined( 'YP_LW_SKIP' ) && YP_LW_SKIP ) {

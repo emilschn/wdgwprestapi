@@ -388,11 +388,16 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 					$merge_kyc->set_property( 'file_extension', 'pdf' );
 					$merge_kyc->set_property( 'status', 'merged' );// on met un nouveau status pour indiquer que c'est un fichier mergé
 					$merge_kyc->set_property( 'gateway', 'lemonway' );
-					$merge_kyc->set_property( 'gateway_user_id', $gateway_user_id );
 				}
+				// on enregistre l'id LW dans le fichier mergé, et aussi dans le fichier d'origine (pour afficher le bon état)
+				$merge_kyc->set_property( 'gateway_user_id', $gateway_user_id );
+				$this->loaded_data->gateway_user_id = $gateway_user_id;
 				// on met à jour les informations spécifiques
 				$merge_kyc->set_property( 'file_name', $mergeFileName );
 				$merge_kyc->set_property( 'file_signature', md5( $lw_file_data ) );
+				// on ne met à jour l'update_date que si on modifie le fichier (pour le trouver dans le bon dossier)
+				$current_datetime = new DateTime();
+				$merge_kyc->set_property( 'update_date', $current_datetime->format( 'Y-m-d H:i:s' ) );
 				// on enregistre le file_signature des recto et verso en metadata du fichier mergé
 				$metadata = array();
 				$metadata[ 'recto_file_signature' ] = $recto_kyc->loaded_data->file_signature;
