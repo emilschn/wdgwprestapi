@@ -45,10 +45,14 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		
 		if ( $with_investments ) {
 			$investments_list = WDGRESTAPI_Entity_Investment::list_get( FALSE, FALSE, $buffer->id );
-			$buffer->investments = $investments_list;
+			if ( $investments_list ) {
+				$buffer->investments = $investments_list;
+			}
 			
 			$investment_drafts_list = WDGRESTAPI_Entity_InvestmentDraft::list_get( $authorized_client_id_string, $buffer->id );
-			$buffer->investment_drafts = $investment_drafts_list;
+			if ( $investment_drafts_list ) {
+				$buffer->investment_drafts = $investment_drafts_list;
+			}
 		}
 		
 		if ( $with_organization ) {
