@@ -81,7 +81,7 @@ class WDGRESTAPI_Entity_Email extends WDGRESTAPI_Entity {
 			$list_recipients_bcc_temp = explode( ',', $this->loaded_data->recipient );
 			$list_recipients_bcc = array();
 			foreach ( $list_recipients_bcc_temp as $recipient ) {
-				if ( strpos( $recipient, '@ ') !== FALSE ) {
+				if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
 					array_push( $list_recipients_bcc, $recipient );
 				}
 			}

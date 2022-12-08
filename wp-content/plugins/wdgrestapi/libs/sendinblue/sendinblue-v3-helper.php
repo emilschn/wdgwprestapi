@@ -174,29 +174,41 @@ class SIBv3Helper {
 		if ( !empty( $list_recipients ) ) {
 			$list_recipients_object = array();
 			foreach ( $list_recipients as $recipient_email ) {
-				$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailTo();
-				$recipient_item->setEmail( $recipient_email );
-				array_push( $list_recipients_object, $recipient_item );
+				if (filter_var($recipient_email, FILTER_VALIDATE_EMAIL)) {
+					$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailTo();
+					$recipient_item->setEmail( $recipient_email );
+					array_push( $list_recipients_object, $recipient_item );
+				}
 			}
-			$sendSmtpEmail->setTo( $list_recipients_object );
+			if ( count( $list_recipients_object ) > 0 ){
+				$sendSmtpEmail->setTo( $list_recipients_object );
+			}
 		}
 		if ( !empty( $list_recipients_bcc ) ) {
 			$list_recipients_bcc_object = array();
 			foreach ( $list_recipients_bcc as $recipient_email ) {
-				$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailBcc();
-				$recipient_item->setEmail( $recipient_email );
-				array_push( $list_recipients_bcc_object, $recipient_item );
+				if (filter_var($recipient_email, FILTER_VALIDATE_EMAIL)) {
+					$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailBcc();
+					$recipient_item->setEmail( $recipient_email );
+					array_push( $list_recipients_bcc_object, $recipient_item );
+				}
 			}
-			$sendSmtpEmail->setBcc( $list_recipients_bcc_object );
+			if ( count( $list_recipients_bcc_object ) > 0 ){
+				$sendSmtpEmail->setBcc( $list_recipients_bcc_object );
+			}
 		}
 		if ( !empty( $list_recipients_cc ) ) {
 			$list_recipients_cc_object = array();
 			foreach ( $list_recipients_cc as $recipient_email ) {
-				$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailCc();
-				$recipient_item->setEmail( $recipient_email );
-				array_push( $list_recipients_cc_object, $recipient_item );
+				if (filter_var($recipient_email, FILTER_VALIDATE_EMAIL)) {
+					$recipient_item = new \SendinBlue\Client\Model\SendSmtpEmailCc();
+					$recipient_item->setEmail( $recipient_email );
+					array_push( $list_recipients_cc_object, $recipient_item );
+				}
 			}
-			$sendSmtpEmail->setCc( $list_recipients_cc_object );
+			if ( count( $list_recipients_cc_object ) > 0 ){
+				$sendSmtpEmail->setCc( $list_recipients_cc_object );
+			}
 		}
 		if ( !empty( $sender ) ) {
 			$sender_object = new \SendinBlue\Client\Model\SendSmtpEmailSender();
