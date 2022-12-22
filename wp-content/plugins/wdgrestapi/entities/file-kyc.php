@@ -128,13 +128,16 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	/**
 	 * Surcharge la fonction de sauvegarde pour renommer le fichier de la bonne façon
 	 */
-	public function save() {
+	public function save( $needSendFile = TRUE ) {
 		// à chaque modification sur le fichier kyc, on envoie les infos à LW
 		if ( in_array( $this->loaded_data->doc_type, self::$document_types ) ) {
 			// Si on passe en statut 'removed', il faut supprimer l'existant
 			if ( $this->loaded_data->status == 'removed' ) {
 				$this->try_remove_current_file();
 				$this->loaded_data->file_signature = '';
+				$this->loaded_data->gateway_user_id = 0;
+				$this->loaded_data->gateway_organization_id = 0;
+				$needSendFile = FALSE; // on n'a pas besoin de l'envoyer à LW puisqu'on n'envoie pas le status
 			}
 
 			// Enregistrement du fichier à partir des données binaires
@@ -169,19 +172,22 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save change update_date '. $this->loaded_data->update_date . ' de '.$this->loaded_data->file_name);
 			}
 
-			// Enregistrement des informations de base de données
-			$this->loaded_data->gateway_user_id = 0;
-			$this->loaded_data->gateway_organization_id = 0;
-			parent::save();
 
-			// Ajout d'une tâche décalée d'envoi à LW
-			$new_queued_action = new WDGRESTAPI_Entity_QueuedAction();
-			$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
-			$new_queued_action->set_property( 'client_user_id', $current_client->ID );
-			$new_queued_action->set_property( 'priority', 'high' );
-			$new_queued_action->set_property( 'action', 'document_kyc_send_to_lemonway' );
-			$new_queued_action->set_property( 'entity_id', $this->loaded_data->id );
-			$new_queued_action->save();
+			if ( $needSendFile ){
+				$this->loaded_data->gateway_user_id = 0;
+				$this->loaded_data->gateway_organization_id = 0;
+				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save on ajoute une action pour envoyer à LW');
+				// Ajout d'une tâche décalée d'envoi à LW
+				$new_queued_action = new WDGRESTAPI_Entity_QueuedAction();
+				$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
+				$new_queued_action->set_property( 'client_user_id', $current_client->ID );
+				$new_queued_action->set_property( 'priority', 'high' );
+				$new_queued_action->set_property( 'action', 'document_kyc_send_to_lemonway' );
+				$new_queued_action->set_property( 'entity_id', $this->loaded_data->id );
+				$new_queued_action->save();
+			}
+			// Enregistrement des informations de base de données
+			parent::save();
 			
 		} else {
 			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save FALSE');
@@ -305,7 +311,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$recto_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 1);					
 			if( isset($recto_kyc) && $recto_kyc !== FALSE ) {
 				$recto = $this->get_relative_path() . $recto_kyc->loaded_data->file_name;
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on recupère le $recto = ' . $recto, $this->current_entity_type );
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on recupère le $recto = ' . $recto_kyc->loaded_data->id . ' path = ' . $recto, $this->current_entity_type );
 			}
 		} else {
 			// si c'est un recto, on essaie de récupérer le verso
@@ -314,7 +320,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$verso_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 2);	
 			if( isset($verso_kyc) && $verso_kyc !== FALSE ) {
 				$verso = $this->get_relative_path() . $verso_kyc->loaded_data->file_name;
-				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on a récupéré le $verso = ' . $verso, $this->current_entity_type );
+				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on a récupéré le $verso = ' . $verso_kyc->loaded_data->id . ' path = ' . $verso, $this->current_entity_type );
 			}			
 		}
 
@@ -354,20 +360,20 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			if ( $needMergeFile ) {
 				$wdgrestapi->add_include_lib( 'merge-files/mergeFiles' );
 				// génère un nouveau nom de fichier pour le fichier concaténé
-				$path = $this->make_path();
+				$current_datetime = new DateTime();
+				$mergeDateTime = $current_datetime->format( 'Y-m-d H:i:s' );	
+				$path = $this->make_path( $mergeDateTime );
 				$mergeFileName = $this->get_random_filename( $path, 'pdf' );
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on a besoin de concaténer 2 fichiers $mergeFileName = ' . $mergeFileName, $this->current_entity_type );
 				// on fusionne les 2 documents en un seul
 				$merge_success = WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles($recto, $verso, $this->get_relative_path() . $mergeFileName);	
-				
-				$current_datetime = new DateTime();
-				$mergeDateTime = $current_datetime->format( 'Y-m-d H:i:s' );		
+								
+				if( isset($merge_kyc) && $merge_kyc !== FALSE ) {
+					$merge_kyc->set_property( 'status', 'removed' );// on supprime l'ancien fichier qui ne correspond plus
+					$merge_kyc->save( FALSE );
+				}
 				// s'il y a eu un pb de concaténation
-				if ( $merge_success != TRUE ) {					
-					if( isset($merge_kyc) && $merge_kyc !== FALSE ) {
-						$merge_kyc->set_property( 'status', 'removed' );// on supprime l'ancien fichier qui ne correspond plus
-						$merge_kyc->save();
-					}
+				if ( $merge_success != TRUE ) {		
 					WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > merge a échoué $merge_success = ' . $merge_success, $this->current_entity_type );
 					// TODO : que faire s'il y a eu un pb de merge (hormis de loguer) ?
 					return $merge_success;
@@ -408,7 +414,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				$metadata[ 'recto_file_signature' ] = $recto_kyc->loaded_data->file_signature;
 				$metadata[ 'verso_file_signature' ] = $verso_kyc->loaded_data->file_signature;
 				$merge_kyc->set_property( 'metadata', json_encode( $metadata ) );
-				$merge_kyc->save();
+				$merge_kyc->save( FALSE ); // on enregistre ce nouveau fichier sans lui ajouter une tâche d'envoi à LW puisqu'on vient de le faire
 			}
 			
 		} else {
@@ -423,8 +429,10 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	/**
 	 * Retourne le chemin du document (chemin créé à partir de la date d'envoi)
 	 */
-	private function get_path() {
-		$datetime = new DateTime( $this->loaded_data->update_date );
+	private function get_path( $datetime = '' ) {
+		if ( $datetime == '' ) {			
+			$datetime = new DateTime( $this->loaded_data->update_date );
+		}
 		$date_str = $datetime->format( 'Y-m-d' );
 		return 'files/kyc/' . $date_str;
 	}
@@ -432,15 +440,15 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	/**
 	 * Retourne le chemin du document relativement au fichier en cours
 	 */
-	private function get_relative_path() {
-		return __DIR__. '/../' .$this->get_path(). '/';
+	private function get_relative_path( $updateDateTime = '' ) {
+		return __DIR__. '/../' .$this->get_path( $updateDateTime ). '/';
 	}
 	
 	/**
 	 * Récupère le chemin du fichier et crée les dossiers nécessaires
 	 */
-	private function make_path() {
-		$buffer = $this->get_relative_path();
+	private function make_path( $updateDateTime = '' ) {
+		$buffer = $this->get_relative_path( $updateDateTime );
 		if ( !is_dir( $buffer ) ) {
 			mkdir( $buffer, 0777, true );
 		}
