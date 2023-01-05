@@ -429,9 +429,11 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 	/**
 	 * Retourne le chemin du document (chemin créé à partir de la date d'envoi)
 	 */
-	private function get_path( $datetime = '' ) {
+	private function get_path( $datetime = '' ) {		
 		if ( $datetime == '' ) {			
 			$datetime = new DateTime( $this->loaded_data->update_date );
+		} else {
+			$datetime = new DateTime( $datetime );
 		}
 		$date_str = $datetime->format( 'Y-m-d' );
 		return 'files/kyc/' . $date_str;
