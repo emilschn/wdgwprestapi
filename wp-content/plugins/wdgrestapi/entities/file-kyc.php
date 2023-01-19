@@ -310,7 +310,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$verso = $this->get_relative_path() . $this->loaded_data->file_name;
 			$recto_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 1);					
 			if( isset($recto_kyc) && $recto_kyc !== FALSE ) {
-				$recto = $this->get_relative_path() . $recto_kyc->loaded_data->file_name;
+				$recto = $this->get_relative_path($recto_kyc->loaded_data->update_date) . $recto_kyc->loaded_data->file_name;
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on recupère le $recto = ' . $recto_kyc->loaded_data->id . ' path = ' . $recto, $this->current_entity_type );
 			}
 		} else {
@@ -319,7 +319,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			$recto = $this->get_relative_path() . $this->loaded_data->file_name;
 			$verso_kyc = self::get_single('user', $this->loaded_data->user_id, $this->loaded_data->doc_type, 2);	
 			if( isset($verso_kyc) && $verso_kyc !== FALSE ) {
-				$verso = $this->get_relative_path() . $verso_kyc->loaded_data->file_name;
+				$verso = $this->get_relative_path($verso_kyc->loaded_data->update_date) . $verso_kyc->loaded_data->file_name;
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on a récupéré le $verso = ' . $verso_kyc->loaded_data->id . ' path = ' . $verso, $this->current_entity_type );
 			}			
 		}
@@ -338,7 +338,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			if( isset($merge_kyc) && $merge_kyc !== FALSE ) {
 				// si on en a déjà un, c'est celui là qu'on envoie
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on a deja un fichier mergé enregistré ' , $this->current_entity_type );
-				$lw_file_data = file_get_contents( $this->get_relative_path() . $merge_kyc->loaded_data->file_name );
+				$lw_file_data = file_get_contents( $this->get_relative_path($merge_kyc->loaded_data->update_date) . $merge_kyc->loaded_data->file_name );
 				// on vérifie si les file_signature des recto et verso constituants le fichier mergé correspond au file_signature des fichiers actuels
 				$metadata_decoded = json_decode( $merge_kyc->loaded_data->metadata );
 				if ( $metadata_decoded->recto_file_signature == $recto_kyc->loaded_data->file_signature && $metadata_decoded->verso_file_signature == $verso_kyc->loaded_data->file_signature ){
@@ -366,7 +366,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				$mergeFileName = $this->get_random_filename( $path, 'pdf' );
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on a besoin de concaténer 2 fichiers $mergeFileName = ' . $mergeFileName, $this->current_entity_type );
 				// on fusionne les 2 documents en un seul
-				$merge_success = WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles($recto, $verso, $this->get_relative_path() . $mergeFileName);	
+				$merge_success = WDGRESTAPI_Lib_MergeFiles::mergeRectoVersoFiles($recto, $verso, $this->get_relative_path( $mergeDateTime ) . $mergeFileName);	
 								
 				if( isset($merge_kyc) && $merge_kyc !== FALSE ) {
 					$merge_kyc->set_property( 'status', 'removed' );// on supprime l'ancien fichier qui ne correspond plus
@@ -383,7 +383,7 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 			if ( $needSendFile ) {
 				// et c'est ce document qu'on envoie à LW dans le bon slot (quitte à écraser le recto envoyé précédemment)		
 				WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Entity_FileKYC::merge_files_if_needed > on envoie le fichier suivant $mergeFileName = ' . $mergeFileName, $this->current_entity_type );
-				$lw_file_data = file_get_contents( $this->get_relative_path() . $mergeFileName );
+				$lw_file_data = file_get_contents( $this->get_relative_path( $mergeDateTime ) . $mergeFileName );
 				$lw_document_id = WDGRESTAPI_Lib_Lemonway::get_lw_document_id_from_document_type( $this->loaded_data->doc_type, 1 );
 				$gateway_user_id = $lw->wallet_upload_file( $user_wallet_id, $mergeFileName, $lw_document_id, $lw_file_data );
 				// on enregistre ce document en base avec un doc_index 0
