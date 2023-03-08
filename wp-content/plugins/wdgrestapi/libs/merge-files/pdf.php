@@ -134,8 +134,8 @@ class WDGRESTAPI_Lib_PDF extends FPDF {
 			WDGRESTAPI_Lib_Logs::log( 'WDGRESTAPI_Lib_PDF::resizeToFit > recalcul $height = ' . $height, FALSE );
 		}
 
-        $widthScale = self::MAX_WIDTH / $width;
-        $heightScale = self::MAX_HEIGHT / $height;
+        $widthScale = $width > 0 ? self::MAX_WIDTH / $width : 1;
+        $heightScale = $height > 0 ? self::MAX_HEIGHT / $height : 1;
 
         $scale = min($widthScale, $heightScale);
 
