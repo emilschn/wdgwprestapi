@@ -172,10 +172,15 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save change update_date '. $this->loaded_data->update_date . ' de '.$this->loaded_data->file_name);
 			}
 
-
 			if ( $needSendFile ){
 				$this->loaded_data->gateway_user_id = 0;
 				$this->loaded_data->gateway_organization_id = 0;
+			}
+			
+			// Enregistrement des informations de base de données
+			parent::save();
+
+			if ( $needSendFile ){
 				WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save on ajoute une action pour envoyer à LW');
 				// Ajout d'une tâche décalée d'envoi à LW
 				$new_queued_action = new WDGRESTAPI_Entity_QueuedAction();
@@ -186,8 +191,6 @@ class WDGRESTAPI_Entity_FileKYC extends WDGRESTAPI_Entity {
 				$new_queued_action->set_property( 'entity_id', $this->loaded_data->id );
 				$new_queued_action->save();
 			}
-			// Enregistrement des informations de base de données
-			parent::save();
 			
 		} else {
 			WDGRESTAPI_Lib_Logs::log('WDGRESTAPI_Entity_FileKYC::save FALSE');
