@@ -548,6 +548,7 @@ WHERE status=\''. self::$status_vote .'\' OR status=\''. self::$status_collecte 
 		'estimated_turnover'	=> array( 'type' => 'varchar', 'other' => '' ),
 		'estimated_sales'		=> array( 'type' => 'varchar', 'other' => '' ),
 		'blank_contract_file'	=> array( 'type' => 'longtext', 'other' => '' ),
+		'key_info_form_version'	=> array( 'type' => 'varchar', 'other' => '' ),
 		'vote_start_datetime'	=> array( 'type' => 'datetime', 'other' => '' ),
 		'vote_end_datetime'		=> array( 'type' => 'datetime', 'other' => '' ),
 		'vote_count'			=> array( 'type' => 'int', 'other' => '' ),
