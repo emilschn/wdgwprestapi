@@ -46,7 +46,6 @@ class WDGRESTAPI_Route_Bill extends WDGRESTAPI_Route {
 		$current_client = WDG_RESTAPIUserBasicAccess_Class_Authentication::$current_client;
 		$bill_item->set_property( 'client_user_id', $current_client->ID );
 		$this->log( "WDGRESTAPI_Route_Bill::single_create", 'before save' );
-		
 		if ( $bill_item->save() ) {
 			$reloaded_data = $bill_item->get_loaded_data();
 			$this->log( "WDGRESTAPI_Route_Bill::single_create", json_encode( $reloaded_data ) );
