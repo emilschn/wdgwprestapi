@@ -87,7 +87,7 @@ class WDGRESTAPI_Entity_Bill extends WDGRESTAPI_Entity
 					"deadline" => date("Y-m-d"),
 					"line_items" => array(
 						array(
-							"vat_rate" => "FR_09",
+							"vat_rate" => "FR_200",
 							"label" => $options->itemdescription,
 							"quantity" => 1,
 							"currency_amount_before_tax" => $options->itemvalue,
