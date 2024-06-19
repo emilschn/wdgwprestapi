@@ -260,7 +260,7 @@ class WDGRESTAPI_Entity_User extends WDGRESTAPI_Entity {
 	 */
 	public function get_transactions() {
 		if ( !empty( $this->loaded_data->gateway_list ) ) {
-			return WDGRESTAPI_Entity_Transaction::list_get_by_user_id( $this->loaded_data->id, json_decode( $this->loaded_data->gateway_list ) );
+			return WDGRESTAPI_Entity_Transaction::list_get_by_user_id( $this->loaded_data->id, json_decode( $this->loaded_data->gateway_list ));
 		}
 
 		return FALSE;
