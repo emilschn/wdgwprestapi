@@ -327,7 +327,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		// Somme des montants collectés
 		//SELECT SUM(amount_collected) FROM `wdgrestapi1524_entity_project` WHERE status = 'funded' OR status = 'closed'
 		$project_table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
-		$query = 'SELECT SUM(amount_collected) AS amount FROM ' .$project_table_name . ' WHERE status=\'funded\' OR status=\'closed\' OR project.status=\'collecte\'';
+		$query = 'SELECT SUM(amount_collected) AS amount FROM ' .$project_table_name . ' WHERE status=\'funded\' OR status=\'closed\' OR status=\'collecte\'';
 		$result_amount_collected = $wpdb->get_results( $query );
 		$buffer[ 'amount_collected' ] = $result_amount_collected[ 0 ]->amount;
 
