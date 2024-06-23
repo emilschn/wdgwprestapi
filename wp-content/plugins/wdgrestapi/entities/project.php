@@ -327,7 +327,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		// Somme des montants collectés
 		//SELECT SUM(amount_collected) FROM `wdgrestapi1524_entity_project` WHERE status = 'funded' OR status = 'closed'
 		$project_table_name = WDGRESTAPI_Entity::get_table_name( self::$entity_type );
-		$query = 'SELECT SUM(amount_collected) AS amount FROM ' .$project_table_name . ' WHERE status=\'funded\' OR status=\'closed\'';
+		$query = 'SELECT SUM(amount_collected) AS amount FROM ' .$project_table_name . ' WHERE status=\'funded\' OR status=\'closed\' OR project.status=\'collecte\'';
 		$result_amount_collected = $wpdb->get_results( $query );
 		$buffer[ 'amount_collected' ] = $result_amount_collected[ 0 ]->amount;
 
@@ -338,7 +338,7 @@ class WDGRESTAPI_Entity_Project extends WDGRESTAPI_Entity {
 		$query .= ' LEFT JOIN ' .$project_table_name. ' project';
 		$query .= ' ON project.id = investment.project';
 		$query .= ' WHERE investment.status = \'publish\'';
-		$query .= ' AND (project.status=\'funded\' OR project.status=\'closed\')';
+		$query .= ' AND (project.status=\'funded\' OR project.status=\'closed\' OR project.status=\'collecte\')';
 		$result_count_investors = $wpdb->get_results( $query );
 		$buffer[ 'count_investors' ] = $result_count_investors[ 0 ]->nb_investors;
 
