@@ -13,14 +13,22 @@ class WDGRESTAPI_Route_ROI extends WDGRESTAPI_Route {
 			WP_REST_Server::READABLE,
 			array( $this, 'list_get_stats')
 		);
-		
+
+
 		WDGRESTAPI_Route::register_wdg(
 			'/roi/(?P<id>\d+)',
 			WP_REST_Server::READABLE,
 			array( $this, 'single_get'),
 			array( 'token' => array( 'default' => 0 ) )
 		);
-		
+
+		WDGRESTAPI_Route::register_wdg(
+			'/roi/latest/(?P<id>\d+)',
+			WP_REST_Server::READABLE,
+			array( $this, 'get_latest'),
+			array( 'token' => array( 'default' => 0 ) )
+		);
+
 		WDGRESTAPI_Route::register_wdg(
 			'/roi',
 			WP_REST_Server::CREATABLE,
@@ -94,6 +102,24 @@ class WDGRESTAPI_Route_ROI extends WDGRESTAPI_Route {
 		}
 	}
 	
+
+	public function get_latest(WP_REST_Request $request)
+	{
+		$user_id = $request->get_param( 'id' );
+		if ( !empty( $user_id ) ) {
+			try {
+				$declaration_items = WDGRESTAPI_Entity_ROI::get_latest($user_id);
+				return $declaration_items;				
+			} catch ( Exception $e ) {
+				$this->log( "WDGRESTAPI_Route_ROI::get_latest::" . $user_id, $e->getMessage() );
+				return new WP_Error( 'cant-get', $e->getMessage() );
+			}
+			
+		} else {
+			$this->log( "WDGRESTAPI_Route_ROI::get_latest", "404 : Invalid user id (empty)" );
+			return new WP_Error( '404', "Invalid user id (empty)" );
+		}
+	}
 	/**
 	 * Crée un ROI
 	 * @param WP_REST_Request $request
