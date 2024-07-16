@@ -46,7 +46,7 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity
 			$query .= ' LIMIT ' . $limit;
 		} else {
 			$query .= ' ORDER BY datetime DESC';
-
+			$query .= ' LIMIT 3000';
 			if (file_exists($userfilepath)) {
 				$file_mod_time = filemtime($userfilepath);
 				$time_diff = time() - $file_mod_time;
