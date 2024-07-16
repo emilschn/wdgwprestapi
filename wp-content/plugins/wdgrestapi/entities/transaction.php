@@ -40,10 +40,13 @@ class WDGRESTAPI_Entity_Transaction extends WDGRESTAPI_Entity
 		$is_legal_entity_str = $is_legal_entity ? '1' : '0';
 		global $wpdb;
 		$table_name = WDGRESTAPI_Entity::get_table_name(self::$entity_type);
-		$query = 'SELECT * FROM ' . $table_name . ' WHERE (sender_id = ' . $item_id . ' AND sender_is_legal_entity = ' . $is_legal_entity_str . ') OR (recipient_id = ' . $item_id . ' AND recipient_is_legal_entity = ' . $is_legal_entity_str . ') ORDER BY id DESC';
+		$query = 'SELECT * FROM ' . $table_name . ' WHERE (sender_id = ' . $item_id . ' AND sender_is_legal_entity = ' . $is_legal_entity_str . ') OR (recipient_id = ' . $item_id . ' AND recipient_is_legal_entity = ' . $is_legal_entity_str . ')';
 		if (!empty($limit)) {
+			$query .= ' ORDER BY datetime DESC';
 			$query .= ' LIMIT ' . $limit;
 		} else {
+			$query .= ' ORDER BY datetime DESC';
+
 			if (file_exists($userfilepath)) {
 				$file_mod_time = filemtime($userfilepath);
 				$time_diff = time() - $file_mod_time;
