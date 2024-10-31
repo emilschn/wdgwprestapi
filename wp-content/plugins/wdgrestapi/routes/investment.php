@@ -2,6 +2,8 @@
 class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 	
 	public function __construct() {
+
+
 		WDGRESTAPI_Route::register_wdg(
 			'/investments',
 			WP_REST_Server::READABLE,
@@ -41,6 +43,8 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 			array( $this, 'single_edit'),
 			$this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE )
 		);
+
+	
 	}
 	
 	public static function register() {
@@ -80,6 +84,7 @@ class WDGRESTAPI_Route_Investment extends WDGRESTAPI_Route {
 		}
 	}
 	
+
 	/**
 	 * Retourne un investissement grâce à son token
 	 * @param WP_REST_Request $request

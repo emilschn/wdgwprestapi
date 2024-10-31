@@ -498,6 +498,17 @@ WHERE status=\''. self::$status_vote .'\' OR status=\''. self::$status_collecte 
 		return WDGRESTAPI_Entity::post_data_on_client_site( 'post_project_equitearly', '', $posted_params );
 	}
 	
+	public static function get_project_name($id){
+		global $wpdb;
+		if (!isset($wpdb) || empty($id)) {
+			return array();
+		}
+
+		$table_name = WDGRESTAPI_Entity::get_table_name( WDGRESTAPI_Entity_Project::$entity_type );
+		$query = "SELECT name, status, funding_end_datetime, wpref, funding_duration, url FROM " .$table_name." where id=".$id;
+		$results = $wpdb->get_results( $query );
+		return $results[0];
+	}
 /*******************************************************************************
  * GESTION BDD
  ******************************************************************************/
