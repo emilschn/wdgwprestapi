@@ -111,6 +111,14 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route
 			array($this, 'single_get_royalties'),
 			array('id' => array('default' => 0))
 		);
+
+		WDGRESTAPI_Route::register_wdg(
+			'/user/(?P<id>\d+)/investment-royalties/(?P<id_inv>\d+)',
+			WP_REST_Server::READABLE,
+			array( $this, 'single_get_investment_royalties'),
+			array( 'id' => array( 'default' => 0 ), 'id_inv' => array( 'default' => 0 ) )
+		);
+
 	}
 
 
@@ -322,6 +330,40 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route
 	}
 
 	/**
+	 * Retourne un investissement grâce à son token
+	 * @param WP_REST_Request $request
+	 * @return \WDGRESTAPI_Entity_Project
+	 */
+	public function single_get_investment_royalties(WP_REST_Request $request)
+	{
+		$investment_id = $request->get_param('id_inv');
+		$user_id = $request->get_param('id');
+
+		if (!empty($investment_id)) {
+			try {
+				$user = new WDGRESTAPI_Entity_User($user_id);
+				$loaded_data = $user->get_loaded_data();
+				if (!empty($loaded_data) && $this->is_data_for_current_client($loaded_data)) {
+					$royalties = $user->get_investment_royalties($investment_id);
+					return $royalties;
+
+				} else {
+					$this->log("WDGRESTAPI_Route_Investment::single_get::" . $investment_id, "404 : Invalid investment token");
+					return new WP_Error('404', "Invalid investment token");
+
+				}
+
+			} catch (Exception $e) {
+				$this->log("WDGRESTAPI_Route_Investment::single_get::" . $investment_id, $e->getMessage());
+				return new WP_Error('cant-get', $e->getMessage());
+			}
+
+		} else {
+			$this->log("WDGRESTAPI_Route_Investment::single_get", "404 : Invalid investment token (empty)");
+			return new WP_Error('404', "Invalid investment token (empty)");
+		}
+	}
+	/**
 	 * Edite un utilisateur spécifique
 	 * @param WP_REST_Request $request
 	 * @return \WP_Error
@@ -361,7 +403,7 @@ class WDGRESTAPI_Route_User extends WDGRESTAPI_Route
 
 				if (!empty($loaded_data) && $this->is_data_for_current_client($loaded_data)) {
 					$input_sort = filter_input(INPUT_GET, 'sort');
-					$investments_data = $user_item->get_investments($input_sort);
+					$investments_data = $user_item->get_investments_new($input_sort);
 					return $investments_data;
 
 				} else {
